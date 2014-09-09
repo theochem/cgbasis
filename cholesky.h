@@ -23,10 +23,16 @@
 
 #include <vector>
 #include "gbw.h"
+
+#ifdef CBLAS_C
 extern "C"
 {
-           #include <cblas.h>
+    #include CBLAS_C
 }
+#endif
+#ifdef CBLAS_CPP
+    #include CBLAS_CPP
+#endif
 
 
 long cholesky(GB4IntegralWrapper* gbw4, double** uninit_result, double threshold);
