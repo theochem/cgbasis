@@ -3,6 +3,7 @@ GBasis
 [![Build Status](https://travis-ci.org/theochem/gbasis.svg?branch=master)](https://travis-ci.org/theochem/gbasis)
 <a href='https://docs.python.org/2.7/'><img src='https://img.shields.io/badge/python-2.7-blue.svg'></a>
 <a href='https://docs.python.org/3.5/'><img src='https://img.shields.io/badge/python-3.5-blue.svg'></a>
+[![codecov](https://codecov.io/gh/theochem/gbasis/branch/master/graph/badge.svg)](https://codecov.io/gh/theochem/gbasis)
 
 
 About
