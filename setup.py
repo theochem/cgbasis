@@ -18,7 +18,7 @@ def get_version():
     This function assumes that the last line in the file contains a variable defining the
     version string with single quotes.
     """
-    with open('meanfield/version.py', 'r') as f:
+    with open('gbasis/version.py', 'r') as f:
         return f.read().split('=')[-1].replace('\'', '').strip()
 
 
