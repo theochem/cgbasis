@@ -13,7 +13,7 @@ env:
     - GITHUB_REPO_NAME=theochem/gbasis
     - PROJECT_NAME=gbasis
     - CONDA_PKG_NAME_PY=gbasis
-    - INPLACE_INC=-I${HOME}/miniconda/include/libint2
+    - CPATH=${HOME}/miniconda/include/libint2
 
 # TEMPLATED FROM https://raw.githubusercontent.com/theochem/python-cython-ci-example/download_template/.travis.yml
 ####
