@@ -52,5 +52,5 @@ setup(
     ],
     zip_safe=False,
     setup_requires=['numpy>=1.0', 'cython>=0.24.1'],
-    install_requires=['numpy>=1.0', 'nose>=0.11', 'cython>=0.24.1']    
+    install_requires=['numpy>=1.0', 'nose>=0.11', 'cython>=0.24.1']
 )
