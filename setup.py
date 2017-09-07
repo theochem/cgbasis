@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import glob
 import Cython.Build
 import numpy as np
 from setuptools import setup, Extension
@@ -35,6 +36,7 @@ setup(
         sources=["gbasis/cext.pyx"] + glob.glob("gbasis/*.cpp"),
         depends=glob.glob("gbasis/*.h") + glob.glob("gbasis/*.h"),
         include_dirs=[np.get_include()],
+        language="c++",
         ),
     ],
     include_package_data=True,

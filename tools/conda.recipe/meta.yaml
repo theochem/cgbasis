@@ -1,5 +1,5 @@
 package:
-  version: "{{ load_setup_py_data().version }}"
+  version: "{{ PROJECT_VERSION }}"
   name: 'gbasis'
 
 source:
@@ -7,7 +7,6 @@ source:
 
 build:
   number: 0
-  script: ./tools/libs/install_libint-2.0.3.sh; python setup.py install
 
 requirements:
   build:
@@ -17,11 +16,15 @@ requirements:
     - cython >=0.24.1
     - setuptools
     - nose
+    - libint
+    - gcc
   run:
     - python
     - numpy
     - scipy
     - nose
+    - libint
+    - libgcc
 
 about:
   home: https://github.com/theochem/gbasis
