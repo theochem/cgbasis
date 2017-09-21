@@ -1,10 +1,11 @@
 GBasis
 ======
-[![Build Status](https://travis-ci.org/theochem/gbasis.svg?branch=master)](https://travis-ci.org/theochem/gbasis)
-<a href='https://docs.python.org/2.7/'><img src='https://img.shields.io/badge/python-2.7-blue.svg'></a>
-<a href='https://docs.python.org/3.5/'><img src='https://img.shields.io/badge/python-3.5-blue.svg'></a>
-[![codecov](https://codecov.io/gh/theochem/gbasis/branch/master/graph/badge.svg)](https://codecov.io/gh/theochem/gbasis)
-
+|Travis|
+|Conda|
+|Pypi|
+|Codecov|
+|Version|
+|CondaVersion|
 
 About
 -----
@@ -46,3 +47,15 @@ To run tests:
 ```bash
 nosetests -v gbasis
 ```
+
+.. |Travis| image:: https://travis-ci.org/theochem/gbasis.svg?branch=master
+    :target: https://travis-ci.org/theochem/gbasis
+.. |Version| image:: https://img.shields.io/pypi/pyversions/gbasis.svg
+.. |Pypi| image:: https://img.shields.io/pypi/v/gbasis.svg
+    :target: https://pypi.python.org/pypi/gbasis/0.1.3
+.. |Codecov| image:: https://img.shields.io/codecov/c/github/theochem/gbasis/master.svg
+    :target: https://codecov.io/gh/theochem/gbasis
+.. |Conda| image:: https://img.shields.io/conda/v/theochem/gbasis.svg
+    :target: https://anaconda.org/theochem/gbasis
+.. |CondaVersion| image:: https://img.shields.io/conda/pn/theochem/gbasis.svg
+    :target: https://anaconda.org/theochem/gbasis
