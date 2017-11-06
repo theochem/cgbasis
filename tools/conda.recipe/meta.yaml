@@ -17,14 +17,14 @@ requirements:
     - setuptools
     - nose
     - libint
-    - gcc
+    - {{ compiler('c') }}
+    - {{ compiler('cxx') }}
   run:
     - python
     - numpy
     - scipy
     - nose
     - libint
-    - libgcc
 
 about:
   home: https://github.com/theochem/gbasis
