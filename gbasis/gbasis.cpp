@@ -28,8 +28,8 @@
 #include <cstdlib>
 #include <stdexcept>
 #include <cstring>
-#include "gbasis.h"
-#include "iter_gb.h"
+#include "gbasis.hpp"
+#include "iter_gb.hpp"
 
 using std::abs;
 

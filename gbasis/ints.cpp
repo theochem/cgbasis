@@ -22,9 +22,9 @@
 #include <cstdlib>
 #include <cstring>
 #include <stdexcept>
-#include "boys.h"
-#include "cartpure.h"
-#include "ints.h"
+#include "boys.hpp"
+#include "cartpure.hpp"
+#include "ints.hpp"
 
 using std::abs;
 

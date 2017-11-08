@@ -28,9 +28,9 @@
 #include <cstdlib>
 #include <cstring>
 #include <stdexcept>
-#include "boys.h"
-#include "cartpure.h"
-#include "fns.h"
+#include "boys.hpp"
+#include "cartpure.hpp"
+#include "fns.hpp"
 
 /*
 

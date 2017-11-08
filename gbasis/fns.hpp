@@ -21,15 +21,15 @@
 // UPDATELIBDOCTITLE: Evaluate functions on grids and derive Fock matrices from potentials on grids.
 
 /**
-    @file fns.h
+    @file fns.hpp
     @brief Evaluate functions on grids and derive Fock matrices from potentials on grids.
 
     Functions on grid points are calculated in three steps, which are controlled by
-    methods in the GBasis class in gbasis.h. Also code is shared with the Fock build from
+    methods in the GBasis class in gbasis.hpp. Also code is shared with the Fock build from
     potentials on grids.
 
     GB1GridFn functions require only a single loop to compute properties of basis
-    functions. See following methods in gbasis.h:
+    functions. See following methods in gbasis.hpp:
 
         GOBasis::compute_grid1_exp
         GOBasis::compute_grid1_dm
@@ -37,7 +37,7 @@
         GOBasis::compute_grid_point1 (called by the previous three)
 
     GB2GridFn functions requires double loop to compute properties of basis pairs of basis
-    functions. See following methods in gbasis.h:
+    functions. See following methods in gbasis.hpp:
 
         GOBasis::compute_grid2_dm
         GOBasis::compute_grid_point2 (called by compute_grid2_dm)
@@ -119,9 +119,9 @@
 #ifndef GBASIS_FNS_H_
 #define GBASIS_FNS_H_
 
-#include "calc.h"
-#include "common.h"
-#include "iter_pow.h"
+#include "calc.hpp"
+#include "common.hpp"
+#include "iter_pow.hpp"
 
 /** @brief
       Base class for grid calculators that require only a single loop over all basis

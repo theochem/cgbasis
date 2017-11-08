@@ -27,8 +27,8 @@
 
 #include <cstring>
 #include <stdexcept>
-#include "common.h"
-#include "cartpure.h"
+#include "common.hpp"
+#include "cartpure.hpp"
 
 typedef struct {
   int ipure, icart;

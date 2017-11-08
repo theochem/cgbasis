@@ -19,7 +19,7 @@
 //--
 
 
-#include "gbw.h"
+#include "gbw.hpp"
 
 GB4IntegralWrapper::GB4IntegralWrapper(GOBasis *gobasis, GB4Integral *gb4int)
     : gobasis(gobasis), gb4int(gb4int), ishell0(-1), ishell2(-1), begin0(-1),

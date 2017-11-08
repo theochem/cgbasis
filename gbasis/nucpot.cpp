@@ -20,7 +20,7 @@
 
 
 #include <cmath>
-#include "nucpot.h"
+#include "nucpot.hpp"
 
 void compute_grid_nucpot(double *coordinates, double *charges, long natom,
                          double *points, double *output, long npoint) {

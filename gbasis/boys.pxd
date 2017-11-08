@@ -20,6 +20,6 @@
 # --
 
 
-cdef extern from "boys.h":
+cdef extern from "boys.hpp":
     double boys_function(long m, double t) except +
     void boys_function_array(long mmax, double t, double *output) except +
