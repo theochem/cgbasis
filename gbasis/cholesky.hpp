@@ -24,7 +24,7 @@
 #define GBASIS_CHOLESKY_H_
 
 #include <vector>
-#include "gbw.h"
+#include "gbw.hpp"
 
 /**
     @brief
@@ -36,7 +36,7 @@
     four-center work like that.)
 
     @param gbw4
-        A wrapper around a definition of the 4-center integral. See gbw.h
+        A wrapper around a definition of the 4-center integral. See gbw.hpp
 
     @param vectors
         An output pointer. The Cholesky vectors will be added to this std::vector.

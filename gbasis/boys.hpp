@@ -23,7 +23,7 @@
 #ifndef GBASIS_BOYS_H_
 #define GBASIS_BOYS_H_
 
-#include "common.h"
+#include "common.hpp"
 
 #define BOYS_MAX_M 4*MAX_SHELL_TYPE
 

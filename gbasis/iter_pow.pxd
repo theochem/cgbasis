@@ -20,7 +20,7 @@
 # --
 
 
-cdef extern from "iter_pow.h":
+cdef extern from "iter_pow.hpp":
     bint iter_pow1_inc(long* n)
 
     cdef cppclass IterPow1:

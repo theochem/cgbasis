@@ -21,8 +21,8 @@
 
 #include <cstdlib>
 #include <cstring>
-#include "common.h"
-#include "iter_gb.h"
+#include "common.hpp"
+#include "iter_gb.hpp"
 
 IterGB1::IterGB1(GBasis *gbasis)
     : gbasis(gbasis), basis_offsets(gbasis->get_basis_offsets()),

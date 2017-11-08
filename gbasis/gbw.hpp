@@ -23,8 +23,8 @@
 #ifndef GBASIS_GBW_H_
 #define GBASIS_GBW_H_
 
-#include "gbasis.h"
-#include "ints.h"
+#include "gbasis.hpp"
+#include "ints.hpp"
 
 /**
     @brief

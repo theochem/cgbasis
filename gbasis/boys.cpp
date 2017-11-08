@@ -21,7 +21,7 @@
 
 #include <cmath>
 #include <stdexcept>
-#include "boys.h"
+#include "boys.hpp"
 
 
 // The static arrays in boys_inc.cpp are pre-computed to full precision with

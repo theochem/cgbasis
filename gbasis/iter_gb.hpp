@@ -23,7 +23,7 @@
 #ifndef GBASIS_ITER_GB_H_
 #define GBASIS_ITER_GB_H_
 
-#include "gbasis.h"
+#include "gbasis.hpp"
 
 class IterGB1 {
  private:

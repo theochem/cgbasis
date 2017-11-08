@@ -22,7 +22,7 @@
 
 cimport gbasis
 
-cdef extern from "iter_gb.h":
+cdef extern from "iter_gb.hpp":
     cdef cppclass IterGB1:
         IterGB1(gbasis.GBasis* gbasis)
 

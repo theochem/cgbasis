@@ -19,7 +19,7 @@
 //--
 
 
-#include "iter_pow.h"
+#include "iter_pow.hpp"
 
 int iter_pow1_inc(long *n) {
   // Modify the indexes in place as to move to the next combination of powers

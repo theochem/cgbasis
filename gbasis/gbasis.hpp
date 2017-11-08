@@ -23,8 +23,8 @@
 #ifndef GBASIS_GBASIS_H_
 #define GBASIS_GBASIS_H_
 
-#include "ints.h"
-#include "fns.h"
+#include "ints.hpp"
+#include "fns.hpp"
 
 const double gob_cart_normalization(const double alpha, const long *n);
 

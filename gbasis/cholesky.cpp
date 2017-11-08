@@ -22,7 +22,7 @@
 #include <cstring>
 #include <cmath>
 #include <stdexcept>
-#include "cholesky.h"
+#include "cholesky.hpp"
 
 /**
     Find the maximum diagonal error, used several times in the cholesky routine.

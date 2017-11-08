@@ -21,7 +21,7 @@
 cimport gbasis
 cimport ints
 
-cdef extern from "gbw.h":
+cdef extern from "gbw.hpp":
     cdef cppclass GB4IntegralWrapper:
         GB4IntegralWrapper(gbasis.GOBasis* gobasis, ints.GB4Integral* gb4int)
         long get_nbasis()

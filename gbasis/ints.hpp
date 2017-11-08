@@ -24,8 +24,8 @@
 #define GBASIS_INTS_H_
 
 #include "libint2.h"
-#include "calc.h"
-#include "iter_pow.h"
+#include "calc.hpp"
+#include "iter_pow.hpp"
 
 class GB2Integral : public GBCalculator {
  protected:

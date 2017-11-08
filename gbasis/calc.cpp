@@ -23,8 +23,8 @@
 #include <cmath>
 #include <cstdlib>
 #include <stdexcept>
-#include "calc.h"
-#include "common.h"
+#include "calc.hpp"
+#include "common.hpp"
 
 GBCalculator::GBCalculator(long max_shell_type, long dim_work, int basis_work)
     : max_shell_type(max_shell_type), work_pure(NULL), work_cart(NULL) {
