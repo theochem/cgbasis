@@ -25,7 +25,7 @@
 
 #include "libint2.h"
 #include "calc.hpp"
-#include "iter_pow.hpppp"
+#include "iter_pow.hpp"
 
 class GB2Integral : public GBCalculator {
  protected:

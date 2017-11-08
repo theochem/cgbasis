@@ -22,5 +22,5 @@ from libcpp.vector cimport vector
 
 cimport gbw
 
-cdef extern from "cholesky.hpppp":
+cdef extern from "cholesky.hpp":
     long cholesky(gbw.GB4IntegralWrapper* gbw4, vector[double]* vectors, double threshold)
