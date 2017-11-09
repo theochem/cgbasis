@@ -17,7 +17,7 @@ def get_version():
 
 
 def get_cxxflags():
-    """If the CXXFLAGS variable is defined (clang/osx) then get it"""
+    """If the CXXFLAGS variable is defined (clang/osx) then get it."""
     return os.environ.get("CXXFLAGS", "").split()
 
 
