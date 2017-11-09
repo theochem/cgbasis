@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import os
 import glob
 import Cython.Build
 import numpy as np
@@ -13,6 +14,11 @@ def get_version():
     """
     with open('gbasis/version.py', 'r') as f:
         return f.read().split('=')[-1].replace('\'', '').strip()
+
+
+def get_cxxflags():
+    """If the CXXFLAGS variable is defined (clang/osx) then get it"""
+    return os.environ.get("CXXFLAGS", "").split()
 
 
 def get_readme():
@@ -37,6 +43,7 @@ setup(
         depends=glob.glob("gbasis/*.h") + glob.glob("gbasis/*.h"),
         include_dirs=[np.get_include()],
         libraries=["int2"],
+        extra_compile_args=get_cxxflags(),
         language="c++",
         ),
     ],
