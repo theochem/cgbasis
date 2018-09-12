@@ -28,6 +28,8 @@ from contextlib import contextmanager
 import numpy as np
 from os import path
 
+import pkg_resources
+
 from . import gobasis_data as gdata
 from . import mol_data as mdata
 from .. import gobasis
@@ -121,18 +123,12 @@ def check_delta(fun, fun_deriv, x, dxs):
 
 
 def _compose_fn(subpath, fn, ext=".npy"):
-    cur_pth = path.split(__file__)[0]
-    pth = cur_pth + "/cached/{}/{}{}".format(fn, subpath, ext)
-    return np.load(pth).astype(np.float64)
+    pkg_resources.resource_filename("gbasis.test.cached", fn)
+    return np.load(f"{subpath}{ext}").astype(np.float64)
 
 
 def load_json(fn):
     return _compose_fn("er", fn)
-    # cur_pth = path.split(__file__)[0]
-    # pth = cur_pth + "/cached/json/{}".format(fn)
-    # with open(pth) as fh:
-    #     a = np.array(json.load(fh))
-    # return a
 
 
 def load_quad(fn):

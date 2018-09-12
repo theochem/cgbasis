@@ -19,8 +19,6 @@
 #
 # --
 """C++ extensions"""
-
-
 import numpy as np
 cimport numpy as np
 np.import_array()
@@ -28,6 +26,8 @@ np.import_array()
 cimport libc.string
 from libcpp.vector cimport vector
 from cython.operator cimport dereference as deref
+
+from numpy_wrapper cimport PyArray_ENABLEFLAGS
 
 cimport boys
 cimport cartpure
@@ -971,9 +971,6 @@ cdef class GOBasis(GBasis):
         cdef vector[double]* vectors = NULL
         cdef np.npy_intp dims[3]
         cdef np.ndarray result
-
-        cdef extern from "numpy/arrayobject.h":
-            void PyArray_ENABLEFLAGS(np.ndarray arr, int flags)
 
         try:
             gb4w = new gbw.GB4IntegralWrapper(<gbasis.GOBasis*> self._this,

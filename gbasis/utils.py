@@ -23,6 +23,7 @@
 
 from os import path
 import numpy as np
+import pkg_resources
 
 
 def typecheck_geo(coordinates=None, numbers=None, pseudo_numbers=None,
@@ -106,6 +107,4 @@ def typecheck_geo(coordinates=None, numbers=None, pseudo_numbers=None,
 
 
 def to_basis_path(fn):
-    cur_pth = path.split(__file__)[0]
-    pth = cur_pth + "/bsets/{}".format(fn)
-    return pth
+    return pkg_resources.resource_filename("gbasis.bsets", fn)
