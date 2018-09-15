@@ -1,7 +1,7 @@
 env:
   matrix:
-  - MYCONDAPY=3.5
   - MYCONDAPY=3.6
+  - MYCONDAPY=3.7
   global:
     # ANACONDA_TOKEN
     - secure: "ZEez6ZLVYwitgGRiq1Z4QZLve/gH7Lgj7SoLqB93gfmJ8pK9wD4lf0l6hYnviEKFAP5TCmc2Y5HoPT4C9YtP4oFE9xdTD9kTYLkDb9/6PsP/bCDwOeLmqoBqjmqvhpMPMF/idLOH81lyuecedoxaQjK8Gf8Ybesz3p1X1FlDrJgrcTtvPpz9uhHQXwb7otZbsc6He+YWdKrZy8PiBidmP3rK3SZvSPBmk5nrgfWsP1fnE27RfbVwABZ6txE8ns9ceHXdjIoxScnF5OlxLMOaobNgRuk4IB5yZMQNgEFPfzklKZAlmeTLVKHMbywTN7+KO64Tqu02pg6SJm3bSTFircticELbz9bgu5W8Dw7TghU9X+IPYrCsL7Fk67Rwk4dMFfZRaJ7BsnSLJCWYlDcu8GQWZvZI7jM8zDde3Z78zYY5Jhk981OI4AtLgW1STrdikXJWMEV+e4YaDI5vlT+FGt7FNcc9MxgNiHq/TpejTStiVFHKzDiGKu5hvzzpxZXdqKlonjac2Ajkju7CXmcQk3QjLhGBdu1WdzaOEV/D3QjkrwRv5RP8twenYtTWxHpu77UsBAJc9LACoYPodyd4wccIYlkl/hcBhAMw44k39DCcAz7FyYjjsG3hNi1QK2fR8u8VXbElEp8CSb1kV5YsbM1vemgCDMEgwxy3EKlyolk="
@@ -108,7 +108,7 @@ install:
 - conda render -f tools/conda.recipe/rendered.yaml tools/conda.recipe
 - CONDA_DEPENDENCIES=$(python -c "from yaml import load;
     req1 = load(open('tools/conda.recipe/rendered.yaml'))['requirements'];
-    deps = req1['build'] + req1['run'];
+    deps = req1['build'] + req1['run'] + req1['host'];
     print(' '.join(set(dep.split()[0] for dep in deps)))")
 
 # Get the right python version for building. This only does something for 3.5.
@@ -136,10 +136,7 @@ script:
 # Unit tests and dynamic linting
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 - if [[ $TRAVIS_TAG ]]; then
-    conda build -q tools/conda.recipe &&
-    conda install --use-local ${CONDA_PKG_NAME_PY} &&
-    (cd; nosetests ${PROJECT_NAME} -v --detailed-errors) &&
-    conda uninstall ${CONDA_PKG_NAME_PY};
+    conda build -q tools/conda.recipe; 
   else
     python setup.py build_ext -i --define CYTHON_TRACE_NOGIL &&
     nosetests ${PROJECT_NAME}

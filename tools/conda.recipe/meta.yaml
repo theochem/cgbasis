@@ -10,24 +10,27 @@ build:
 
 requirements:
   build:
-    - python >=3
-    - numpy
-    - scipy
-    - cython >=0.24.1
-    - setuptools
-    - nose
-    - libint
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
+  host:
+    - python >=3
+    - libint 
+    - cython >=0.24.1
+    - numpy
+    - setuptools
+    - nose
   run:
     - python >=3
     - numpy
     - scipy
     - nose
     - libint
-  test:
-    commands:
-      - conda inspect linkages gbasis
+test:
+  requires:
+    - nose
+  commands:
+    - nosetests -v --detailed-errors gbasis
+    - conda inspect linkages gbasis
 
 about:
   home: https://github.com/theochem/gbasis

@@ -20,7 +20,7 @@
 # --
 
 """Utilities for unit tests"""
-
+import os
 import shutil
 import tempfile
 from contextlib import contextmanager
@@ -123,8 +123,8 @@ def check_delta(fun, fun_deriv, x, dxs):
 
 
 def _compose_fn(subpath, fn, ext=".npy"):
-    pkg_resources.resource_filename("gbasis.test.cached", fn)
-    return np.load(f"{subpath}{ext}").astype(np.float64)
+    full_path = pkg_resources.resource_filename("gbasis.test.cached", fn)
+    return np.load(os.path.join(full_path, f"{subpath}{ext}")).astype(np.float64)
 
 
 def load_json(fn):

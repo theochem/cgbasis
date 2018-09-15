@@ -35,7 +35,9 @@ setup(
     author_email="Toon.Verstraelen@UGent.be",
     url="https://github.com/theochem/gbasis",
     package_dir={"gbasis": "gbasis"},
-    packages=["gbasis", "gbasis.test"],
+    packages=["gbasis", "gbasis.test", "gbasis.bsets", "gbasis.test.cached"],
+    package_data={"gbasis.bsets": ["*"],
+                  "gbasis.test.cached": ["*/*"]},
     cmdclass={"build_ext": Cython.Build.build_ext},
     ext_modules=[Extension(
         "gbasis.cext",

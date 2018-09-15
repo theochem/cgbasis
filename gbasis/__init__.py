@@ -21,6 +21,7 @@
 """Gaussian basis sets"""
 
 
-from .cext import *
-from .gobasis import *
-from .iobas import *
+from gbasis.cext import *
+from gbasis.gobasis import *
+from gbasis.iobas import *
+from gbasis.bsets import *
