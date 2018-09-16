@@ -25,7 +25,6 @@ language: generic
 os:
   - linux
   - osx
-osx_image: xcode8.3
 dist: trusty
 sudo: false
 
@@ -113,11 +112,14 @@ install:
 
 # Get the right python version for building. This only does something for 3.5.
 # Install extra package needed to make things work. Most things can be listed as
-# dependencies on metal.yaml and setup.py, unless setup.py already imports them.
+# dependencies on meta.yaml and setup.py, unless setup.py already imports them.
 # Install conda tools for packaging and uploading
-- conda install -q python=${MYCONDAPY} anaconda-client ${CONDA_DEPENDENCIES}
-# Install more recent stuff with pip
-- pip install --upgrade pylint codecov coverage pycodestyle pydocstyle
+- conda install -q python=${MYCONDAPY} anaconda-client numpy setuptools cython
+- export CONDA_PY=${MYCONDAPY//./}
+- if ! [[ $TRAVIS_TAG ]]; then
+    conda install -q ${CONDA_DEPENDENCIES};
+    pip install --upgrade pylint codecov coverage pycodestyle pydocstyle;
+  fi
 # Show conda info for debugging
 - conda info -a
 
@@ -136,7 +138,7 @@ script:
 # Unit tests and dynamic linting
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 - if [[ $TRAVIS_TAG ]]; then
-    conda build -q tools/conda.recipe; 
+    conda build -q tools/conda.recipe;
   else
     python setup.py build_ext -i --define CYTHON_TRACE_NOGIL &&
     nosetests ${PROJECT_NAME}
@@ -184,7 +186,7 @@ deploy:
   on:
     repo: ${GITHUB_REPO_NAME}
     tags: true
-    condition: "$MYCONDAPY == 2.7 && $TRAVIS_OS_NAME == linux && $TRAVIS_TAG == *[ab]*"
+    condition: "$MYCONDAPY == 3.6 && $TRAVIS_OS_NAME == linux && $TRAVIS_TAG == *[ab]*"
   prerelease: true
 
 - provider: releases
@@ -194,7 +196,7 @@ deploy:
   on:
     repo: ${GITHUB_REPO_NAME}
     tags: true
-    condition: "$MYCONDAPY == 2.7 && $TRAVIS_OS_NAME == linux && $TRAVIS_TAG != *[ab]*"
+    condition: "$MYCONDAPY == 3.6 && $TRAVIS_OS_NAME == linux && $TRAVIS_TAG != *[ab]*"
   prerelease: false
 
 - provider: script
@@ -211,7 +213,7 @@ deploy:
   on:
     repo: ${GITHUB_REPO_NAME}
     tags: true
-    condition: "$TRAVIS_TAG != *[ab]* && $MYCONDAPY == 2.7 && $TRAVIS_OS_NAME == linux"
+    condition: "$TRAVIS_TAG != *[ab]* && $MYCONDAPY == 3.6 && $TRAVIS_OS_NAME == linux"
 
 - provider: pages
   skip_cleanup: true
@@ -220,5 +222,5 @@ deploy:
   local_dir: doc/_build/html
   on:
     repo: ${GITHUB_REPO_NAME}
-    condition: "-e doc && $TRAVIS_TAG != *[ab]* && $MYCONDAPY == 2.7 && $TRAVIS_OS_NAME == linux"
+    condition: "-e doc && $TRAVIS_TAG != *[ab]* && $MYCONDAPY == 3.6 && $TRAVIS_OS_NAME == linux"
     tags: true
