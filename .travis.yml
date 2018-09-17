@@ -137,7 +137,6 @@ script:
 # Unit tests and dynamic linting
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 - if [[ $TRAVIS_TAG ]]; then
-    export CONDA_PY=${MYCONDAPY//./};
     conda build -q tools/conda.recipe;
   else
     python setup.py build_ext -i --define CYTHON_TRACE_NOGIL &&

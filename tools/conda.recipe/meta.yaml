@@ -13,7 +13,7 @@ requirements:
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
   host:
-    - python >=3
+    - python ={{ MYCONDAPY }}
     - libint 
     - cython >=0.24.1
     - numpy
