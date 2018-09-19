@@ -30,8 +30,8 @@ Installation (from Conda)
 
 To install GBasis:
 
-```bash
-conda -c theochem install gbasis
+```
+$ conda -c theochem install gbasis
 ```
 
 Installation (from source)
@@ -45,8 +45,8 @@ emulate the travis build environment.
 
 From project root, issue some variation of:
 
-```bash
-PROJECT_VERSION=0.0.0 MYCONDAPY=3.7 conda-build tools/conda.recipe/meta.yaml
+```
+$ PROJECT_VERSION=0.0.0 MYCONDAPY=3.7 conda-build tools/conda.recipe/meta.yaml
 ```
 
 Installation (manual)
@@ -72,8 +72,8 @@ Testing
 The tests are automatically run when building with conda, but you may try
 them again on your own machine:
 
-```bash
-nosetests -v gbasis
+```
+$ nosetests -v gbasis
 ```
 
 .. |Travis| image:: https://travis-ci.org/theochem/gbasis.svg?branch=master
