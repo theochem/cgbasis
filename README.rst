@@ -9,7 +9,7 @@ GBasis
 
 About
 -----
-
+GBasis is a HORTON3 package for calculating Gaussian Basis integrals.
 
 License
 -------
@@ -20,29 +20,57 @@ GBasis is distributed under GPL License version 3 (GPLv3).
 Dependencies
 ------------
 
-The following dependencies will be necessary for GBasis to build properly,
+Gbasis (like all HORTON3 packages) is built using conda:
 
-* Python >= 2.7, >= 3.5: http://www.python.org/
-* SciPy >= 0.11.0: http://www.scipy.org/
-* NumPy >= 1.9.1: http://www.numpy.org/
-* Nosetests >= 1.1.2: http://readthedocs.org/docs/nose/en/latest/
+It is provided in the conda **theochem** channel.
 
 
-Installation
-------------
+Installation (from Conda)
+-------------------------
 
 To install GBasis:
 
 ```bash
-./tools/libs/install_libint-2.0.3.sh
-python ./setup install --user
+conda -c theochem install gbasis
 ```
+
+Installation (from source)
+--------------------------
+
+If you wish to build from source, you will need the **conda-build** package
+to build it.
+
+You must set the PROJECT_VERSION and MYCONDAPY environmental variables to
+emulate the travis build environment.
+
+From project root, issue some variation of:
+
+```bash
+PROJECT_VERSION=0.0.0 MYCONDAPY=3.7 conda-build tools/conda.recipe/meta.yaml
+```
+
+Installation (manual)
+---------------------
+
+Advanced developers may build by hand using the dependencies listed below,
+but the procedure is entirely unsupported. You are responsible for setting
+the proper flags to find headers and linking.
+
+The following dependencies will be necessary for GBasis to build properly,
+
+* Python >= 3.6
+* SciPy >= 0.11.0
+* NumPy >= 1.9.1
+* Nosetests >= 1.1.2
+* Libint = 2.0.3
+* gcc/clang with C++ 1x support
 
 
 Testing
 -------
 
-To run tests:
+The tests are automatically run when building with conda, but you may try
+them again on your own machine:
 
 ```bash
 nosetests -v gbasis

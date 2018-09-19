@@ -8,12 +8,8 @@ from setuptools import setup, Extension
 
 
 def get_version():
-    """Load the version from version.py, without importing it.
-    This function assumes that the last line in the file contains a variable defining the
-    version string with single quotes.
-    """
-    with open('gbasis/version.py', 'r') as f:
-        return f.read().split('=')[-1].replace('\'', '').strip()
+    """Get the version string set by Travis, else default to version 0.0.0"""
+    return os.environ.get("PROJECT_VERSION", "0.0.0")
 
 
 def get_cxxflags():
