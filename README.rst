@@ -46,7 +46,7 @@ emulate the travis build environment.
 From project root, issue some variation of:
 
 ```
-$ PROJECT_VERSION=0.0.0 MYCONDAPY=3.7 conda-build tools/conda.recipe/meta.yaml
+$ PROJECT_VERSION=0.0.0 MYCONDAPY=3.7 conda-build -c theochem tools/conda.recipe
 ```
 
 Installation (manual)
@@ -54,7 +54,7 @@ Installation (manual)
 
 Advanced developers may build by hand using the dependencies listed below,
 but the procedure is entirely unsupported. You are responsible for setting
-the proper flags to find headers and linking.
+the proper flags to find headers and linking through the setuptools -I, -L cli options.
 
 The following dependencies will be necessary for GBasis to build properly,
 
