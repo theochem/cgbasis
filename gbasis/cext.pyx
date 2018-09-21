@@ -51,14 +51,14 @@ cimport nucpot
 import atexit
 
 __all__ = [
-    # # boys
-    # '_boys_function', '_boys_function_array',
-    # # cartpure
-    # '_cart_to_pure_low',
-    # # common
-    # '_fac', '_fac2', '_binom', '_get_shell_nbasis', '_get_max_shell_type',
-    # '_gpt_coeff', '_gb_overlap_int1d', '_nuclear_attraction_helper',
-    # '_cit', '_jfac', '_dtaylor',
+    # boys
+    '_boys_function', '_boys_function_array',
+    # cartpure
+    '_cart_to_pure_low',
+    # common
+    '_fac', '_fac2', '_binom', '_get_shell_nbasis', '_get_max_shell_type',
+    '_gpt_coeff', '_gb_overlap_int1d', '_nuclear_attraction_helper',
+    '_cit', '_jfac', '_dtaylor',
     # gbasis
     '_gob_cart_normalization', '_gob_pure_normalization',
     'GOBasis',
@@ -72,6 +72,9 @@ __all__ = [
     '_GB4ElectronRepulsionIntegralLibInt',
     '_GB4ErfIntegralLibInt', '_GB4GaussIntegralLibInt',
     '_GB4RAlphaIntegralLibInt',
+    '_GB4DeltaIntegralLibInt',
+    '_GB4IntraDensIntegralLibInt',
+
     # fns
     '_GB1DMGridDensityFn', '_GB1DMGridGradientFn', '_GB1DMGridGGAFn',
     '_GB1DMGridKineticFn', '_GB1DMGridHessianFn', '_GB1DMGridMGGAFn',
@@ -1026,6 +1029,63 @@ cdef class GOBasis(GBasis):
         output = _prepare_array(output, (self.nbasis, self.nbasis, self.nbasis, self.nbasis), 'output')
         (<gbasis.GOBasis*>self._this).compute_ralpha_repulsion(&output[0, 0, 0, 0], alpha)
         return np.asarray(output)
+
+    def compute_delta_repulsion(self, double[:, :, :, ::1] output=None):
+        r"""Compute electron-electron repulsion integrals.
+
+        The potential has the following form:
+
+        .. math::
+            v = \delta(\mathbf{r})
+
+        Parameters
+        ----------
+        output
+            A Four-index object, optional.
+
+        Returns
+        -------
+        output
+
+        Keywords: :index:`ERI`, :index:`four-center integrals`
+        """
+        self.biblio.append(('valeev2014',
+                    'the efficient implementation of four-center electron repulsion integrals'))
+        output = _prepare_array(output, (self.nbasis, self.nbasis, self.nbasis, self.nbasis), 'output')
+        (<gbasis.GOBasis*>self._this).compute_delta_repulsion(&output[0, 0, 0, 0])
+        return np.asarray(output)
+
+    def compute_intra_density(self, double[:, :, :, ::1] output=None,
+                              double[:, ::1] point=None):
+        r"""Compute electron-electron repulsion integrals.
+
+        The potential has the following form:
+
+        .. math::
+            v = \delta(\mathbf{r})
+
+        Parameters
+        ----------
+        output
+            A Four-index object, optional.
+        point
+            The intracular coordinate.
+
+        Returns
+        -------
+        output
+
+        Keywords: :index:`ERI`, :index:`four-center integrals`
+        """
+        self.biblio.append(('valeev2014',
+                    'the efficient implementation of four-center electron repulsion integrals'))
+        _check_shape(point, (-1, 3), 'coordinates')
+        if point is None:
+            point = np.zeros((-1, 3))
+        output = _prepare_array(output, (self.nbasis, self.nbasis, self.nbasis, self.nbasis), 'output')
+        (<gbasis.GOBasis*>self._this).compute_intra_density(&output[0, 0, 0, 0], &point[0, 0])
+        return np.asarray(output)
+
 
     def _compute_cholesky(self, _GB4Integral gb4int, double threshold=1e-8):
         """Apply the Cholesky code to a given type of four-center integrals.
@@ -2064,6 +2124,21 @@ cdef class _GB4RAlphaIntegralLibInt(_GB4Integral):
     @property
     def alpha(self):
         return (<ints.GB4RAlphaIntegralLibInt*>self._this).get_alpha()
+
+cdef class _GB4DeltaIntegralLibInt(_GB4Integral):
+    """Wrapper for ints.GB4DeltaIntegralLibInt, for testing only"""
+
+    def __cinit__(self, long max_nbasis):
+        self._this = <ints.GB4Integral*>(new ints.GB4DeltaIntegralLibInt(max_nbasis))
+
+
+cdef class _GB4IntraDensIntegralLibInt(_GB4Integral):
+    """Wrapper for ints.GB4IntraDensIntegralLibInt, for testing only"""
+
+    def __cinit__(self, long max_nbasis, np.ndarray[double, ndim=2] point not None):
+        assert point.flags['C_CONTIGUOUS']
+        self._this = <ints.GB4Integral*>(new ints.GB4IntraDensIntegralLibInt(max_nbasis, &point[0, 0]))
+
 
 
 #

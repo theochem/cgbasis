@@ -84,6 +84,12 @@ cdef extern from "ints.h":
         GB4RAlphaIntegralLibInt(long max_shell_type, double alpha) except +
         double get_alpha()
 
+    cdef cppclass GB4DeltaIntegralLibInt:
+        GB4DeltaIntegralLibInt(long max_shell_type) except +
+
+    cdef cppclass GB4IntraDensIntegralLibInt:
+        GB4IntraDensIntegralLibInt(long max_shell_type, double* point) except +
+
 
 cdef extern from "libint2.h":
     void libint2_static_init()
