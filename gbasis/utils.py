@@ -74,7 +74,7 @@ def typecheck_geo(coordinates=None, numbers=None, pseudo_numbers=None,
         if need_coordinates:
             raise TypeError('Coordinates can not be None.')
     else:
-        if coordinates.shape != (natom, 3) or not np.issubdtype(coordinates.dtype, np.float):
+        if coordinates.shape != (natom, 3) or not np.issubdtype(coordinates.dtype, np.floating):
             raise TypeError('The argument centers must be a float array with shape (natom,3).')
 
     # Typecheck numbers
@@ -106,5 +106,5 @@ def typecheck_geo(coordinates=None, numbers=None, pseudo_numbers=None,
     return result
 
 
-def to_basis_path(fn):
+def to_bset_path(fn):
     return pkg_resources.resource_filename("gbasis.bsets", fn)

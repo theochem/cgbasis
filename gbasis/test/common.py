@@ -26,8 +26,6 @@ import tempfile
 from contextlib import contextmanager
 
 import numpy as np
-from os import path
-
 import pkg_resources
 
 from . import gobasis_data as gdata
@@ -184,8 +182,10 @@ def load_orbsb_dms(fn):
 
 
 def load_obasis(fn):
+    """Loads the cached from molecule, and returns a gobasis object."""
     return gobasis.GOBasis(*getattr(gdata, fn))
 
 
 def load_mdata(fn):
+    """Loads the cached data from the molecule class."""
     return getattr(mdata, fn)

@@ -20,7 +20,6 @@
 # --
 """Gaussian basis sets"""
 
-
 from gbasis.cext import *
 from gbasis.gobasis import *
 from gbasis.iobas import *

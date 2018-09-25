@@ -19,6 +19,7 @@
 #
 # --
 """Input/Output routines for gaussian basis sets"""
+from typing import List, Dict
 
 import numpy as np
 
@@ -31,7 +32,7 @@ __all__ = [
 ]
 
 
-def str_to_shell_types(s, pure=False):
+def str_to_shell_types(s: str, pure: bool = False) -> List[int]:
     """Convert a string into a list of contraction types"""
     if pure:
         d = {'s': 0, 'p': 1, 'd': -2, 'f': -3, 'g': -4, 'h': -5, 'i': -6}
@@ -40,19 +41,19 @@ def str_to_shell_types(s, pure=False):
     return [d[c] for c in s.lower()]
 
 
-def shell_type_to_str(shell_type):
+def shell_type_to_str(shell_type: int) -> str:
     """Convert a shell type into a character"""
     return {0: 's', 1: 'p', 2: 'd', 3: 'f', 4: 'g', 5: 'h', 6: 'i'}[abs(shell_type)]
 
 
-def fortran_float(s):
+def fortran_float(s: str) -> float:
     """Convert a string to a float. Works also with D before the mantissa"""
     return float(s.replace('D', 'E').replace('d', 'e'))
 
 
-def load_basis_atom_map_nwchem(filename):
+def load_basis_atom_map_nwchem(filename: str) -> Dict:
     """Load the basis set family from an NWChem file."""
-    from .gobasis import GOBasisAtom, GOBasisContraction
+    from .gobasis import GOBasisAtom, GOBasisContraction  # to get around circular imports...
 
     f = open(filename)
     basis_atom_map = {}
@@ -86,10 +87,9 @@ def load_basis_atom_map_nwchem(filename):
     return basis_atom_map
 
 
-def load_basis_atom_map_gbs(filename):
+def load_basis_atom_map_gbs(filename: str) -> Dict:
     """Load the basis set family from a GBS file."""
-    from .gobasis import GOBasisAtom, GOBasisContraction
-
+    from .gobasis import GOBasisAtom, GOBasisContraction  # to get around circular imports...
     basis_atom_map = {}
     cur_atom = None
     cur_shell_types = None
@@ -126,16 +126,16 @@ def load_basis_atom_map_gbs(filename):
     return basis_atom_map
 
 
-def dump_basis_atom_map_gbs(filename, name, basis_atom_map):
+def dump_basis_atom_map_gbs(filename: str, name: str, basis_atom_map: Dict):
     """Write gaussian basis file from the basis object in HORTON.
 
     Parameters
     ----------
-    filename: str
+    filename
         File name of the new gbs file
-    name : str
+    name
         Name of the basis set to mention in the comments of the written file.
-    basis_atom_map: dict
+    basis_atom_map
         Keys are atomic numbers, values are GOBasisAtom objects.
     """
     with open(filename, 'w') as f:

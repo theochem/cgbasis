@@ -38,7 +38,7 @@ setup(
     ext_modules=[Extension(
         "gbasis.cext",
         sources=["gbasis/cext.pyx"] + glob.glob("gbasis/*.cpp"),
-        depends=glob.glob("gbasis/*.h") + glob.glob("gbasis/*.h"),
+        depends=glob.glob("gbasis/*.h") + glob.glob("gbasis/*.pxd"),
         include_dirs=[np.get_include()],
         libraries=["int2"],
         extra_compile_args=get_cxxflags(),
