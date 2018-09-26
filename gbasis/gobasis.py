@@ -437,9 +437,9 @@ class GOBasisContraction:
     shell_type : int
         The angular momentum of the shell. 0 = S, 1 = P, 2 = D (cartesian), -2 = D (pure)
             3 = F (cartesian), -3 = F (pure).
-    alphas : np.array
+    alphas : np.ndarray
         The exponent of each primitive.
-    con_coeffs : np.array
+    con_coeffs : np.ndarray
         The contraction coefficients of the shell. It can be either segmented (1d),
         or generalized (2d).
 

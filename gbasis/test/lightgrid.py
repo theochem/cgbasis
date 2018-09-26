@@ -20,44 +20,66 @@
 # --
 """Simple molecule integration grids."""
 
+from __future__ import annotations
+
+from functools import reduce
+from typing import Union, Tuple
 
 import numpy as np
-from functools import reduce
-
 
 __all__ = ['generate_molecular_grid', 'integrate']
 
 
-class Shell(object):
-    """A 1s-type Slater density shell"""
+class Shell:
+    """A 1s-type Slater density shell."""
 
-    def __init__(self, population, exponent, center=None):
+    def __init__(self, population: float, exponent: float, center: np.ndarray = None):
         """Initialize a Shell instance.
 
         Parameters
         ----------
-        population : float
+        population
             The number of electrons in the shell.
-        exponent : float
+        exponent
             The exponent of the Slater function.
-        center : np.ndarray, shape=(3,)
+        center
+            The atomic center for the shell. An array of (3, ) shape.
         """
         self.population = population
         self.exponent = exponent
         self.center = center
 
-    def clone(self, center):
-        """Make a copy of the shell with a new center."""
+    def clone(self, center: np.ndarray) -> Shell:
+        """Make a copy of the shell with a new center.
+        Parameters
+        ----------
+        center
+            The atomic center for the shell. An array of (3, ) shape.
+
+        Returns
+        -------
+        Another instance of Shell with the new center.
+        """
         return Shell(self.population, self.exponent, center)
 
-    def compute_density(self, distance):
-        """Compute the density of the shell as function of the distance from the center."""
-        prefactor = self.population*self.exponent**3/(8*np.pi)
-        return prefactor*np.exp(-distance*self.exponent)
+    def compute_density(self, distance: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
+        """Compute the density of the shell as function of the distance from the centre.
 
-    def get_random_points(self, npoint):
+        Parameters
+        ----------
+        distance
+            The distance from the centre.
+
+        Returns
+        -------
+
+        """
+        prefactor = self.population * self.exponent ** 3 / (8 * np.pi)
+        return prefactor * np.exp(-distance * self.exponent)
+
+    def get_random_points(self, npoint: int) -> np.ndarray:
         """Sample npoint random points from shape function of the shell."""
-        radii = np.random.gamma(3, 1.0/self.exponent, npoint)
+        radii = np.random.gamma(3, 1.0 / self.exponent, npoint)
         points = np.zeros((npoint, 3))
         norms = np.zeros(npoint)
         while True:
@@ -69,7 +91,7 @@ class Shell(object):
             newnorms = np.sqrt(np.einsum('ij,ij->i', newpoints, newpoints))
             points[mask] = newpoints
             norms[mask] = newnorms
-        return points*(radii/norms).reshape(-1, 1) + self.center
+        return points * (radii / norms).reshape(-1, 1) + self.center
 
 
 setups = {
@@ -82,26 +104,28 @@ setups = {
 }
 
 
-def generate_molecular_grid(numbers, coordinates, npoint_per_electron=100, seed=1):
+def generate_molecular_grid(numbers: np.ndarray, coordinates: np.ndarray,
+                            npoint_per_electron: int = 100, seed: int = 1) -> Tuple[np.ndarray,
+                                                                                    np.ndarray]:
     """Generate a molecular integration grid, using importance sampling.
 
     Parameters
     ----------
-    numbers : np.ndarray, shape=(natom,), dtype=int
-        Atomic numbers.
-    coordinates : np.ndarray, shape(natom, 3), dtype=float
-        Atomic coordinates.
-    npoint_per_electron : int
+    numbers
+        Atomic numbers. shape=(natom,), dtype=int
+    coordinates
+        Atomic coordinates in Bohr. shape(natom, 3), dtype=float
+    npoint_per_electron
         The number of grid points per atomic shell.
-    seed : int
+    seed
         The random seed to use when generating the grid.
 
     Returns
     -------
-    points : np.ndarray, shape=(npoint, 3), dtype=float
-        Positions of the grid points.
-    weights : np.ndarray, shape=(npoint,), dtype=float
-        Integration grid weights for all points.
+    points
+        Positions of the grid points. shape=(npoint, 3), dtype=float
+    weights
+        Integration grid weights for all points. shape=(npoint,), dtype=float
     """
     state = np.random.get_state()
     np.random.seed(seed)
@@ -120,7 +144,7 @@ def generate_molecular_grid(numbers, coordinates, npoint_per_electron=100, seed=
         nelec = sum(shell.population for shell in shells)
         weights_sum = 0.0
         for ishell0, shell0 in enumerate(shells):
-            npoint_shell = int(np.round(npoint_per_electron*shell0.population))
+            npoint_shell = int(np.round(npoint_per_electron * shell0.population))
             shell_points.append(shell0.get_random_points(npoint_shell))
             prob = 0.0
             for ishell1, shell1 in enumerate(shells):
@@ -128,8 +152,8 @@ def generate_molecular_grid(numbers, coordinates, npoint_per_electron=100, seed=
                 distances = np.sqrt(np.einsum('ij,ij->i', deltas, deltas))
                 prob += shell1.compute_density(distances)
             prob /= nelec
-            scale = shell0.population/npoint_shell
-            shell_weights.append(scale/prob)
+            scale = shell0.population / npoint_shell
+            shell_weights.append(scale / prob)
             weights_sum += shell0.population
 
         # Fix shapes
@@ -138,12 +162,19 @@ def generate_molecular_grid(numbers, coordinates, npoint_per_electron=100, seed=
     finally:
         np.random.set_state(state)
 
-    return points, weights/weights_sum
+    return points, weights / weights_sum
 
 
-def integrate(*args):
+def integrate(*args: np.ndarray) -> np.float64:
     """Replaces grid.integrate for gbasis tests.
-
     Simply takes a dot product of all 1D numpy arrays passed to it.
+
+    Parameters
+    ----------
+    args
+        1D numpy arrays
+    Returns
+    -------
+        The integral of the grids.
     """
     return np.sum(reduce(np.multiply, args))

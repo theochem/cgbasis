@@ -20,44 +20,41 @@
 # --
 """Utility Functions"""
 
+from typing import List
 
-from os import path
 import numpy as np
 import pkg_resources
 
 
-def typecheck_geo(coordinates=None, numbers=None, pseudo_numbers=None,
-                  need_coordinates=True, need_numbers=True,
-                  need_pseudo_numbers=True):
-    """Type check a molecular geometry specification
+def typecheck_geo(coordinates: np.ndarray = None, numbers: np.ndarray = None,
+                  pseudo_numbers: np.ndarray = None,
+                  need_coordinates: bool = True, need_numbers: bool = True,
+                  need_pseudo_numbers: bool = True) -> List:
+    """Type check for the molecular geometry specification.
 
-       **Arguments:**
+    Parameters
+    ----------
+    coordinates
+        A (N, 3) float array with Cartesian coordinates of the atoms in Bohr.
+    numbers
+        A (N,) int vector with the atomic numbers.
+    pseudo_numbers
+        A (N,) float array with pseudo-potential core charges.
+    need_coordinates
+        When set to False, the coordinates can be None, are not type checked
+        and not returned.
+    need_numbers
+        When set to False, the numbers can be None, are not type checked
+        and not returned.
+    need_pseudo_numbers
+        When set to False, the pseudo_numbers can be None, are not type
+        checked and not returned.
 
-       coordinates
-            A (N, 3) float array with Cartesian coordinates of the atoms.
+    Returns
+    -------
+    A list consisting of `natom` and all arguments that were type checked. The
+    pseudo_numbers argument is converted to a floating point array.
 
-       numbers
-            A (N,) int vector with the atomic numbers.
-
-       **Optional arguments:**
-
-       pseudo_numbers
-            A (N,) float array with pseudo-potential core charges.
-
-       need_coordinates
-            When set to False, the coordinates can be None, are not type checked
-            and not returned.
-
-       need_numbers
-            When set to False, the numbers can be None, are not type checked
-            and not returned.
-
-       need_pseudo_numbers
-            When set to False, the pseudo_numbers can be None, are not type
-            checked and not returned.
-
-       **Returns:** ``[natom]`` + all arguments that were type checked. The
-       pseudo_numbers argument is converted to a floating point array.
     """
     # Determine natom
     if coordinates is not None:
@@ -82,7 +79,7 @@ def typecheck_geo(coordinates=None, numbers=None, pseudo_numbers=None,
         if need_numbers:
             raise TypeError('Numbers can not be None.')
     else:
-        if numbers.shape != (natom,) or not np.issubdtype(numbers.dtype, np.integer):
+        if numbers.shape != (natom,) or not np.issubdtype(numbers.dtype, np.signedinteger):
             raise TypeError('The argument numbers must be a vector with length natom.')
 
     # Typecheck pseudo_numbers
@@ -92,7 +89,7 @@ def typecheck_geo(coordinates=None, numbers=None, pseudo_numbers=None,
     else:
         if pseudo_numbers.shape != (natom,):
             raise TypeError('The argument pseudo_numbers must be a vector with length natom.')
-        if not np.issubdtype(pseudo_numbers.dtype, np.float):
+        if not np.issubdtype(pseudo_numbers.dtype, np.floating):
             pseudo_numbers = pseudo_numbers.astype(float)
 
     # Collect return values
@@ -106,5 +103,17 @@ def typecheck_geo(coordinates=None, numbers=None, pseudo_numbers=None,
     return result
 
 
-def to_bset_path(fn):
+def to_bset_path(fn: str) -> str:
+    """Get the absolute path of a basis set file.
+
+    Parameters
+    ----------
+    fn
+        The basepath of the basis set file. i.e. "3-21g.nwchem"
+
+    Returns
+    -------
+    The absolute path of the basis file
+
+    """
     return pkg_resources.resource_filename("gbasis.bsets", fn)
