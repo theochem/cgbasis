@@ -18,7 +18,10 @@
 //
 //--
 
-// UPDATELIBDOCTITLE: Gaussian basis set classes
+/**
+ * @file gbasis.h
+ * @brief Gaussian basis set classes
+ */
 
 #ifndef GBASIS_GBASIS_H_
 #define GBASIS_GBASIS_H_

@@ -24,6 +24,7 @@ import os
 import shutil
 import tempfile
 from contextlib import contextmanager
+from typing import Callable, List
 
 import numpy as np
 import pkg_resources
@@ -42,30 +43,16 @@ def tmpdir(name):
         shutil.rmtree(dn)
 
 
-def check_delta(fun, fun_deriv, x, dxs):
+def check_delta(fun: Callable, fun_deriv: Callable, x: np.ndarray, dxs: List):
     """Check the difference between two function values using the analytical gradient
 
-       Arguments:
-
-       fun
-            The function whose derivatives must be to be tested
-
-       fun_deriv
-            The implementation of the analytical derivatives
-
-       x
-            The argument for the reference point.
-
-       dxs
-            A list with small relative changes to x
-
-       For every displacement in ``dxs``, the following computation is repeated:
+    For every displacement in ``dxs``, the following computation is repeated:
 
        1) ``D1 = fun(x+dx) - fun(x)`` is computed.
        2) ``D2 = 0.5*dot(fun_deriv(x+dx) + fun_deriv(x), dx)`` is computed.
 
-       A threshold is set to the median of the D1 set. For each case where |D1|
-       is larger than the threshold, |D1 - D2|, should be smaller than the
+       A threshold is set to the median of the D1 set. For each case where \|D1\|
+       is larger than the threshold, \|D1 - D2\|, should be smaller than the
        threshold.
 
        This test makes two assumptions:
@@ -75,7 +62,28 @@ def check_delta(fun, fun_deriv, x, dxs):
           of cases, the linear term in ``fun(x+dx) - fun(x)`` dominates. Hence,
           sufficient elements in ``dxs`` should be provided for this test to
           work.
+
+    Parameters
+    ----------
+    fun
+        The function whose derivatives must be to be tested
+    fun_deriv
+        The implementation of the analytical derivatives
+    x
+        The argument for the reference point.
+    dxs
+        A list with small relative changes to x.
+
+
+
+    Raises
+    ------
+    AssertionError
+        If the first order approximation on the difference is too wrong.
+    ValueError
+        If less than 20 displacements are given.
     """
+
     assert len(x.shape) == 1
     if len(dxs) < 20:
         raise ValueError('At least 20 displacements are needed for good statistics.')

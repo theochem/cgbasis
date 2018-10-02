@@ -18,7 +18,25 @@
 //
 //--
 
-// UPDATELIBDOCTITLE: Evaluation of integrals of Gaussian basis functions
+/**
+ * @file ints.h
+ * @brief Evaluation of integrals of Gaussian basis functions
+ *
+    The implementation of the two-index operators in this module are based on
+    the paper "Gaussian-Expansion Methods for Molecular Integrals", H. Taketa,
+    S. Huzinga, K. O-ohata, Journal of the Physical Society of Japan, vol. 21,
+    p. 2313, y. 1966. Be aware that there are some misprints in the paper:
+
+    - eq. 2.18: CP_x should be p_x, i.e. change of sign.
+    - list of expressions at the bottom of p. 2319:
+        case l_1+l_2=2, G_1 = -f_1*p - f_2/(2*gamma)
+
+    The implementation of the (multipole) moment integrals in this module are
+    based on the paper "Efficient recursive computation of molecular integrals
+    over Cartesian Gaussian functions", S. Obara, A. Saika, Journal of Chemical
+    Physics, vol. 84, p. 3963, y. 1986.
+ *
+ */
 
 #ifndef GBASIS_INTS_H_
 #define GBASIS_INTS_H_
@@ -29,19 +47,55 @@
 
 class GB2Integral : public GBCalculator {
  protected:
-  long shell_type0, shell_type1;
-  const double *r0, *r1;
-  IterPow2 i2p;
+  long shell_type0, shell_type1; /// shell types
+  const double *r0, *r1; /// Gaussian centres
+  IterPow2 i2p; /// Cartesian basis function iterator
  public:
+  /**
+   * Construct a GB2Integral object.
+   *
+   * @param max_shell_type The maximum shell type in the basis set. This is used to allocate
+   *    sufficiently large working arrays.
+   */
   explicit GB2Integral(long max_shell_type)
       : GBCalculator(max_shell_type, 1, 2), shell_type0(0), shell_type1(0),
         r0(NULL), r1(NULL), i2p() {}
-
+  /**
+   * Re-initialize on a new shell.
+   *
+   * @param shell_type0 Shell 0 type
+   * @param shell_type1 Shell 1 type
+   * @param r0 Gaussian Centre 0
+   * @param r1 Gaussian Centre 1
+   */
   void reset(long shell_type0, long shell_type1, const double *r0, const double *r1);
 
+  /**
+   Add results for a combination of Cartesian primitive shells to the work array.
+
+   See eqn 2.12 of Taketa et al. (1966)
+
+   @param coeff
+       Product of the contraction coefficients of the two primitives.
+
+   @param alpha0
+       The exponent of primitive shell 0.
+
+   @param alpha1
+       The exponent of primitive shell 1.
+
+   @param scales0
+      The normalization prefactors for basis functions in primitive shell 0
+
+   @param scales1
+      The normalization prefactors for basis functions in primitive shell 1
+   */
   virtual void add(double coeff, double alpha0, double alpha1, const double *scales0,
                    const double *scales1) = 0;
 
+  /**
+   * Transform the work arrays from cartesian into pure coordinates. N.B. The results are store back into work_cart!
+   */
   void cart_to_pure();
 
   const long get_shell_type0() const { return shell_type0; }
@@ -101,7 +155,7 @@ class GB2AttractionIntegral : public GB2Integral {
     Add results for a combination of Cartesian primitive shells to the work array.
 
    @param coeff
-       Product of the contraction coefficients of the four primitives.
+       Product of the contraction coefficients of the two primitives.
 
    @param alpha0
        The exponent of primitive shell 0.

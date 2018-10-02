@@ -26,11 +26,13 @@ from nose.tools import assert_raises
 from .common import (load_obasis, load_mdata, load_dm, load_er, load_quad, load_dipole, load_na,
                      load_kin, load_olp, load_json)
 from .lightgrid import generate_molecular_grid, integrate
-from .. import (GB4RAlphaIntegralLibInt, GB4ErfIntegralLibInt, GB4GaussIntegralLibInt,
-                GB4ElectronRepulsionIntegralLibInt, GB2ErfAttractionIntegral, GB2KineticIntegral,
-                GB2GaussAttractionIntegral, GB2NuclearAttractionIntegral, GB2OverlapIntegral,
-                get_shell_nbasis, nuclear_attraction_helper, gpt_coeff, gb_overlap_int1d, binom,
-                gob_cart_normalization, iter_pow1_inc)
+from .. import (_GB4RAlphaIntegralLibInt, _GB4ErfIntegralLibInt, _GB4GaussIntegralLibInt,
+                _GB4ElectronRepulsionIntegralLibInt, _GB2ErfAttractionIntegral, _GB2KineticIntegral,
+                _GB2GaussAttractionIntegral, _GB2NuclearAttractionIntegral, _GB2OverlapIntegral,
+                gob_cart_normalization, _iter_pow1_inc)
+
+from gbasis.cext import (_get_shell_nbasis, _nuclear_attraction_helper, _gpt_coeff,
+                         _gb_overlap_int1d, _binom,)
 
 
 def test_gpt_coeff():
@@ -41,65 +43,65 @@ def test_gpt_coeff():
             i1 = (k - q) / 2
             assert (k + q) % 2 == 0
             assert (k - q) % 2 == 0
-            result += binom(n0, i0) * binom(n1, i1) * pa ** (n0 - i0) * pb ** (n1 - i1)
+            result += _binom(n0, i0) * _binom(n1, i1) * pa ** (n0 - i0) * pb ** (n1 - i1)
         return result
 
     pa = 0.8769
     pb = 0.123
     for k in range(5):
         check = py_gpt_coeff(k, 2, 2, pa, pb)
-        result = gpt_coeff(k, 2, 2, pa, pb)
+        result = _gpt_coeff(k, 2, 2, pa, pb)
         assert abs(check - result) < 1e-10
 
     for k in range(7):
         check = py_gpt_coeff(k, 3, 3, pa, pb)
-        result = gpt_coeff(k, 3, 3, pa, pb)
+        result = _gpt_coeff(k, 3, 3, pa, pb)
         assert abs(check - result) < 1e-10
 
 
 def test_gb_overlap_int1d():
-    assert abs(gb_overlap_int1d(0, 0, 0.0, 0.0, 1 / 4.0) - 0.886227) < 1e-5
-    assert abs(gb_overlap_int1d(2, 2, 0.0, 0.0, 1 / 5.0) - 0.023780) < 1e-5
-    assert abs(gb_overlap_int1d(2, 2, 0.0, 0.0, 1 / 5.0) - 0.023780) < 1e-5
-    assert abs(gb_overlap_int1d(0, 0, 0.0, 0.0, 1 / 5.0) - 0.792665) < 1e-5
-    assert abs(gb_overlap_int1d(2, 2, 0.0, 0.0, 1 / 1.0) - 1.329340) < 1e-5
-    assert abs(gb_overlap_int1d(2, 2, 0.0, 0.0, 1 / 1.0) - 1.329340) < 1e-5
-    assert abs(gb_overlap_int1d(1, 1, 0.0, 0.0, 1 / 1.0) - 0.886227) < 1e-5
-    assert abs(gb_overlap_int1d(2, 2, 0.0, 0.0, 1 / 2.0) - 0.234996) < 1e-5
-    assert abs(gb_overlap_int1d(2, 2, 0.0, 0.0, 1 / 2.0) - 0.234996) < 1e-5
-    assert abs(gb_overlap_int1d(1, 1, 0.0, 0.0, 1 / 2.0) - 0.313329) < 1e-5
-    assert abs(gb_overlap_int1d(2, 2, 0.0, 0.0, 1 / 3.0) - 0.085277) < 1e-5
-    assert abs(gb_overlap_int1d(2, 2, 0.0, 0.0, 1 / 3.0) - 0.085277) < 1e-5
-    assert abs(gb_overlap_int1d(1, 1, 0.0, 0.0, 1 / 3.0) - 0.170554) < 1e-5
-    assert abs(gb_overlap_int1d(2, 2, 0.0, 0.0, 1 / 4.0) - 0.041542) < 1e-5
-    assert abs(gb_overlap_int1d(2, 2, 0.0, 0.0, 1 / 4.0) - 0.041542) < 1e-5
-    assert abs(gb_overlap_int1d(1, 1, 0.0, 0.0, 1 / 4.0) - 0.110778) < 1e-5
-    assert abs(gb_overlap_int1d(2, 2, 0.0, 0.0, 1 / 5.0) - 0.023780) < 1e-5
+    assert abs(_gb_overlap_int1d(0, 0, 0.0, 0.0, 1 / 4.0) - 0.886227) < 1e-5
+    assert abs(_gb_overlap_int1d(2, 2, 0.0, 0.0, 1 / 5.0) - 0.023780) < 1e-5
+    assert abs(_gb_overlap_int1d(2, 2, 0.0, 0.0, 1 / 5.0) - 0.023780) < 1e-5
+    assert abs(_gb_overlap_int1d(0, 0, 0.0, 0.0, 1 / 5.0) - 0.792665) < 1e-5
+    assert abs(_gb_overlap_int1d(2, 2, 0.0, 0.0, 1 / 1.0) - 1.329340) < 1e-5
+    assert abs(_gb_overlap_int1d(2, 2, 0.0, 0.0, 1 / 1.0) - 1.329340) < 1e-5
+    assert abs(_gb_overlap_int1d(1, 1, 0.0, 0.0, 1 / 1.0) - 0.886227) < 1e-5
+    assert abs(_gb_overlap_int1d(2, 2, 0.0, 0.0, 1 / 2.0) - 0.234996) < 1e-5
+    assert abs(_gb_overlap_int1d(2, 2, 0.0, 0.0, 1 / 2.0) - 0.234996) < 1e-5
+    assert abs(_gb_overlap_int1d(1, 1, 0.0, 0.0, 1 / 2.0) - 0.313329) < 1e-5
+    assert abs(_gb_overlap_int1d(2, 2, 0.0, 0.0, 1 / 3.0) - 0.085277) < 1e-5
+    assert abs(_gb_overlap_int1d(2, 2, 0.0, 0.0, 1 / 3.0) - 0.085277) < 1e-5
+    assert abs(_gb_overlap_int1d(1, 1, 0.0, 0.0, 1 / 3.0) - 0.170554) < 1e-5
+    assert abs(_gb_overlap_int1d(2, 2, 0.0, 0.0, 1 / 4.0) - 0.041542) < 1e-5
+    assert abs(_gb_overlap_int1d(2, 2, 0.0, 0.0, 1 / 4.0) - 0.041542) < 1e-5
+    assert abs(_gb_overlap_int1d(1, 1, 0.0, 0.0, 1 / 4.0) - 0.110778) < 1e-5
+    assert abs(_gb_overlap_int1d(2, 2, 0.0, 0.0, 1 / 5.0) - 0.023780) < 1e-5
 
-    assert abs(gb_overlap_int1d(0, 0, 0.000000, -0.377945, 1 / 211400.020633) - 0.003855) < 1e-5
-    assert abs(gb_overlap_int1d(0, 0, 0.000000, -0.377945, 1 / 31660.020633) - 0.009961) < 1e-5
-    assert abs(gb_overlap_int1d(0, 0, 0.000001, -0.377944, 1 / 7202.020633) - 0.020886) < 1e-5
-    assert abs(gb_overlap_int1d(0, 0, 0.000004, -0.377941, 1 / 2040.020633) - 0.039243) < 1e-5
-    assert abs(gb_overlap_int1d(0, 0, 0.000012, -0.377934, 1 / 666.420633) - 0.068660) < 1e-5
-    assert abs(gb_overlap_int1d(0, 0, 0.000032, -0.377913, 1 / 242.020633) - 0.113933) < 1e-5
-    assert abs(gb_overlap_int1d(0, 0, 0.000082, -0.377864, 1 / 95.550633) - 0.181325) < 1e-5
-    assert abs(gb_overlap_int1d(0, 0, 0.000194, -0.377751, 1 / 40.250633) - 0.279376) < 1e-5
-    assert abs(gb_overlap_int1d(0, 0, 0.000440, -0.377506, 1 / 17.740633) - 0.420814) < 1e-5
-    assert abs(gb_overlap_int1d(0, 0, 0.000972, -0.376974, 1 / 8.025633) - 0.625656) < 1e-5
+    assert abs(_gb_overlap_int1d(0, 0, 0.000000, -0.377945, 1 / 211400.020633) - 0.003855) < 1e-5
+    assert abs(_gb_overlap_int1d(0, 0, 0.000000, -0.377945, 1 / 31660.020633) - 0.009961) < 1e-5
+    assert abs(_gb_overlap_int1d(0, 0, 0.000001, -0.377944, 1 / 7202.020633) - 0.020886) < 1e-5
+    assert abs(_gb_overlap_int1d(0, 0, 0.000004, -0.377941, 1 / 2040.020633) - 0.039243) < 1e-5
+    assert abs(_gb_overlap_int1d(0, 0, 0.000012, -0.377934, 1 / 666.420633) - 0.068660) < 1e-5
+    assert abs(_gb_overlap_int1d(0, 0, 0.000032, -0.377913, 1 / 242.020633) - 0.113933) < 1e-5
+    assert abs(_gb_overlap_int1d(0, 0, 0.000082, -0.377864, 1 / 95.550633) - 0.181325) < 1e-5
+    assert abs(_gb_overlap_int1d(0, 0, 0.000194, -0.377751, 1 / 40.250633) - 0.279376) < 1e-5
+    assert abs(_gb_overlap_int1d(0, 0, 0.000440, -0.377506, 1 / 17.740633) - 0.420814) < 1e-5
+    assert abs(_gb_overlap_int1d(0, 0, 0.000972, -0.376974, 1 / 8.025633) - 0.625656) < 1e-5
 
-    assert abs(gb_overlap_int1d(0, 0, -0.014528, 0.363418, 1 / 8.325) - 0.614303) < 1e-5
-    assert abs(gb_overlap_int1d(0, 3, 0.014528, -0.363418, 1 / 8.325) - -0.069710) < 1e-5
-    assert abs(gb_overlap_int1d(0, 4, -0.014528, 0.363418, 1 / 8.325) - 0.046600) < 1e-5
-    assert abs(gb_overlap_int1d(0, 3, -0.014528, 0.363418, 1 / 8.325) - 0.069710) < 1e-5
-    assert abs(gb_overlap_int1d(0, 1, 0.014528, -0.363418, 1 / 8.325) - -0.223249) < 1e-5
-    assert abs(gb_overlap_int1d(0, 0, -0.101693, 2.543923, 1 / 8.325) - 0.614303) < 1e-5
-    assert abs(gb_overlap_int1d(0, 2, -0.014528, 0.363418, 1 / 8.325) - 0.118028) < 1e-5
-    assert abs(gb_overlap_int1d(0, 1, -0.014528, 0.363418, 1 / 8.325) - 0.223249) < 1e-5
-    assert abs(gb_overlap_int1d(0, 3, 0.014528, -0.363418, 1 / 8.325) - -0.069710) < 1e-5
+    assert abs(_gb_overlap_int1d(0, 0, -0.014528, 0.363418, 1 / 8.325) - 0.614303) < 1e-5
+    assert abs(_gb_overlap_int1d(0, 3, 0.014528, -0.363418, 1 / 8.325) - -0.069710) < 1e-5
+    assert abs(_gb_overlap_int1d(0, 4, -0.014528, 0.363418, 1 / 8.325) - 0.046600) < 1e-5
+    assert abs(_gb_overlap_int1d(0, 3, -0.014528, 0.363418, 1 / 8.325) - 0.069710) < 1e-5
+    assert abs(_gb_overlap_int1d(0, 1, 0.014528, -0.363418, 1 / 8.325) - -0.223249) < 1e-5
+    assert abs(_gb_overlap_int1d(0, 0, -0.101693, 2.543923, 1 / 8.325) - 0.614303) < 1e-5
+    assert abs(_gb_overlap_int1d(0, 2, -0.014528, 0.363418, 1 / 8.325) - 0.118028) < 1e-5
+    assert abs(_gb_overlap_int1d(0, 1, -0.014528, 0.363418, 1 / 8.325) - 0.223249) < 1e-5
+    assert abs(_gb_overlap_int1d(0, 3, 0.014528, -0.363418, 1 / 8.325) - -0.069710) < 1e-5
 
 
 def test_gb2integral_exceptions():
-    gb2i = GB2OverlapIntegral(2)
+    gb2i = _GB2OverlapIntegral(2)
     r = np.random.uniform(-1, 1, 3)
     for st0, st1 in (-3, 0), (3, 0), (0, -3), (0, 3):
         with assert_raises(ValueError):
@@ -108,14 +110,14 @@ def test_gb2integral_exceptions():
 
 def test_overlap_norm():
     max_shell_type = 3
-    gb2i = GB2OverlapIntegral(max_shell_type)
+    gb2i = _GB2OverlapIntegral(max_shell_type)
     for shell_type in 0, 1, 2, 3:
         for alpha in np.arange(0.5, 2.51, 0.5):
-            scales = np.ones(get_shell_nbasis(shell_type), float)
+            scales = np.ones(_get_shell_nbasis(shell_type), float)
             r = np.random.uniform(-1, 1, 3)
             gb2i.reset(shell_type, shell_type, r, r)
             gb2i.add(1.0, alpha, alpha, scales, scales)
-            size = get_shell_nbasis(shell_type)
+            size = _get_shell_nbasis(shell_type)
             work = gb2i.get_work(size, size)
             diag = np.diag(work)
             indexes = np.array([shell_type, 0, 0])
@@ -123,18 +125,18 @@ def test_overlap_norm():
             while True:
                 check = diag[counter] * gob_cart_normalization(alpha, indexes) ** 2
                 assert abs(check - 1) < 1e-10
-                if not iter_pow1_inc(indexes):
+                if not _iter_pow1_inc(indexes):
                     break
                 counter += 1
 
 
 def test_gb2_overlap_integral_class():
     max_shell_type = 4
-    max_nbasis = get_shell_nbasis(max_shell_type)
+    max_nbasis = _get_shell_nbasis(max_shell_type)
     r0 = np.array([2.645617, 0.377945, -0.188973])
     r1 = np.array([0.000000, 0.000000, 0.188973])
 
-    gb2i = GB2OverlapIntegral(max_shell_type)
+    gb2i = _GB2OverlapIntegral(max_shell_type)
     assert gb2i.max_shell_type == max_shell_type
     assert gb2i.max_nbasis == max_nbasis
     assert gb2i.nwork == max_nbasis ** 2
@@ -171,9 +173,9 @@ def test_nuclear_attraction_helper():
     def my_nah(index, n0, n1, pa, pb, cp, gamma_inv):
         # functions taken from the THO paper
         f = [
-            gpt_coeff(0, n0, n1, pa, pb),
-            gpt_coeff(1, n0, n1, pa, pb),
-            gpt_coeff(2, n0, n1, pa, pb),
+            _gpt_coeff(0, n0, n1, pa, pb),
+            _gpt_coeff(1, n0, n1, pa, pb),
+            _gpt_coeff(2, n0, n1, pa, pb),
         ]
         if n0 + n1 == 0:
             if index == 0:
@@ -203,16 +205,16 @@ def test_nuclear_attraction_helper():
         pa, pb, cp, gamma_inv = np.random.uniform(0.5, 2.0, 4)
         #
         work_g = np.zeros(1, float)
-        nuclear_attraction_helper(work_g, 0, 0, pa, pb, cp, gamma_inv)
+        _nuclear_attraction_helper(work_g, 0, 0, pa, pb, cp, gamma_inv)
         assert abs(work_g[0] - my_nah(0, 0, 0, pa, pb, cp, gamma_inv)) < 1e-10
         #
         work_g = np.zeros(2, float)
-        nuclear_attraction_helper(work_g, 0, 1, pa, pb, cp, gamma_inv)
+        _nuclear_attraction_helper(work_g, 0, 1, pa, pb, cp, gamma_inv)
         assert abs(work_g[0] - my_nah(0, 0, 1, pa, pb, cp, gamma_inv)) < 1e-10
         assert abs(work_g[1] - my_nah(1, 0, 1, pa, pb, cp, gamma_inv)) < 1e-10
         #
         work_g = np.zeros(3, float)
-        nuclear_attraction_helper(work_g, 1, 1, pa, pb, cp, gamma_inv)
+        _nuclear_attraction_helper(work_g, 1, 1, pa, pb, cp, gamma_inv)
         assert abs(work_g[0] - my_nah(0, 1, 1, pa, pb, cp, gamma_inv)) < 1e-10
         assert abs(work_g[1] - my_nah(1, 1, 1, pa, pb, cp, gamma_inv)) < 1e-10
         assert abs(work_g[2] - my_nah(2, 1, 1, pa, pb, cp, gamma_inv)) < 1e-10
@@ -222,11 +224,11 @@ def check_overlap(alphas0, alphas1, r0, r1, scales0, scales1, shell_type0, shell
     # This test compares output from HORTON with reference data computed with
     # PyQuante.
     max_shell_type = 4
-    max_nbasis = get_shell_nbasis(max_shell_type)
-    gb2i = GB2OverlapIntegral(max_shell_type)
+    max_nbasis = _get_shell_nbasis(max_shell_type)
+    gb2i = _GB2OverlapIntegral(max_shell_type)
     assert gb2i.max_nbasis == max_nbasis
-    nbasis0 = get_shell_nbasis(shell_type0)
-    nbasis1 = get_shell_nbasis(shell_type1)
+    nbasis0 = _get_shell_nbasis(shell_type0)
+    nbasis1 = _get_shell_nbasis(shell_type1)
     assert result0.shape == (nbasis0, nbasis1)
     # Clear the working memory
     gb2i.reset(shell_type0, shell_type1, r0, r1)
@@ -586,12 +588,12 @@ def check_kinetic(alphas0, alphas1, r0, r1, scales0, scales1, shell_type0, shell
     # This test compares output from HORTON with reference data computed with
     # PyQuante.
     max_shell_type = 4
-    max_nbasis = get_shell_nbasis(max_shell_type)
-    gb2i = GB2KineticIntegral(max_shell_type)
+    max_nbasis = _get_shell_nbasis(max_shell_type)
+    gb2i = _GB2KineticIntegral(max_shell_type)
     assert gb2i.max_nbasis == max_nbasis
 
-    nbasis0 = get_shell_nbasis(shell_type0)
-    nbasis1 = get_shell_nbasis(shell_type1)
+    nbasis0 = _get_shell_nbasis(shell_type0)
+    nbasis1 = _get_shell_nbasis(shell_type1)
     assert result0.shape == (nbasis0, nbasis1)
     # Clear the working memory
     gb2i.reset(shell_type0, shell_type1, r0, r1)
@@ -949,13 +951,13 @@ def check_nuclear_attraction(alphas0, alphas1, r0, r1, scales0, scales1, charges
     # This test compares output from HORTON with reference data computed with
     # PyQuante.
     max_shell_type = 4
-    max_nbasis = get_shell_nbasis(max_shell_type)
-    gb2i = GB2NuclearAttractionIntegral(max_shell_type, charges, centers)
+    max_nbasis = _get_shell_nbasis(max_shell_type)
+    gb2i = _GB2NuclearAttractionIntegral(max_shell_type, charges, centers)
     assert gb2i.max_nbasis == max_nbasis
 
     assert gb2i.max_nbasis == max_nbasis
-    nbasis0 = get_shell_nbasis(shell_type0)
-    nbasis1 = get_shell_nbasis(shell_type1)
+    nbasis0 = _get_shell_nbasis(shell_type0)
+    nbasis1 = _get_shell_nbasis(shell_type1)
     assert result0.shape == (nbasis0, nbasis1)
     # Clear the working memory
     gb2i.reset(shell_type0, shell_type1, r0, r1)
@@ -1445,13 +1447,13 @@ def get_erf_attraction(alphas0, alphas1, r0, r1, scales0, scales1, charges, cent
         The range-separation parameters.
     """
     max_shell_type = 4
-    max_nbasis = get_shell_nbasis(max_shell_type)
-    gb2i = GB2ErfAttractionIntegral(max_shell_type, charges, centers, mu)
+    max_nbasis = _get_shell_nbasis(max_shell_type)
+    gb2i = _GB2ErfAttractionIntegral(max_shell_type, charges, centers, mu)
     assert gb2i.max_nbasis == max_nbasis
     assert gb2i.mu == mu
 
-    nbasis0 = get_shell_nbasis(shell_type0)
-    nbasis1 = get_shell_nbasis(shell_type1)
+    nbasis0 = _get_shell_nbasis(shell_type0)
+    nbasis1 = _get_shell_nbasis(shell_type1)
     # Clear the working memory
     gb2i.reset(shell_type0, shell_type1, r0, r1)
     # Add a few contributions:
@@ -2010,14 +2012,14 @@ def check_gauss_attraction(alphas0, alphas1, r0, r1, scales0, scales1, charges, 
         The exponential parameter of the Gaussian function.
     """
     max_shell_type = 4
-    max_nbasis = get_shell_nbasis(max_shell_type)
-    gb2i = GB2GaussAttractionIntegral(max_shell_type, charges, centers, c, alpha)
+    max_nbasis = _get_shell_nbasis(max_shell_type)
+    gb2i = _GB2GaussAttractionIntegral(max_shell_type, charges, centers, c, alpha)
     assert gb2i.max_nbasis == max_nbasis
     assert gb2i.c == c
     assert gb2i.alpha == alpha
 
-    nbasis0 = get_shell_nbasis(shell_type0)
-    nbasis1 = get_shell_nbasis(shell_type1)
+    nbasis0 = _get_shell_nbasis(shell_type0)
+    nbasis1 = _get_shell_nbasis(shell_type1)
     assert result0.shape == (nbasis0, nbasis1)
     # Clear the working memory
     gb2i.reset(shell_type0, shell_type1, r0, r1)
@@ -2691,9 +2693,9 @@ def test_gauss_attraction_4_4():
 
 def test_gb4_erilibint_class():
     max_shell_type = 4
-    max_nbasis = get_shell_nbasis(max_shell_type)
+    max_nbasis = _get_shell_nbasis(max_shell_type)
 
-    gb4i = GB4ElectronRepulsionIntegralLibInt(max_shell_type)
+    gb4i = _GB4ElectronRepulsionIntegralLibInt(max_shell_type)
     assert gb4i.max_shell_type == max_shell_type
     assert gb4i.max_nbasis == max_nbasis
     assert gb4i.nwork == max_nbasis ** 4
@@ -2705,15 +2707,15 @@ def check_electron_repulsion(alphas0, alphas1, alphas2, alphas3, r0, r1, r2, r3,
     # This test compares output from HORTON with reference data computed with
     # PyQuante.
     max_shell_type = 4
-    max_nbasis = get_shell_nbasis(max_shell_type)
-    gb4i = GB4ElectronRepulsionIntegralLibInt(max_shell_type)
+    max_nbasis = _get_shell_nbasis(max_shell_type)
+    gb4i = _GB4ElectronRepulsionIntegralLibInt(max_shell_type)
     assert gb4i.max_nbasis == max_nbasis
     assert gb4i.nwork == max_nbasis ** 4
 
-    nbasis0 = get_shell_nbasis(shell_type0)
-    nbasis1 = get_shell_nbasis(shell_type1)
-    nbasis2 = get_shell_nbasis(shell_type2)
-    nbasis3 = get_shell_nbasis(shell_type3)
+    nbasis0 = _get_shell_nbasis(shell_type0)
+    nbasis1 = _get_shell_nbasis(shell_type1)
+    nbasis2 = _get_shell_nbasis(shell_type2)
+    nbasis3 = _get_shell_nbasis(shell_type3)
     assert result0.shape == (nbasis0, nbasis1, nbasis2, nbasis3)
     # Clear the working memory
     gb4i.reset(shell_type0, shell_type1, shell_type2, shell_type3, r0, r1, r2, r3)
@@ -3035,12 +3037,12 @@ def get_erf_repulsion(alphas0, alphas1, alphas2, alphas3, r0, r1, r2, r3,
         The range-separation parameters.
     """
     max_shell_type = 4
-    gb4i = GB4ErfIntegralLibInt(max_shell_type, mu)
+    gb4i = _GB4ErfIntegralLibInt(max_shell_type, mu)
 
-    nbasis0 = get_shell_nbasis(shell_type0)
-    nbasis1 = get_shell_nbasis(shell_type1)
-    nbasis2 = get_shell_nbasis(shell_type2)
-    nbasis3 = get_shell_nbasis(shell_type3)
+    nbasis0 = _get_shell_nbasis(shell_type0)
+    nbasis1 = _get_shell_nbasis(shell_type1)
+    nbasis2 = _get_shell_nbasis(shell_type2)
+    nbasis3 = _get_shell_nbasis(shell_type3)
     # Clear the working memory
     gb4i.reset(shell_type0, shell_type1, shell_type2, shell_type3, r0, r1, r2, r3)
     # Add a few contributions:
@@ -3432,17 +3434,17 @@ def check_gauss_repulsion(alphas0, alphas1, alphas2, alphas3, r0, r1, r2, r3, sc
         Exponential parameter of the gaussian.
     """
     max_shell_type = 4
-    max_nbasis = get_shell_nbasis(max_shell_type)
-    gb4i = GB4GaussIntegralLibInt(max_shell_type, c, alpha)
+    max_nbasis = _get_shell_nbasis(max_shell_type)
+    gb4i = _GB4GaussIntegralLibInt(max_shell_type, c, alpha)
     assert gb4i.max_nbasis == max_nbasis
     assert gb4i.alpha == alpha
     assert gb4i.c == c
     assert gb4i.nwork == max_nbasis ** 4
 
-    nbasis0 = get_shell_nbasis(shell_type0)
-    nbasis1 = get_shell_nbasis(shell_type1)
-    nbasis2 = get_shell_nbasis(shell_type2)
-    nbasis3 = get_shell_nbasis(shell_type3)
+    nbasis0 = _get_shell_nbasis(shell_type0)
+    nbasis1 = _get_shell_nbasis(shell_type1)
+    nbasis2 = _get_shell_nbasis(shell_type2)
+    nbasis3 = _get_shell_nbasis(shell_type3)
     assert result0.shape == (nbasis0, nbasis1, nbasis2, nbasis3)
     # Clear the working memory
     gb4i.reset(shell_type0, shell_type1, shell_type2, shell_type3, r0, r1, r2, r3)
@@ -3955,16 +3957,16 @@ def check_ralpha_repulsion(alphas0, alphas1, alphas2, alphas3, r0, r1, r2, r3, s
         The interaction is r to the power alpha.
     """
     max_shell_type = 4
-    max_nbasis = get_shell_nbasis(max_shell_type)
-    gb4i = GB4RAlphaIntegralLibInt(max_shell_type, alpha)
+    max_nbasis = _get_shell_nbasis(max_shell_type)
+    gb4i = _GB4RAlphaIntegralLibInt(max_shell_type, alpha)
     assert gb4i.max_nbasis == max_nbasis
     assert gb4i.nwork == max_nbasis ** 4
     assert gb4i.alpha == alpha
 
-    nbasis0 = get_shell_nbasis(shell_type0)
-    nbasis1 = get_shell_nbasis(shell_type1)
-    nbasis2 = get_shell_nbasis(shell_type2)
-    nbasis3 = get_shell_nbasis(shell_type3)
+    nbasis0 = _get_shell_nbasis(shell_type0)
+    nbasis1 = _get_shell_nbasis(shell_type1)
+    nbasis2 = _get_shell_nbasis(shell_type2)
+    nbasis3 = _get_shell_nbasis(shell_type3)
     assert result0.shape == (nbasis0, nbasis1, nbasis2, nbasis3)
     # Clear the working memory
     gb4i.reset(shell_type0, shell_type1, shell_type2, shell_type3, r0, r1, r2, r3)

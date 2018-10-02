@@ -18,7 +18,10 @@
 //
 //--
 
-// UPDATELIBDOCTITLE: Conversion of Cartesian to Pure Gaussian functions
+/**
+ * @file cartpure.h
+ * @brief Conversion of Cartesian to Pure Gaussian functions
+ */
 
 #ifndef GBASIS_CARTPURE_H_
 #define GBASIS_CARTPURE_H_

@@ -18,9 +18,16 @@
 # along with this program; if not, see <http://www.gnu.org/licenses/>
 #
 # --
+
+#!python
+#cython: embedsignature=True
+
 """C++ extensions"""
-import numpy as np
+from typing import Iterable, Tuple, Type, List, Union
+
 cimport numpy as np
+import numpy as np
+
 np.import_array()
 
 cimport libc.string
@@ -44,34 +51,34 @@ cimport nucpot
 import atexit
 
 __all__ = [
-    # boys
-    'boys_function', 'boys_function_array',
-    # cartpure
-    'cart_to_pure_low',
-    # common
-    'fac', 'fac2', 'binom', 'get_shell_nbasis', 'get_max_shell_type',
-    'gpt_coeff', 'gb_overlap_int1d', 'nuclear_attraction_helper',
-    'cit', 'jfac', 'dtaylor',
+    # # boys
+    # '_boys_function', '_boys_function_array',
+    # # cartpure
+    # '_cart_to_pure_low',
+    # # common
+    # '_fac', '_fac2', '_binom', '_get_shell_nbasis', '_get_max_shell_type',
+    # '_gpt_coeff', '_gb_overlap_int1d', '_nuclear_attraction_helper',
+    # '_cit', '_jfac', '_dtaylor',
     # gbasis
     'gob_cart_normalization', 'gob_pure_normalization',
     'GOBasis',
     # gbw (testing)
-    'get_2index_slice', 'compute_diagonal', 'select_2index',
+    '_get_2index_slice', '_compute_diagonal', '_select_2index',
     # ints
-    'GB2OverlapIntegral', 'GB2KineticIntegral',
-    'GB2ErfAttractionIntegral',
-    'GB2GaussAttractionIntegral',
-    'GB2NuclearAttractionIntegral','GB4Integral',
-    'GB4ElectronRepulsionIntegralLibInt',
-    'GB4ErfIntegralLibInt', 'GB4GaussIntegralLibInt',
-    'GB4RAlphaIntegralLibInt',
+    '_GB2OverlapIntegral', '_GB2KineticIntegral',
+    '_GB2ErfAttractionIntegral',
+    '_GB2GaussAttractionIntegral',
+    '_GB2NuclearAttractionIntegral', '_GB4Integral',
+    '_GB4ElectronRepulsionIntegralLibInt',
+    '_GB4ErfIntegralLibInt', '_GB4GaussIntegralLibInt',
+    '_GB4RAlphaIntegralLibInt',
     # fns
-    'GB1DMGridDensityFn', 'GB1DMGridGradientFn', 'GB1DMGridGGAFn',
-    'GB1DMGridKineticFn', 'GB1DMGridHessianFn', 'GB1DMGridMGGAFn',
+    '_GB1DMGridDensityFn', '_GB1DMGridGradientFn', '_GB1DMGridGGAFn',
+    '_GB1DMGridKineticFn', '_GB1DMGridHessianFn', '_GB1DMGridMGGAFn',
     # iter_gb
-    'IterGB1', 'IterGB2', 'IterGB4',
+    '_IterGB1', '_IterGB2', '_IterGB4',
     # iter_pow
-    'iter_pow1_inc', 'IterPow1', 'IterPow2',
+    '_iter_pow1_inc', '_IterPow1', '_IterPow2',
 ]
 
 
@@ -79,14 +86,14 @@ __all__ = [
 # Internal business
 #
 
-cdef check_shape(array, shape, name):
+cdef _check_shape(array: Union[np.ndarray, memoryview], shape: Tuple[int], name: str):
     """Checks the shape of an array.
 
     Parameters
     ----------
     array
         Array to be checked
-    shape : tuple
+    shape
         Expected shape. Negative sizes are not checked.
     name
         The name of the array, used in the error messages.
@@ -105,7 +112,7 @@ cdef check_shape(array, shape, name):
             name, i, array.shape[i], i, si))
 
 
-cdef prepare_array(array, shape, name):
+cdef _prepare_array(array: Union[np.ndarray, None], shape: Tuple[int], name: str):
     """Check array shape or initialize it if None.
 
     Parameters
@@ -129,7 +136,7 @@ cdef prepare_array(array, shape, name):
     if array is None:
         array = np.zeros(shape)
     else:
-        check_shape(array, shape, name)
+        _check_shape(array, shape, name)
     return array
 
 
@@ -138,11 +145,11 @@ cdef prepare_array(array, shape, name):
 #
 
 
-def boys_function(long m, double t):
+def _boys_function(long m, double t):
     return boys.boys_function(m, t)
 
 
-def boys_function_array(long mmax, double t):
+def _boys_function_array(long mmax, double t):
     cdef double[::1] output = np.zeros(mmax+1)
     boys.boys_function_array(mmax, t, &output[0])
     return output
@@ -153,7 +160,7 @@ def boys_function_array(long mmax, double t):
 #
 
 
-def cart_to_pure_low(double[::1] work_cart not None,
+def _cart_to_pure_low(double[::1] work_cart not None,
                      double[::1] work_pure not None,
                      long shell_type, long nant, long npost):
     cartpure.cart_to_pure_low(
@@ -167,50 +174,50 @@ def cart_to_pure_low(double[::1] work_cart not None,
 #
 
 
-def fac(long n):
+def _fac(long n):
     return common.fac(n)
 
 
-def fac2(long n):
+def _fac2(long n):
     return common.fac2(n)
 
 
-def binom(long n, long m):
+def _binom(long n, long m):
     return common.binom(n, m)
 
 
-def get_shell_nbasis(long shell_type):
+def _get_shell_nbasis(long shell_type):
     result = common.get_shell_nbasis(shell_type)
     if result <= 0:
         raise ValueError("shell_type -1 is not supported.")
     return result
 
 
-def get_max_shell_type():
+def _get_max_shell_type():
     return common.get_max_shell_type()
 
 
-def gpt_coeff(long k, long n0, long n1, double pa, double pb):
+def _gpt_coeff(long k, long n0, long n1, double pa, double pb):
     return common.gpt_coeff(k, n0, n1, pa, pb)
 
 
-def gb_overlap_int1d(long n0, long n1, double pa, double pb, double inv_gamma):
+def _gb_overlap_int1d(long n0, long n1, double pa, double pb, double inv_gamma):
     return common.gb_overlap_int1d(n0, n1, pa, pb, inv_gamma)
 
 
-def nuclear_attraction_helper(double[::1] work_g not None,
+def _nuclear_attraction_helper(double[::1] work_g not None,
                               long n0, long n1, double pa, double pb, double cp,
                               double gamma_inv):
     assert work_g.shape[0] == n0+n1+1
     common.nuclear_attraction_helper(&work_g[0], n0, n1, pa, pb, cp, gamma_inv)
 
-def cit(int i, double t, int m):
+def _cit(int i, double t, int m):
         return common.cit(i, t, m)
 
-def jfac(int j, int n):
+def _jfac(int j, int n):
     return common.jfac(j, n)
 
-def dtaylor(int n, double alpha, double t, double tfactor):
+def _dtaylor(int n, double alpha, double t, double tfactor):
     return common.dtaylor(n, alpha, t, tfactor)
 
 
@@ -230,86 +237,58 @@ def gob_pure_normalization(double alpha, long l):
 
 cdef class GBasis:
     """
-       This class describes basis sets applied to a certain molecular structure.
+    This class describes basis sets applied to a certain molecular structure.
 
-       **Arguments:**
+    The order of the pure shells is based on the order of real spherical.
+    The functions are sorted from low to high magnetic quantum number,
+    with cosine-like functions before the sine-like functions. The order
+    of functions in a Cartesian shell is alphabetic. Some examples:
 
-       centers
-            A numpy array with centers for the basis functions.
-            shape = (ncenter, 3)
+    shell_type = 0, S:
+     0 -> 1
+    shell_type = 1, P:
+     0 -> x
+     1 -> y
+     2 -> z
+    shell_type = 2, Cartesian D:
+     0 -> xx
+     1 -> xy
+     2 -> xz
+     3 -> yy
+     4 -> yz
+     5 -> zz
+    shell_type = 3, Cartesian F:
+     0 -> xxx
+     1 -> xxy
+     2 -> xxz
+     3 -> xyy
+     4 -> xyz
+     5 -> xzz
+     6 -> yyy
+     7 -> yyz
+     8 -> yzz
+     9 -> zzz
+    shell_type = -1, not allowed
+    shell_type = -2, pure D:
+     0 -> zz
+     1 -> xz
+     2 -> yz
+     3 -> xx-yy
+     4 -> xy
+    shell_type = -3, pure F:
+     0 -> zzz
+     1 -> xzz
+     2 -> yzz
+     3 -> xxz-yyz
+     4 -> xyz
+     5 -> xxx-3xyy
+     6 -> 3xxy-yyy
 
-       shell_map
-            An array with the center index for each shell.
-            shape = (nshell,)
-
-       nprims
-            The number of primitives in each shell.
-            shape = (nshell,)
-
-       shell_types
-            An array with contraction types: 0 = S, 1 = P, 2 = Cartesian D,
-            3 = Cartesian F, ..., -2 = pure D, -3 = pure F, ...
-            shape = (nshell,)
-
-       alphas
-            The exponents of the primitives in one shell.
-            shape = (sum(nprims),)
-
-       con_coeffs
-            The contraction coefficients of the primitives for each
-            contraction in a contiguous array. The coefficients are ordered
-            according to the shells. Within each shell, the coefficients are
-            grouped per exponent.
-            shape = (sum(nprims),)
-
-       All arguments may also be lists. In any case, copies are made of the
-       arguments and stored internally, and are not meant to be modified once
-       the GOBasis object is created.
-
-       The order of the pure shells is based on the order of real spherical.
-       The functions are sorted from low to high magnetic quantum number,
-       with cosine-like functions before the sine-like functions. The order
-       of functions in a Cartesian shell is alphabetic. Some examples:
-
-       shell_type = 0, S:
-         0 -> 1
-       shell_type = 1, P:
-         0 -> x
-         1 -> y
-         2 -> z
-       shell_type = 2, Cartesian D:
-         0 -> xx
-         1 -> xy
-         2 -> xz
-         3 -> yy
-         4 -> yz
-         5 -> zz
-       shell_type = 3, Cartesian F:
-         0 -> xxx
-         1 -> xxy
-         2 -> xxz
-         3 -> xyy
-         4 -> xyz
-         5 -> xzz
-         6 -> yyy
-         7 -> yyz
-         8 -> yzz
-         9 -> zzz
-       shell_type = -1, not allowed
-       shell_type = -2, pure D:
-         0 -> zz
-         1 -> xz
-         2 -> yz
-         3 -> xx-yy
-         4 -> xy
-       shell_type = -3, pure F:
-         0 -> zzz
-         1 -> xzz
-         2 -> yzz
-         3 -> xxz-yyz
-         4 -> xyz
-         5 -> xxx-3xyy
-         6 -> 3xxy-yyy
+     Attributes
+     ==========
+     biblio : list
+        A list of references to cite. It is populated depending on which methods were run during the
+        calculation.
     """
 
     cdef gbasis.GBasis* _this
@@ -321,7 +300,43 @@ cdef class GBasis:
     cdef np.ndarray _alphas
     cdef np.ndarray _con_coeffs
 
-    def __cinit__(self, centers, shell_map, nprims, shell_types, alphas, con_coeffs):
+    def __cinit__(self, centers: Iterable, shell_map: Iterable, nprims: Iterable,
+                  shell_types: Iterable, alphas: Iterable, con_coeffs: Iterable):
+        """
+        Parameters
+        ----------
+        centers
+            A numpy array with centers for the basis functions.
+            shape = (ncenter, 3)
+        shell_map
+            An array with the center index for each shell.
+            shape = (nshell,)
+        nprims
+            The number of primitives in each shell.
+            shape = (nshell,)
+        shell_types
+            An array with contraction types: 0 = S, 1 = P, 2 = Cartesian D,
+            3 = Cartesian F, ..., -2 = pure D, -3 = pure F, ...
+            shape = (nshell,)
+        alphas
+            The exponents of the primitives in one shell.
+            shape = (sum(nprims),)
+        con_coeffs
+            The contraction coefficients of the primitives for each
+            contraction in a contiguous array. The coefficients are ordered
+            according to the shells. Within each shell, the coefficients are
+            grouped per exponent.
+            shape = (sum(nprims),)
+
+
+        Copies are made of the arguments and stored internally, and are not meant
+        to be modified once the GOBasis object is created.
+
+        Returns
+        -------
+        An instance of GOBasis
+
+        """
         # Make private copies of the input arrays.
         self._centers = np.array(centers, dtype=float)
         self._shell_map = np.array(shell_map, dtype=int)
@@ -381,22 +396,69 @@ cdef class GBasis:
         if self._alphas.shape[0] != nprim_total:
             raise TypeError('The length of alphas must equal the total number of primitives.')
 
-    def __init__(self, centers, shell_map, nprims, shell_types, alphas, con_coeffs):
+
+    def __init__(self, centers: Iterable, shell_map: Iterable, nprims: Iterable,
+                  shell_types: Iterable, alphas: Iterable, con_coeffs: Iterable):
+        """
+
+        Parameters
+        ----------
+        centers
+            A numpy array with centers for the basis functions.
+            shape = (ncenter, 3)
+        shell_map
+            An array with the center index for each shell.
+            shape = (nshell,)
+        nprims
+            The number of primitives in each shell.
+            shape = (nshell,)
+        shell_types
+            An array with contraction types: 0 = S, 1 = P, 2 = Cartesian D,
+            3 = Cartesian F, ..., -2 = pure D, -3 = pure F, ...
+            shape = (nshell,)
+        alphas
+            The exponents of the primitives in one shell.
+            shape = (sum(nprims),)
+        con_coeffs
+            The contraction coefficients of the primitives for each
+            contraction in a contiguous array. The coefficients are ordered
+            according to the shells. Within each shell, the coefficients are
+            grouped per exponent.
+            shape = (sum(nprims),)
+
+
+        Copies are made of the arguments and stored internally, and are not meant
+        to be modified once the GOBasis object is created.
+
+        Returns
+        -------
+        An instance of GOBasis
+
+        """
         if self.__class__ == GBasis:
             raise NotImplementedError('GBasis is an abstract base class')
         self._log_init()
-        self.biblio = []
+        self._biblio = []
 
     def __dealloc__(self):
         del self._this
 
     @classmethod
-    def concatenate(cls, *gbs):
+    def concatenate(cls, *gbs: Type[GBasis]) -> Type[GBasis]:
         """Concatenate multiple basis objects into a new one.
 
-           **Arguments:** each argument is an instance of the same subclass of
-           GBasis.
+        Parameters
+        ----------
+        gbs
+            Each argument must be an instance of the same subclass of
+            GBasis.
+
+        Returns
+        -------
+        An instance of Gbasis (or its children) with its attributes concatenated together from
+        the arguments.
         """
+
         # check if the classes match
         for gb in gbs:
             assert isinstance(gb, cls)
@@ -415,92 +477,96 @@ cdef class GBasis:
         con_coeffs = np.concatenate([gb.con_coeffs for gb in gbs])
         return cls(centers, shell_map, nprims, shell_types, alphas, con_coeffs)
 
-    @classmethod
-    def from_hdf5(cls, grp):
-        return cls(
-            np.array(grp['centers']),
-            np.array(grp['shell_map']),
-            np.array(grp['nprims']),
-            np.array(grp['shell_types']),
-            np.array(grp['alphas']),
-            np.array(grp['con_coeffs'])
-        )
-
-    def to_hdf5(self, grp):
-        grp['centers'] = self.centers
-        grp['shell_map'] = self.shell_map
-        grp['nprims'] = self.nprims
-        grp['shell_types'] = self.shell_types
-        grp['alphas'] = self.alphas
-        grp['con_coeffs'] = self.con_coeffs
+    @property
+    def biblio(self):
+        """References to cite. The list is generated depending on what users run."""
+        return self._biblio
 
     # Array properties
 
-    property centers:
-        def __get__(self):
-            return self._centers
+    @property
+    def centers(self):
+        """The basis function centres"""
+        return self._centers
 
-    property shell_map:
-        def __get__(self):
-            return self._shell_map.view()
+    @property
+    def shell_map(self):
+        """The index in ``centers`` for each shell"""
+        return self._shell_map.view()
 
-    property nprims:
-        def __get__(self):
-            return self._nprims.view()
+    @property
+    def nprims(self):
+        """The number of primitives in each shell."""
+        return self._nprims.view()
 
-    property shell_types:
-        def __get__(self):
-            return self._shell_types.view()
+    @property
+    def shell_types(self):
+        """The type of each shell.
+        0 = S, 1 = P, 2 = Cartesian D, 3 = Cartesian F, ..., -2 = pure D, -3 = pure F, ...
+        """
+        return self._shell_types.view()
 
-    property alphas:
-        def __get__(self):
-            return self._alphas.view()
+    @property
+    def alphas(self):
+        """The exponents of the primitives in one shell."""
+        return self._alphas.view()
 
-    property con_coeffs:
-        def __get__(self):
-            return self._con_coeffs.view()
+    @property
+    def con_coeffs(self):
+        """The contraction coefficients of the primitives for each
+        contraction in a contiguous array. The coefficients are ordered
+        according to the shells. Within each shell, the coefficients are
+        grouped per exponent.
+        """
+        return self._con_coeffs.view()
 
     # Array sizes
 
-    property ncenter:
-        def __get__(self):
-            return self.centers.shape[0]
+    @property
+    def ncenter(self):
+        """The number of centres"""
+        return self.centers.shape[0]
 
-    property nshell:
-        def __get__(self):
-            return self.shell_map.shape[0]
+    @property
+    def nshell(self):
+        """The number of shells"""
+        return self.shell_map.shape[0]
 
-    property nprim_total:
-        def __get__(self):
-            return self.nprims.sum()
+    @property
+    def nprim_total(self):
+        """The total number of primitives"""
+        return self.nprims.sum()
 
     # Other properties
 
-    property nbasis:
-        def __get__(self):
-            return self._this.get_nbasis()
+    @property
+    def nbasis(self):
+        """The number of basis functions"""
+        return self._this.get_nbasis()
 
-    property shell_lookup:
-        def __get__(self):
-            cdef np.npy_intp* shape = [self.nbasis]
-            tmp = np.PyArray_SimpleNewFromData(1, shape,
-                    np.NPY_LONG, <void*> self._this.get_shell_lookup())
-            return tmp.copy()
+    @property
+    def shell_lookup(self):
+        cdef np.npy_intp* shape = [self.nbasis]
+        tmp = np.PyArray_SimpleNewFromData(1, shape,
+                np.NPY_LONG, <void*> self._this.get_shell_lookup())
+        return tmp.copy()
 
-    property basis_offsets:
-        def __get__(self):
-            cdef np.npy_intp* shape = [self.nshell]
-            tmp = np.PyArray_SimpleNewFromData(1, shape, np.NPY_LONG,
-                        <void*> self._this.get_basis_offsets())
-            return tmp.copy()
+    @property
+    def basis_offsets(self):
+        cdef np.npy_intp* shape = [self.nshell]
+        tmp = np.PyArray_SimpleNewFromData(1, shape, np.NPY_LONG,
+                    <void*> self._this.get_basis_offsets())
+        return tmp.copy()
 
-    property nscales:
-        def __get__(self):
-            return self._this.get_nscales()
+    @property
+    def nscales(self):
+        """The number of normalization constants"""
+        return self._this.get_nscales()
 
-    property max_shell_type:
-        def __get__(self):
-            return self._this.get_max_shell_type()
+    @property
+    def max_shell_type(self):
+        """The largest shell angular momentum in this basis object."""
+        return self._this.get_max_shell_type()
 
     def _log_init(self):
         """Write a summary of the basis to the screen logger"""
@@ -514,44 +580,47 @@ cdef class GBasis:
             -2: 'Dp', -3: 'Fp', -4:'Gp', -5: 'Hp', -6: 'Ip',
         }
         descs = ['']*self.ncenter
-        for i in xrange(self.nshell):
+        for i in range(self.nshell):
             icenter = self.shell_map[i]
             s = descs[icenter]
             name = shell_type_names[self.shell_types[i]]
             s += ' %s%i' % (name, self.nprims[i])
             descs[icenter] = s
         deflist = []
-        # for i in xrange(self.ncenter):
+        # for i in range(self.ncenter):
         #     deflist.append(('9: Center % 5i' % i, descs[i]))
         # print(deflist)
         # print()
 
     def get_scales(self):
-        # A **copy** of the scales is returned.
+        """Return a copy of the normalization constants."""
         cdef np.npy_intp shape[1]
         shape[0] = self.nscales
         tmp = np.PyArray_SimpleNewFromData(1, shape, np.NPY_DOUBLE, <void*> self._this.get_scales(0))
         return tmp.copy()
 
     # low-level compute routines, for debugging only
-    def compute_grid_point1(self, double[::1] output not None,
+    def _compute_grid_point1(self, double[::1] output not None,
                             double[::1] point not None,
-                            GB1DMGridFn grid_fn not None):
+                            _GB1DMGridFn grid_fn not None):
         assert output.shape[0] == self.nbasis
         assert point.shape[0] == 3
         self._this.compute_grid_point1(&output[0], &point[0], grid_fn._this)
 
-    def get_subset(self, ishells):
+    def get_subset(self, ishells: List) -> Type[GBasis]:
         """Construct a sub basis set for a selection of shells
 
-           **Argument:**
+        Parameters
+        ----------
+        ishells
+            A list of indexes of shells to be retained in the sub basis set
 
-           ishells
-                A list of indexes of shells to be retained in the sub basis set
-
-           **Returns:** An instance of the same class as self containing only
-           the basis functions of self that correspond to the select shells in
-           the ``ishells`` list.
+        Returns
+        -------
+        GBasis instance
+            An instance of the same class as self containing only
+            the basis functions that correspond to the select shells in
+            the ``ishells`` list.
         """
         # find the centers corresponding to ishells
         icenters = set([])
@@ -585,7 +654,7 @@ cdef class GBasis:
         # make a mapping between the indices of old and new basis functions
         ibasis_list = []
         for new_ishell, ishell in enumerate(ishells):
-            ibasis_old = sum(common.get_shell_nbasis(self.shell_types[i]) for i in xrange(ishell))
+            ibasis_old = sum(common.get_shell_nbasis(self.shell_types[i]) for i in range(ishell))
             nbasis = common.get_shell_nbasis(self.shell_types[ishell])
             ibasis_list.extend(range(ibasis_old, ibasis_old+nbasis))
         ibasis_list = np.array(ibasis_list)
@@ -596,37 +665,43 @@ cdef class GBasis:
         return basis, ibasis_list
 
     def get_basis_atoms(self, coordinates):
-        """Return a list of atomic basis sets for a given geometry
+        """Return a list of atomic basis sets for a set of coordinates
 
-           **Arguments:**
+        Parameters
+        ----------
+        coordinates
+            An (N, 3) array with atomic coordinates, used to find the
+            centers associated with atoms. An exact match of the Cartesian
+            coordinates is required to properly select a shell.
 
-           coordinates
-                An (N, 3) array with atomic coordinates, used to find the
-                centers associated with atoms. An exact match of the Cartesian
-                coordinates is required to properly select a shell.
+        Returns
+        -------
+        List
+            A list with one tuple for every atom: (gbasis,
+            ibasis_list), where gbasis is a basis set object for the atom and
+            ibasis_list is a list of basis set indexes that can be used to
+            substitute results from the atomic basis set back into the molecular
+            basis set.
 
-           **Returns:** A list with one tuple for every atom: (gbasis,
-           ibasis_list), where gbasis is a basis set object for the atom and
-           ibasis_list is a list of basis set indexes that can be used to
-           substitute results from the atomic basis set back into the molecular
-           basis set. For example, when a density matrix for the atom is
-           obtained and it needs to be plugged back into the molecular density
-           matrix, one can do the following::
+            For example, when a density matrix for the atom is
+            obtained and it needs to be plugged back into the molecular density
+            matrix, one can do the following::
 
-               mol_dm._array[ibasis_list,ibasis_list.reshape(-1,1)] = atom_dm._array
+            >>>> mol_dm[ibasis_list, ibasis_list.reshape(-1,1)] = atom_dm
+
         """
         result = []
         for c in coordinates:
             # find the corresponding center(s).
             icenters = []
-            for icenter in xrange(self.ncenter):
+            for icenter in range(self.ncenter):
                 # require an exact match of the coordinates
                 if (self.centers[icenter] == c).all():
                     icenters.append(icenter)
             icenters = set(icenters)
             # find the shells on these centers
             ishells = []
-            for ishell in xrange(self.nshell):
+            for ishell in range(self.nshell):
                 if self.shell_map[ishell] in icenters:
                     ishells.append(ishell)
             # construct a sub basis
@@ -636,7 +711,7 @@ cdef class GBasis:
 
 
 cdef class GOBasis(GBasis):
-    cdef public list biblio
+    cdef public list _biblio
 
     def __cinit__(self, centers, shell_map, nprims, shell_types, alphas, con_coeffs):
         self._this = <gbasis.GBasis*> new gbasis.GOBasis(
@@ -663,13 +738,13 @@ cdef class GOBasis(GBasis):
         Parameters
         ----------
         output
-            Two-index object, optional.
+            shape = (nbasis, nbasis). It will be overwritten.
 
         Returns
         -------
         output
         """
-        output = prepare_array(output, (self.nbasis, self.nbasis), 'output')
+        output = _prepare_array(output, (self.nbasis, self.nbasis), 'output')
         (<gbasis.GOBasis*>self._this).compute_overlap(&output[0, 0])
         return np.asarray(output)
 
@@ -679,13 +754,13 @@ cdef class GOBasis(GBasis):
         Parameters
         ----------
         output
-            Two-index object, optional.
+            shape = (nbasis, nbasis). It will be overwritten.
 
         Returns
         -------
         output
         """
-        output = prepare_array(output, (self.nbasis, self.nbasis), 'output')
+        output = _prepare_array(output, (self.nbasis, self.nbasis), 'output')
         (<gbasis.GOBasis*>self._this).compute_kinetic(&output[0, 0])
         return np.asarray(output)
 
@@ -709,10 +784,10 @@ cdef class GOBasis(GBasis):
         output
         """
         # type checking
-        check_shape(coordinates, (-1, 3), 'coordinates')
+        _check_shape(coordinates, (-1, 3), 'coordinates')
         natom = coordinates.shape[0]
-        check_shape(charges, (natom,), 'charges')
-        output = prepare_array(output, (self.nbasis, self.nbasis), 'output')
+        _check_shape(charges, (natom,), 'charges')
+        output = _prepare_array(output, (self.nbasis, self.nbasis), 'output')
         # actual job
         (<gbasis.GOBasis*>self._this).compute_nuclear_attraction(
             &charges[0], &coordinates[0, 0], natom, &output[0, 0])
@@ -748,10 +823,10 @@ cdef class GOBasis(GBasis):
         Keywords: :index:`two-center integrals`
         """
         # type checking
-        check_shape(coordinates, (-1, 3), 'coordinates')
+        _check_shape(coordinates, (-1, 3), 'coordinates')
         natom = coordinates.shape[0]
-        check_shape(charges, (natom,), 'charges')
-        output = prepare_array(output, (self.nbasis, self.nbasis), 'output')
+        _check_shape(charges, (natom,), 'charges')
+        output = _prepare_array(output, (self.nbasis, self.nbasis), 'output')
         # actual job
         (<gbasis.GOBasis*>self._this).compute_erf_attraction(
             &charges[0], &coordinates[0, 0], natom, &output[0, 0], mu)
@@ -789,10 +864,10 @@ cdef class GOBasis(GBasis):
         Keywords: :index:`two-center integrals`
         """
         # type checking
-        check_shape(coordinates, (-1, 3), 'coordinates')
+        _check_shape(coordinates, (-1, 3), 'coordinates')
         natom = coordinates.shape[0]
-        check_shape(charges, (natom,), 'charges')
-        output = prepare_array(output, (self.nbasis, self.nbasis), 'output')
+        _check_shape(charges, (natom,), 'charges')
+        output = _prepare_array(output, (self.nbasis, self.nbasis), 'output')
         # actual job
         (<gbasis.GOBasis*>self._this).compute_gauss_attraction(
             &charges[0], &coordinates[0, 0], natom, &output[0, 0], c, alpha)
@@ -820,12 +895,12 @@ cdef class GOBasis(GBasis):
         output
         """
         # type checking
-        check_shape(center, (3,), 'center')
-        check_shape(xyz, (3,), 'xyz')
+        _check_shape(center, (3,), 'center')
+        _check_shape(xyz, (3,), 'xyz')
         if xyz[0] < 0 or xyz[1] < 0 or xyz[2] < 0 or xyz[0] + xyz[1] + xyz[2] <= 0:
             raise ValueError('Exponents of the Cartesian multipole operators must be '
                              'positive and may not sum to zero.')
-        output = prepare_array(output, (self.nbasis, self.nbasis), 'output')
+        output = _prepare_array(output, (self.nbasis, self.nbasis), 'output')
         # actual job
         (<gbasis.GOBasis*>self._this).compute_multipole_moment(
             &xyz[0], &center[0], &output[0, 0])
@@ -850,9 +925,9 @@ cdef class GOBasis(GBasis):
 
         Keywords: :index:`ERI`, :index:`four-center integrals`
         """
-        self.biblio.append(('valeev2014',
+        self._biblio.append(('valeev2014',
                     'the efficient implementation of four-center electron repulsion integrals'))
-        output = prepare_array(output, (self.nbasis, self.nbasis, self.nbasis, self.nbasis), 'output')
+        output = _prepare_array(output, (self.nbasis, self.nbasis, self.nbasis, self.nbasis), 'output')
         (<gbasis.GOBasis*>self._this).compute_electron_repulsion(&output[0, 0, 0, 0])
         return np.asarray(output)
 
@@ -877,11 +952,11 @@ cdef class GOBasis(GBasis):
 
         Keywords: :index:`ERI`, :index:`four-center integrals`
         """
-        self.biblio.append(('valeev2014',
+        self._biblio.append(('valeev2014',
                  'the efficient implementation of four-center electron repulsion integrals'))
-        self.biblio.append(('ahlrichs2006',
+        self._biblio.append(('ahlrichs2006',
                  'the methodology to implement various types of four-center integrals.'))
-        output = prepare_array(output, (self.nbasis, self.nbasis, self.nbasis, self.nbasis), 'output')
+        output = _prepare_array(output, (self.nbasis, self.nbasis, self.nbasis, self.nbasis), 'output')
         (<gbasis.GOBasis*>self._this).compute_erf_repulsion(&output[0, 0, 0, 0], mu)
         return np.asarray(output)
 
@@ -909,15 +984,15 @@ cdef class GOBasis(GBasis):
 
         Keywords: :index:`ERI`, :index:`four-center integrals`
         """
-        self.biblio.append(('valeev2014',
+        self._biblio.append(('valeev2014',
                  'the efficient implementation of four-center electron repulsion integrals'))
-        self.biblio.append(('ahlrichs2006',
+        self._biblio.append(('ahlrichs2006',
                  'the methodology to implement various types of four-center integrals.'))
-        self.biblio.append(('gill1996',
+        self._biblio.append(('gill1996',
                  'four-center integrals with a Gaussian interaction potential.'))
-        self.biblio.append(('toulouse2004',
+        self._biblio.append(('toulouse2004',
                  'four-center integrals with a Gaussian interaction potential.'))
-        output = prepare_array(output, (self.nbasis, self.nbasis, self.nbasis, self.nbasis), 'output')
+        output = _prepare_array(output, (self.nbasis, self.nbasis, self.nbasis, self.nbasis), 'output')
         (<gbasis.GOBasis*>self._this).compute_gauss_repulsion(&output[0, 0, 0, 0], c, alpha)
         return np.asarray(output)
 
@@ -944,15 +1019,15 @@ cdef class GOBasis(GBasis):
 
         Keywords: :index:`ERI`, :index:`four-center integrals`
         """
-        self.biblio.append(('valeev2014',
+        self._biblio.append(('valeev2014',
                  'the efficient implementation of four-center electron repulsion integrals'))
-        self.biblio.append(('ahlrichs2006',
+        self._biblio.append(('ahlrichs2006',
                  'the methodology to implement various types of four-center integrals.'))
-        output = prepare_array(output, (self.nbasis, self.nbasis, self.nbasis, self.nbasis), 'output')
+        output = _prepare_array(output, (self.nbasis, self.nbasis, self.nbasis, self.nbasis), 'output')
         (<gbasis.GOBasis*>self._this).compute_ralpha_repulsion(&output[0, 0, 0, 0], alpha)
         return np.asarray(output)
 
-    def _compute_cholesky(self, GB4Integral gb4int, double threshold=1e-8):
+    def _compute_cholesky(self, _GB4Integral gb4int, double threshold=1e-8):
         """Apply the Cholesky code to a given type of four-center integrals.
 
         Parameters
@@ -1003,7 +1078,7 @@ cdef class GOBasis(GBasis):
 
         Keywords: :index:`ERI`, :index:`four-center integrals`
         """
-        return self._compute_cholesky(GB4ElectronRepulsionIntegralLibInt(self.max_shell_type))
+        return self._compute_cholesky(_GB4ElectronRepulsionIntegralLibInt(self.max_shell_type))
 
     def compute_erf_repulsion_cholesky(self, double mu=0.0, double threshold=1e-8):
         r"""Compute Cholesky decomposition of Erf repulsion four-center integrals.
@@ -1027,7 +1102,7 @@ cdef class GOBasis(GBasis):
 
         Keywords: :index:`ERI`, :index:`four-center integrals`
         """
-        return self._compute_cholesky(GB4ErfIntegralLibInt(self.max_shell_type, mu))
+        return self._compute_cholesky(_GB4ErfIntegralLibInt(self.max_shell_type, mu))
 
     def compute_gauss_repulsion_cholesky(self, double c=1.0, double alpha=1.0,
                                          double threshold=1e-8):
@@ -1054,7 +1129,7 @@ cdef class GOBasis(GBasis):
 
         Keywords: :index:`ERI`, :index:`four-center integrals`
         """
-        return self._compute_cholesky(GB4GaussIntegralLibInt(self.max_shell_type, c, alpha))
+        return self._compute_cholesky(_GB4GaussIntegralLibInt(self.max_shell_type, c, alpha))
 
     def compute_ralpha_repulsion_cholesky(self, double alpha=-1.0, double threshold=1e-8):
         r"""Compute Cholesky decomposition of ralpha repulsion four-center integrals.
@@ -1079,7 +1154,7 @@ cdef class GOBasis(GBasis):
 
         Keywords: :index:`ERI`, :index:`four-center integrals`
         """
-        return self._compute_cholesky(GB4RAlphaIntegralLibInt(self.max_shell_type, alpha))
+        return self._compute_cholesky(_GB4RAlphaIntegralLibInt(self.max_shell_type, alpha))
 
     def compute_grid_orbitals_exp(self, double[:, ::1] coeffs, double[:, ::1] points not None,
                                   long[::1] iorbs not None, double[:, ::1] output=None):
@@ -1108,10 +1183,10 @@ cdef class GOBasis(GBasis):
         # Do some type checking
         self.check_coeffs(coeffs)
         nfn = coeffs.shape[1]
-        check_shape(points, (-1, 3), 'points')
+        _check_shape(points, (-1, 3), 'points')
         npoint = points.shape[0]
         norb = iorbs.shape[0]
-        output = prepare_array(output, (npoint, norb), 'output')
+        output = _prepare_array(output, (npoint, norb), 'output')
         # compute
         (<gbasis.GOBasis*>self._this).compute_grid1_exp(
             nfn, &coeffs[0, 0], npoint, &points[0, 0],
@@ -1144,10 +1219,10 @@ cdef class GOBasis(GBasis):
         # Do some type checking
         self.check_coeffs(coeffs)
         nfn = coeffs.shape[1]
-        check_shape(points, (-1, 3), 'points')
+        _check_shape(points, (-1, 3), 'points')
         npoint = points.shape[0]
         norb = iorbs.shape[0]
-        output = prepare_array(output, (npoint, norb, 3), 'output')
+        output = _prepare_array(output, (npoint, norb, 3), 'output')
         # compute
         (<gbasis.GOBasis*>self._this).compute_grid1_grad_exp(
             nfn, &coeffs[0, 0], npoint, &points[0, 0],
@@ -1155,7 +1230,7 @@ cdef class GOBasis(GBasis):
         return np.asarray(output)
 
     def _compute_grid1_dm(self, double[:, ::1] dm not None, double[:, ::1] points not None,
-                          GB1DMGridFn grid_fn not None, double[:, ::1] output not None,
+                          _GB1DMGridFn grid_fn not None, double[:, ::1] output not None,
                           double epsilon=0):
         """Compute some density function on a grid for a given density matrix.
 
@@ -1168,7 +1243,7 @@ cdef class GOBasis(GBasis):
             Density matrix, assumed to be symmetric.
         points : np.ndarray, shape=(npoint, 3), dtype=float
             Cartesian grid points.
-        grid_fn : GB1DMGridFn
+        grid_fn : _GB1DMGridFn
             Implements the function to be evaluated on the grid.
         output : np.ndarray, shape=(npoint, n), dtype=float
             Output array. The second dimension depends on grid_fn.
@@ -1177,10 +1252,10 @@ cdef class GOBasis(GBasis):
             efficiency. Some grid_fn implementations may ignore this.
         """
         # Check the array shapes
-        check_shape(dm, (self.nbasis, self.nbasis,), 'dm')
-        check_shape(points, (-1, 3), 'points')
+        _check_shape(dm, (self.nbasis, self.nbasis,), 'dm')
+        _check_shape(points, (-1, 3), 'points')
         npoint = points.shape[0]
-        check_shape(output, (npoint, grid_fn.dim_output), 'output')
+        _check_shape(output, (npoint, grid_fn.dim_output), 'output')
         # Get the maximum of the absolute value over the rows
         cdef double[:] dmmaxrow = np.abs(dm).max(axis=0)
         # Go!
@@ -1215,7 +1290,7 @@ cdef class GOBasis(GBasis):
         """
         if output is None:
             output = np.zeros(points.shape[0])
-        self._compute_grid1_dm(dm, points, GB1DMGridDensityFn(self.max_shell_type),
+        self._compute_grid1_dm(dm, points, _GB1DMGridDensityFn(self.max_shell_type),
                                output[:, None], epsilon)
         return np.asarray(output)
 
@@ -1242,7 +1317,7 @@ cdef class GOBasis(GBasis):
         """
         if output is None:
             output = np.zeros((points.shape[0], 3), float)
-        self._compute_grid1_dm(dm, points, GB1DMGridGradientFn(self.max_shell_type), output)
+        self._compute_grid1_dm(dm, points, _GB1DMGridGradientFn(self.max_shell_type), output)
         return np.asarray(output)
 
     def compute_grid_gga_dm(self, double[:, ::1] dm not None,
@@ -1269,12 +1344,12 @@ cdef class GOBasis(GBasis):
         """
         if output is None:
             output = np.zeros((points.shape[0], 4), float)
-        self._compute_grid1_dm(dm, points, GB1DMGridGGAFn(self.max_shell_type), output)
+        self._compute_grid1_dm(dm, points, _GB1DMGridGGAFn(self.max_shell_type), output)
         return np.asarray(output)
 
     def compute_grid_kinetic_dm(self, double[:, ::1] dm not None,
                                 double[:, ::1] points not None, double[::1] output=None):
-        """Compute the kinetic energy density on a grid for a given density matrix.
+        """Compute the positive definite kinetic energy density on a grid for a given density matrix.
 
         **Warning:** the results are added to the output array! This may be useful to
         combine results from different spin components.
@@ -1295,7 +1370,7 @@ cdef class GOBasis(GBasis):
         """
         if output is None:
             output = np.zeros((points.shape[0],), float)
-        self._compute_grid1_dm(dm, points, GB1DMGridKineticFn(self.max_shell_type), output[:, None])
+        self._compute_grid1_dm(dm, points, _GB1DMGridKineticFn(self.max_shell_type), output[:, None])
         return np.asarray(output)
 
     def compute_grid_hessian_dm(self, double[:, ::1] dm not None,
@@ -1329,7 +1404,7 @@ cdef class GOBasis(GBasis):
         """
         if output is None:
             output = np.zeros((points.shape[0], 6), float)
-        self._compute_grid1_dm(dm, points, GB1DMGridHessianFn(self.max_shell_type), output)
+        self._compute_grid1_dm(dm, points, _GB1DMGridHessianFn(self.max_shell_type), output)
         return np.asarray(output)
 
     def compute_grid_mgga_dm(self, double[:, ::1] dm not None,
@@ -1366,7 +1441,7 @@ cdef class GOBasis(GBasis):
         """
         if output is None:
             output = np.zeros((points.shape[0], 6), float)
-        self._compute_grid1_dm(dm, points, GB1DMGridMGGAFn(self.max_shell_type), output)
+        self._compute_grid1_dm(dm, points, _GB1DMGridMGGAFn(self.max_shell_type), output)
         return np.asarray(output)
 
     def compute_grid_hartree_dm(self, double[:, ::1] dm not None,
@@ -1391,10 +1466,10 @@ cdef class GOBasis(GBasis):
             The output array.
         """
         # type checking
-        check_shape(dm, (self.nbasis, self.nbasis), 'dm')
-        check_shape(points, (-1, 3), 'points')
+        _check_shape(dm, (self.nbasis, self.nbasis), 'dm')
+        _check_shape(points, (-1, 3), 'points')
         npoint = points.shape[0]
-        output = prepare_array(output, (npoint,), 'output')
+        output = _prepare_array(output, (npoint,), 'output')
         # compute
         (<gbasis.GOBasis*>self._this).compute_grid2_dm(
             &dm[0, 0], npoint, &points[0, 0], &output[0])
@@ -1433,7 +1508,7 @@ cdef class GOBasis(GBasis):
         return tmp
 
     def _compute_grid1_fock(self, double[:, ::1] points not None, double[::1] weights not None,
-                            double[:, :] pots not None, GB1DMGridFn grid_fn not None,
+                            double[:, :] pots not None, _GB1DMGridFn grid_fn not None,
                             double[:, ::1] fock=None):
         """Compute a Fock operator from a some sort of potential.
 
@@ -1448,16 +1523,16 @@ cdef class GOBasis(GBasis):
         pots : np.ndarray, shape=(npoint, n)
             Derivative of the energy toward the density-related quantities
             at all grid points. The number of columns depends on grid_fn.
-        grid_fn : GB1DMGridFn
+        grid_fn : _GB1DMGridFn
             Implements the function to be evaluated on the grid.
         fock : np.ndarray, shape=(nbasis, nbasis), dtype=float
             Output two-index object.
         """
-        fock = prepare_array(fock, (self.nbasis, self.nbasis), 'fock')
-        check_shape(points, (-1, 3), 'points')
+        fock = _prepare_array(fock, (self.nbasis, self.nbasis), 'fock')
+        _check_shape(points, (-1, 3), 'points')
         npoint = points.shape[0]
-        check_shape(weights, (npoint,), 'weights')
-        check_shape(pots, (npoint, grid_fn.dim_output), 'pots')
+        _check_shape(weights, (npoint,), 'weights')
+        _check_shape(pots, (npoint, grid_fn.dim_output), 'pots')
         if pots.strides[0] % 8 != 0:
             raise TypeError('stride[0] of the pots argument must be a multiple of 8.')
         if pots.strides[1] % 8 != 0:
@@ -1493,7 +1568,7 @@ cdef class GOBasis(GBasis):
         fock
         """
         fock = self._compute_grid1_fock(
-            points, weights, pots[:, None], GB1DMGridDensityFn(self.max_shell_type), fock)
+            points, weights, pots[:, None], _GB1DMGridDensityFn(self.max_shell_type), fock)
         return np.asarray(fock)
 
     def compute_grid_gradient_fock(self, double[:, ::1] points not None,
@@ -1520,7 +1595,7 @@ cdef class GOBasis(GBasis):
         fock
         """
         fock = self._compute_grid1_fock(
-            points, weights, pots, GB1DMGridGradientFn(self.max_shell_type), fock)
+            points, weights, pots, _GB1DMGridGradientFn(self.max_shell_type), fock)
         return np.asarray(fock)
 
     def compute_grid_gga_fock(self, double[:, ::1] points not None,
@@ -1547,7 +1622,7 @@ cdef class GOBasis(GBasis):
         fock
         """
         fock = self._compute_grid1_fock(
-            points, weights, pots, GB1DMGridGGAFn(self.max_shell_type), fock)
+            points, weights, pots, _GB1DMGridGGAFn(self.max_shell_type), fock)
         return np.asarray(fock)
 
     def compute_grid_kinetic_fock(self, double[:, ::1] points not None,
@@ -1573,7 +1648,7 @@ cdef class GOBasis(GBasis):
         fock
         """
         fock = self._compute_grid1_fock(
-            points, weights, pots[:, None], GB1DMGridKineticFn(self.max_shell_type), fock)
+            points, weights, pots[:, None], _GB1DMGridKineticFn(self.max_shell_type), fock)
         return np.asarray(fock)
 
     def compute_grid_hessian_fock(self, double[:, ::1] points not None,
@@ -1608,7 +1683,7 @@ cdef class GOBasis(GBasis):
         fock
         """
         fock = self._compute_grid1_fock(
-            points, weights, pots, GB1DMGridHessianFn(self.max_shell_type), fock)
+            points, weights, pots, _GB1DMGridHessianFn(self.max_shell_type), fock)
         return np.asarray(fock)
 
     def compute_grid_mgga_fock(self, double[:, ::1] points not None,
@@ -1643,7 +1718,7 @@ cdef class GOBasis(GBasis):
         fock
         """
         fock = self._compute_grid1_fock(
-            points, weights, pots, GB1DMGridMGGAFn(self.max_shell_type), fock)
+            points, weights, pots, _GB1DMGridMGGAFn(self.max_shell_type), fock)
         return np.asarray(fock)
 
 
@@ -1651,7 +1726,8 @@ cdef class GOBasis(GBasis):
 # gbw wrappers
 #
 
-def select_2index(GOBasis gobasis, long index0, long index2):
+def _select_2index(GOBasis gobasis, long index0, long index2):
+    """Select 2index 2e ints to compute. For cholesky testing only"""
     assert 0 <= index0 < gobasis.nbasis
     assert 0 <= index2 < gobasis.nbasis
 
@@ -1677,8 +1753,8 @@ def select_2index(GOBasis gobasis, long index0, long index2):
     return pbegin0, pend0, pbegin2, pend2
 
 
-def compute_diagonal(GOBasis gobasis, double[:, ::1] diagonal not
-        None):
+def _compute_diagonal(GOBasis gobasis, double[:, ::1] diagonal not None):
+    """Get the diagonal 2e ints. For cholesky testing only"""
     cdef ints.GB4ElectronRepulsionIntegralLibInt* gb4int = NULL
     cdef gbw.GB4IntegralWrapper* gb4w = NULL
     cdef double[:, ::1] output
@@ -1697,8 +1773,9 @@ def compute_diagonal(GOBasis gobasis, double[:, ::1] diagonal not
         if gb4w is not NULL:
             del gb4w
 
-def get_2index_slice(GOBasis gobasis, long index0, long index2,
+def _get_2index_slice(GOBasis gobasis, long index0, long index2,
                      double[:, ::1] index_slice not None):
+    """Get a 2-index slice. For cholesky testing only."""
     cdef ints.GB4ElectronRepulsionIntegralLibInt* gb4int = NULL
     cdef gbw.GB4IntegralWrapper* gb4w = NULL
     assert index_slice.shape[0] == gobasis.nbasis
@@ -1717,11 +1794,11 @@ def get_2index_slice(GOBasis gobasis, long index0, long index2,
         gb4w.select_2index(index0, index2, &pbegin0, &pend0, &pbegin2, &pend2)
         gb4w.compute()
         output = gb4w.get_2index_slice(index0, index2)
-        print output[0]
-        print sizeof(double)*gobasis.nbasis*gobasis.nbasis
+        print(output[0])
+        print(sizeof(double)*gobasis.nbasis*gobasis.nbasis)
         libc.string.memcpy(&index_slice[0, 0], output,
                            sizeof(double) * gobasis.nbasis * gobasis.nbasis)
-        print index_slice[0, 0]
+        print(index_slice[0, 0])
 
     finally:
         if gb4int is not NULL:
@@ -1735,24 +1812,24 @@ def get_2index_slice(GOBasis gobasis, long index0, long index2,
 #
 
 
-cdef class GB2Integral:
+cdef class _GB2Integral:
     """Wrapper for ints.GB2Integral, for testing only"""
     cdef ints.GB2Integral* _this
 
     def __dealloc__(self):
         del self._this
 
-    property nwork:
-        def __get__(self):
-            return self._this.get_nwork()
+    @property
+    def nwork(self):
+        return self._this.get_nwork()
 
-    property max_shell_type:
-        def __get__(self):
-            return self._this.get_max_shell_type()
+    @property
+    def max_shell_type(self):
+        return self._this.get_max_shell_type()
 
-    property max_nbasis:
-        def __get__(self):
-            return self._this.get_max_nbasis()
+    @property
+    def max_nbasis(self):
+        return self._this.get_max_nbasis()
 
     def reset(self, long shell_type0, long shell_type1,
               double[::1] r0 not None,
@@ -1764,8 +1841,8 @@ cdef class GB2Integral:
     def add(self, double coeff, double alpha0, double alpha1,
             double[::1] scales0 not None,
             double[::1] scales1 not None):
-        assert scales0.shape[0] == get_shell_nbasis(abs(self._this.get_shell_type0()))
-        assert scales1.shape[0] == get_shell_nbasis(abs(self._this.get_shell_type1()))
+        assert scales0.shape[0] == _get_shell_nbasis(abs(self._this.get_shell_type0()))
+        assert scales1.shape[0] == _get_shell_nbasis(abs(self._this.get_shell_type1()))
         self._this.add(coeff, alpha0, alpha1, &scales0[0], &scales1[0])
 
     def cart_to_pure(self):
@@ -1790,21 +1867,21 @@ cdef class GB2Integral:
         return tmp.copy()
 
 
-cdef class GB2OverlapIntegral(GB2Integral):
+cdef class _GB2OverlapIntegral(_GB2Integral):
     """Wrapper for ints.GB2OverlapIntegral, for testing only"""
 
     def __cinit__(self, long max_nbasis):
         self._this = <ints.GB2Integral*>(new ints.GB2OverlapIntegral(max_nbasis))
 
 
-cdef class GB2KineticIntegral(GB2Integral):
+cdef class _GB2KineticIntegral(_GB2Integral):
     """Wrapper for ints.GB2KineticIntegral, for testing only"""
 
     def __cinit__(self, long max_nbasis):
         self._this = <ints.GB2Integral*>(new ints.GB2KineticIntegral(max_nbasis))
 
 
-cdef class GB2NuclearAttractionIntegral(GB2Integral):
+cdef class _GB2NuclearAttractionIntegral(_GB2Integral):
     """Wrapper for ints.GB2NuclearAttractionIntegral, for testing only"""
     # make an additional reference to these arguments to avoid deallocation
     cdef double[::1] _charges
@@ -1822,7 +1899,7 @@ cdef class GB2NuclearAttractionIntegral(GB2Integral):
         ))
 
 
-cdef class GB2ErfAttractionIntegral(GB2Integral):
+cdef class _GB2ErfAttractionIntegral(_GB2Integral):
     """Wrapper for ints.GB2ErfAttractionIntegral, for testing only"""
     # make an additional reference to these arguments to avoid deallocation
     cdef double[::1] _charges
@@ -1839,12 +1916,12 @@ cdef class GB2ErfAttractionIntegral(GB2Integral):
             max_nbasis, &charges[0], &centers[0, 0], ncharge, mu
         ))
 
-    property mu:
-        def __get__(self):
-            return (<ints.GB2ErfAttractionIntegral*>self._this).get_mu()
+    @property
+    def mu(self):
+        return (<ints.GB2ErfAttractionIntegral*>self._this).get_mu()
 
 
-cdef class GB2GaussAttractionIntegral(GB2Integral):
+cdef class _GB2GaussAttractionIntegral(_GB2Integral):
     """Wrapper for ints.GB2GaussAttractionIntegral, for testing only"""
     # make an additional reference to these arguments to avoid deallocation
     cdef double[::1] _charges
@@ -1862,13 +1939,13 @@ cdef class GB2GaussAttractionIntegral(GB2Integral):
             max_nbasis, &charges[0], &centers[0, 0], ncharge, c, alpha
         ))
 
-    property c:
-        def __get__(self):
-            return (<ints.GB2GaussAttractionIntegral*>self._this).get_c()
+    @property
+    def c(self):
+        return (<ints.GB2GaussAttractionIntegral*>self._this).get_c()
 
-    property alpha:
-        def __get__(self):
-            return (<ints.GB2GaussAttractionIntegral*>self._this).get_alpha()
+    @property
+    def alpha(self):
+        return (<ints.GB2GaussAttractionIntegral*>self._this).get_alpha()
 
 
 ints.libint2_static_init()
@@ -1877,24 +1954,24 @@ def libint2_static_cleanup():
 atexit.register(libint2_static_cleanup)
 
 
-cdef class GB4Integral:
-    """Wrapper for ints.GB4Integral"""
+cdef class _GB4Integral:
+    """Wrapper for ints.GB4Integral. For testing only."""
     cdef ints.GB4Integral* _this
 
     def __dealloc__(self):
         del self._this
 
-    property nwork:
-        def __get__(self):
-            return self._this.get_nwork()
+    @property
+    def nwork(self):
+        return self._this.get_nwork()
 
-    property max_shell_type:
-        def __get__(self):
-            return self._this.get_max_shell_type()
+    @property
+    def max_shell_type(self):
+        return self._this.get_max_shell_type()
 
-    property max_nbasis:
-        def __get__(self):
-            return self._this.get_max_nbasis()
+    @property
+    def max_nbasis(self):
+        return self._this.get_max_nbasis()
 
     def reset(self, long shell_type0, long shell_type1, long shell_type2, long shell_type3,
               double[::1] r0 not None, double[::1] r1 not None,
@@ -1909,10 +1986,10 @@ cdef class GB4Integral:
     def add(self, double coeff, double alpha0, double alpha1, double alpha2, double alpha3,
             double[::1] scales0 not None, double[::1] scales1 not None,
             double[::1] scales2 not None, double[::1] scales3 not None):
-        assert scales0.shape[0] == get_shell_nbasis(abs(self._this.get_shell_type0()))
-        assert scales1.shape[0] == get_shell_nbasis(abs(self._this.get_shell_type1()))
-        assert scales2.shape[0] == get_shell_nbasis(abs(self._this.get_shell_type2()))
-        assert scales3.shape[0] == get_shell_nbasis(abs(self._this.get_shell_type3()))
+        assert scales0.shape[0] == _get_shell_nbasis(abs(self._this.get_shell_type0()))
+        assert scales1.shape[0] == _get_shell_nbasis(abs(self._this.get_shell_type1()))
+        assert scales2.shape[0] == _get_shell_nbasis(abs(self._this.get_shell_type2()))
+        assert scales3.shape[0] == _get_shell_nbasis(abs(self._this.get_shell_type3()))
         self._this.add(coeff, alpha0, alpha1, alpha2, alpha3,
                        &scales0[0], &scales1[0],
                        &scales2[0], &scales3[0])
@@ -1945,48 +2022,48 @@ cdef class GB4Integral:
         return tmp.copy()
 
 
-cdef class GB4ElectronRepulsionIntegralLibInt(GB4Integral):
+cdef class _GB4ElectronRepulsionIntegralLibInt(_GB4Integral):
     """Wrapper for ints.GB4ElectronRepulsionIntegralLibInt, for testing only"""
 
     def __cinit__(self, long max_nbasis):
         self._this = <ints.GB4Integral*>(new ints.GB4ElectronRepulsionIntegralLibInt(max_nbasis))
 
 
-cdef class GB4ErfIntegralLibInt(GB4Integral):
+cdef class _GB4ErfIntegralLibInt(_GB4Integral):
     """Wrapper for ints.GB4ElectronRepulsionIntegralLibInt, for testing only"""
 
     def __cinit__(self, long max_nbasis, double mu):
         self._this = <ints.GB4Integral*>(new ints.GB4ErfIntegralLibInt(max_nbasis, mu))
 
-    property mu:
-        def __get__(self):
-            return (<ints.GB4ErfIntegralLibInt*>self._this).get_mu()
+    @property
+    def mu(self):
+        return (<ints.GB4ErfIntegralLibInt*>self._this).get_mu()
 
 
-cdef class GB4GaussIntegralLibInt(GB4Integral):
+cdef class _GB4GaussIntegralLibInt(_GB4Integral):
     """Wrapper for ints.GB4GaussIntegralLibInt, for testing only"""
 
     def __cinit__(self, long max_nbasis, double c, double alpha):
         self._this = <ints.GB4Integral*>(new ints.GB4GaussIntegralLibInt(max_nbasis, c, alpha))
 
-    property c:
-        def __get__(self):
-            return (<ints.GB4GaussIntegralLibInt*>self._this).get_c()
+    @property
+    def c(self):
+        return (<ints.GB4GaussIntegralLibInt*>self._this).get_c()
 
-    property alpha:
-        def __get__(self):
-            return (<ints.GB4GaussIntegralLibInt*>self._this).get_alpha()
+    @property
+    def alpha(self):
+        return (<ints.GB4GaussIntegralLibInt*>self._this).get_alpha()
 
 
-cdef class GB4RAlphaIntegralLibInt(GB4Integral):
+cdef class _GB4RAlphaIntegralLibInt(_GB4Integral):
     """Wrapper for ints.GB4RAlphaIntegralLibInt, for testing only"""
 
     def __cinit__(self, long max_nbasis, double alpha):
         self._this = <ints.GB4Integral*>(new ints.GB4RAlphaIntegralLibInt(max_nbasis, alpha))
 
-    property alpha:
-        def __get__(self):
-            return (<ints.GB4RAlphaIntegralLibInt*>self._this).get_alpha()
+    @property
+    def alpha(self):
+        return (<ints.GB4RAlphaIntegralLibInt*>self._this).get_alpha()
 
 
 #
@@ -1994,36 +2071,36 @@ cdef class GB4RAlphaIntegralLibInt(GB4Integral):
 #
 
 
-cdef class GB1DMGridFn:
+cdef class _GB1DMGridFn:
     """Wrapper for fns.GB1DMGridFn, for testing only"""
     cdef fns.GB1DMGridFn* _this
 
     def __dealloc__(self):
         del self._this
 
-    property nwork:
-        def __get__(self):
-            return self._this.get_nwork()
+    @property
+    def nwork(self):
+        return self._this.get_nwork()
 
-    property max_shell_type:
-        def __get__(self):
-            return self._this.get_max_shell_type()
+    @property
+    def max_shell_type(self):
+        return self._this.get_max_shell_type()
 
-    property max_nbasis:
-        def __get__(self):
-            return self._this.get_max_nbasis()
+    @property
+    def max_nbasis(self):
+        return self._this.get_max_nbasis()
 
-    property shell_type0:
-        def __get__(self):
-            return self._this.get_shell_type0()
+    @property
+    def shell_type0(self):
+        return self._this.get_shell_type0()
 
-    property dim_work:
-        def __get__(self):
-            return self._this.get_dim_work()
+    @property
+    def dim_work(self):
+        return self._this.get_dim_work()
 
-    property dim_output:
-        def __get__(self):
-            return self._this.get_dim_output()
+    @property
+    def dim_output(self):
+        return self._this.get_dim_output()
 
     def reset(self, long shell_type0, double[::1] r0 not None, double[::1] point not None):
         assert r0.shape[0] == 3
@@ -2032,7 +2109,7 @@ cdef class GB1DMGridFn:
 
     def add(self, double coeff, double alpha0,
             double[::1] scales0 not None):
-        assert scales0.shape[0] == get_shell_nbasis(abs(self._this.get_shell_type0()))
+        assert scales0.shape[0] == _get_shell_nbasis(abs(self._this.get_shell_type0()))
         self._this.add(coeff, alpha0, &scales0[0])
 
     def cart_to_pure(self):
@@ -2058,32 +2135,32 @@ cdef class GB1DMGridFn:
         return tmp.copy()
 
 
-cdef class GB1DMGridDensityFn(GB1DMGridFn):
+cdef class _GB1DMGridDensityFn(_GB1DMGridFn):
     def __cinit__(self, long max_nbasis):
         self._this = <fns.GB1DMGridFn*>(new fns.GB1DMGridDensityFn(max_nbasis))
 
 
-cdef class GB1DMGridGradientFn(GB1DMGridFn):
+cdef class _GB1DMGridGradientFn(_GB1DMGridFn):
     def __cinit__(self, long max_nbasis):
         self._this = <fns.GB1DMGridFn*>(new fns.GB1DMGridGradientFn(max_nbasis))
 
 
-cdef class GB1DMGridGGAFn(GB1DMGridFn):
+cdef class _GB1DMGridGGAFn(_GB1DMGridFn):
     def __cinit__(self, long max_nbasis):
         self._this = <fns.GB1DMGridFn*>(new fns.GB1DMGridGGAFn(max_nbasis))
 
 
-cdef class GB1DMGridKineticFn(GB1DMGridFn):
+cdef class _GB1DMGridKineticFn(_GB1DMGridFn):
     def __cinit__(self, long max_nbasis):
         self._this = <fns.GB1DMGridFn*>(new fns.GB1DMGridKineticFn(max_nbasis))
 
 
-cdef class GB1DMGridHessianFn(GB1DMGridFn):
+cdef class _GB1DMGridHessianFn(_GB1DMGridFn):
     def __cinit__(self, long max_nbasis):
         self._this = <fns.GB1DMGridFn*>(new fns.GB1DMGridHessianFn(max_nbasis))
 
 
-cdef class GB1DMGridMGGAFn(GB1DMGridFn):
+cdef class _GB1DMGridMGGAFn(_GB1DMGridFn):
     def __cinit__(self, long max_nbasis):
         self._this = <fns.GB1DMGridFn*>(new fns.GB1DMGridMGGAFn(max_nbasis))
 
@@ -2093,7 +2170,7 @@ cdef class GB1DMGridMGGAFn(GB1DMGridFn):
 #
 
 
-cdef class IterGB1:
+cdef class _IterGB1:
     """Wrapper for the IterGB1 class, for testing only."""
     cdef iter_gb.IterGB1* _this
     cdef GBasis _gbasis
@@ -2119,32 +2196,32 @@ cdef class IterGB1:
 
     def store(self, double[::1] work not None,
               double[::1] output not None, long dim=1):
-        max_shell_nbasis = get_shell_nbasis(self._gbasis.max_shell_type)
-        assert work.shape[0] == get_shell_nbasis(self._this.shell_type0)
+        max_shell_nbasis = _get_shell_nbasis(self._gbasis.max_shell_type)
+        assert work.shape[0] == _get_shell_nbasis(self._this.shell_type0)
         assert output.shape[0] == self._gbasis.nbasis
         self._this.store(&work[0], &output[0], dim)
 
-    property public_fields:
-        def __get__(self):
-            return (
-                self._this.con_coeff,
-                self._this.shell_type0,
-                self._this.alpha0,
-                self._this.r0[0], self._this.r0[1], self._this.r0[2],
-                self._this.ibasis0,
-            )
+    @property
+    def public_fields(self):
+        return (
+            self._this.con_coeff,
+            self._this.shell_type0,
+            self._this.alpha0,
+            self._this.r0[0], self._this.r0[1], self._this.r0[2],
+            self._this.ibasis0,
+        )
 
-    property private_fields:
-        def __get__(self):
-            return (
-                self._this.ishell0,
-                self._this.nprim0,
-                self._this.oprim0,
-                self._this.iprim0,
-            )
+    @property
+    def private_fields(self):
+        return (
+            self._this.ishell0,
+            self._this.nprim0,
+            self._this.oprim0,
+            self._this.iprim0,
+        )
 
 
-cdef class IterGB2:
+cdef class _IterGB2:
     """Wrapper for the IterGB2 class, for testing only."""
     cdef iter_gb.IterGB2* _this
     cdef GBasis _gbasis
@@ -2170,35 +2247,35 @@ cdef class IterGB2:
 
     def store(self, double[:, ::1] work not None,
               double[:, ::1] output not None):
-        max_shell_nbasis = get_shell_nbasis(self._gbasis.max_shell_type)
-        assert work.shape[0] == get_shell_nbasis(self._this.shell_type0)
-        assert work.shape[1] == get_shell_nbasis(self._this.shell_type1)
+        max_shell_nbasis = _get_shell_nbasis(self._gbasis.max_shell_type)
+        assert work.shape[0] == _get_shell_nbasis(self._this.shell_type0)
+        assert work.shape[1] == _get_shell_nbasis(self._this.shell_type1)
         assert output.shape[0] == self._gbasis.nbasis
         assert output.shape[1] == self._gbasis.nbasis
         self._this.store(&work[0, 0], &output[0, 0])
 
-    property public_fields:
-        def __get__(self):
-            return (
-                self._this.con_coeff,
-                self._this.shell_type0, self._this.shell_type1,
-                self._this.alpha0, self._this.alpha1,
-                self._this.r0[0], self._this.r0[1], self._this.r0[2],
-                self._this.r1[0], self._this.r1[1], self._this.r1[2],
-                self._this.ibasis0, self._this.ibasis1,
-            )
+    @property
+    def public_fields(self):
+        return (
+            self._this.con_coeff,
+            self._this.shell_type0, self._this.shell_type1,
+            self._this.alpha0, self._this.alpha1,
+            self._this.r0[0], self._this.r0[1], self._this.r0[2],
+            self._this.r1[0], self._this.r1[1], self._this.r1[2],
+            self._this.ibasis0, self._this.ibasis1,
+        )
 
-    property private_fields:
-        def __get__(self):
-            return (
-                self._this.ishell0, self._this.ishell1,
-                self._this.nprim0, self._this.nprim1,
-                self._this.oprim0, self._this.oprim1,
-                self._this.iprim0, self._this.iprim1,
-            )
+    @property
+    def private_fields(self):
+        return (
+            self._this.ishell0, self._this.ishell1,
+            self._this.nprim0, self._this.nprim1,
+            self._this.oprim0, self._this.oprim1,
+            self._this.iprim0, self._this.iprim1,
+        )
 
 
-cdef class IterGB4:
+cdef class _IterGB4:
     """Wrapper for the IterGB4 class, for testing only."""
     cdef iter_gb.IterGB4* _this
     cdef GBasis _gbasis
@@ -2224,38 +2301,38 @@ cdef class IterGB4:
 
     def store(self, double[:, :, :, ::1] work not None,
               double[:, :, :, ::1] output not None):
-        max_shell_nbasis = get_shell_nbasis(self._gbasis.max_shell_type)
-        assert work.shape[0] == get_shell_nbasis(self._this.shell_type0)
-        assert work.shape[1] == get_shell_nbasis(self._this.shell_type1)
-        assert work.shape[2] == get_shell_nbasis(self._this.shell_type2)
-        assert work.shape[3] == get_shell_nbasis(self._this.shell_type3)
+        max_shell_nbasis = _get_shell_nbasis(self._gbasis.max_shell_type)
+        assert work.shape[0] == _get_shell_nbasis(self._this.shell_type0)
+        assert work.shape[1] == _get_shell_nbasis(self._this.shell_type1)
+        assert work.shape[2] == _get_shell_nbasis(self._this.shell_type2)
+        assert work.shape[3] == _get_shell_nbasis(self._this.shell_type3)
         assert output.shape[0] == self._gbasis.nbasis
         assert output.shape[1] == self._gbasis.nbasis
         assert output.shape[2] == self._gbasis.nbasis
         assert output.shape[3] == self._gbasis.nbasis
         self._this.store(&work[0, 0, 0, 0], &output[0, 0, 0, 0])
 
-    property public_fields:
-        def __get__(self):
-            return (
-                self._this.con_coeff,
-                self._this.shell_type0, self._this.shell_type1, self._this.shell_type2, self._this.shell_type3,
-                self._this.alpha0, self._this.alpha1, self._this.alpha2, self._this.alpha3,
-                self._this.r0[0], self._this.r0[1], self._this.r0[2],
-                self._this.r1[0], self._this.r1[1], self._this.r1[2],
-                self._this.r2[0], self._this.r2[1], self._this.r2[2],
-                self._this.r3[0], self._this.r3[1], self._this.r3[2],
-                self._this.ibasis0, self._this.ibasis1, self._this.ibasis2, self._this.ibasis3,
-            )
+    @property
+    def public_fields(self):
+        return (
+            self._this.con_coeff,
+            self._this.shell_type0, self._this.shell_type1, self._this.shell_type2, self._this.shell_type3,
+            self._this.alpha0, self._this.alpha1, self._this.alpha2, self._this.alpha3,
+            self._this.r0[0], self._this.r0[1], self._this.r0[2],
+            self._this.r1[0], self._this.r1[1], self._this.r1[2],
+            self._this.r2[0], self._this.r2[1], self._this.r2[2],
+            self._this.r3[0], self._this.r3[1], self._this.r3[2],
+            self._this.ibasis0, self._this.ibasis1, self._this.ibasis2, self._this.ibasis3,
+        )
 
-    property private_fields:
-        def __get__(self):
-            return (
-                self._this.ishell0, self._this.ishell1, self._this.ishell2, self._this.ishell3,
-                self._this.nprim0, self._this.nprim1, self._this.nprim2, self._this.nprim3,
-                self._this.oprim0, self._this.oprim1, self._this.oprim2, self._this.oprim3,
-                self._this.iprim0, self._this.iprim1, self._this.iprim2, self._this.iprim3,
-            )
+    @property
+    def private_fields(self):
+        return (
+            self._this.ishell0, self._this.ishell1, self._this.ishell2, self._this.ishell3,
+            self._this.nprim0, self._this.nprim1, self._this.nprim2, self._this.nprim3,
+            self._this.oprim0, self._this.oprim1, self._this.oprim2, self._this.oprim3,
+            self._this.iprim0, self._this.iprim1, self._this.iprim2, self._this.iprim3,
+        )
 
 
 #
@@ -2263,12 +2340,12 @@ cdef class IterGB4:
 #
 
 
-def iter_pow1_inc(long[::1] n not None):
+def _iter_pow1_inc(long[::1] n not None):
     assert n.shape[0] == 3
     return iter_pow.iter_pow1_inc(&n[0])
 
 
-cdef class IterPow1:
+cdef class _IterPow1:
     """Wrapper for the IterPow1 class, for testing only."""
     cdef iter_pow.IterPow1* _c_i1p
 
@@ -2286,15 +2363,15 @@ cdef class IterPow1:
     def inc(self):
         return self._c_i1p.inc()
 
-    property fields:
-        def __get__(self):
-            return (
-                self._c_i1p.n0[0], self._c_i1p.n0[1], self._c_i1p.n0[2],
-                self._c_i1p.ibasis0
-            )
+    @property
+    def fields(self):
+        return (
+            self._c_i1p.n0[0], self._c_i1p.n0[1], self._c_i1p.n0[2],
+            self._c_i1p.ibasis0
+        )
 
 
-cdef class IterPow2:
+cdef class _IterPow2:
     """Wrapper for the IterPow2 class, for testing only."""
     cdef iter_pow.IterPow2* _c_i2p
 
@@ -2312,13 +2389,13 @@ cdef class IterPow2:
     def inc(self):
         return self._c_i2p.inc()
 
-    property fields:
-        def __get__(self):
-            return (
-                self._c_i2p.n0[0], self._c_i2p.n0[1], self._c_i2p.n0[2],
-                self._c_i2p.n1[0], self._c_i2p.n1[1], self._c_i2p.n1[2],
-                self._c_i2p.offset, self._c_i2p.ibasis0, self._c_i2p.ibasis1,
-            )
+    @property
+    def fields(self):
+        return (
+            self._c_i2p.n0[0], self._c_i2p.n0[1], self._c_i2p.n0[2],
+            self._c_i2p.n1[0], self._c_i2p.n1[1], self._c_i2p.n1[2],
+            self._c_i2p.offset, self._c_i2p.ibasis0, self._c_i2p.ibasis1,
+        )
 
 
 #

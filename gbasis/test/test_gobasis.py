@@ -20,30 +20,30 @@
 # --
 
 
-import numpy as np
 import os
-from nose.tools import assert_raises
+
+import numpy as np
 from nose.plugins.attrib import attr
+from nose.tools import assert_raises
 
-from .lightgrid import generate_molecular_grid
+from gbasis.cext import (gob_pure_normalization, gob_cart_normalization, GOBasis,
+                         _GB1DMGridDensityFn, _get_shell_nbasis, _get_max_shell_type)
+from gbasis.gobasis import GOBasisDesc, get_gobasis, go_basis_families
 from .common import load_obasis, load_mdata, load_dm, load_orbsa_coeffs
-from .. import (GOBasisDesc, GOBasis, GB1DMGridDensityFn, get_shell_nbasis, get_gobasis,
-                gob_pure_normalization, gob_cart_normalization, go_basis_families,
-                get_max_shell_type)
-
+from .lightgrid import generate_molecular_grid
 
 angstrom = 1.0e-10 / 0.5291772083e-10
 
 
 def test_shell_nbasis():
-    assert get_shell_nbasis(-3) == 7
-    assert get_shell_nbasis(-2) == 5
-    assert get_shell_nbasis(0) == 1
-    assert get_shell_nbasis(1) == 3
-    assert get_shell_nbasis(2) == 6
-    assert get_shell_nbasis(3) == 10
+    assert _get_shell_nbasis(-3) == 7
+    assert _get_shell_nbasis(-2) == 5
+    assert _get_shell_nbasis(0) == 1
+    assert _get_shell_nbasis(1) == 3
+    assert _get_shell_nbasis(2) == 6
+    assert _get_shell_nbasis(3) == 10
     with assert_raises(ValueError):
-        get_shell_nbasis(-1)
+        _get_shell_nbasis(-1)
 
 
 def test_gobasis_consistency():
@@ -106,13 +106,13 @@ def test_gobasis_consistency():
     con_coeffs = np.random.uniform(-1, 1, nprims.sum())
 
     # Exceeding the maximym shell type (above):
-    shell_types[0] = get_max_shell_type() + 1
+    shell_types[0] = _get_max_shell_type() + 1
     with assert_raises(ValueError):
         GOBasis(centers, shell_map, nprims, shell_types, alphas, con_coeffs)
     shell_types[0] = 2
 
     # Exceeding the maximym shell type (below):
-    shell_types[0] = -get_max_shell_type() - 1
+    shell_types[0] = -_get_max_shell_type() - 1
     with assert_raises(ValueError):
         GOBasis(centers, shell_map, nprims, shell_types, alphas, con_coeffs)
     shell_types[0] = 2
@@ -137,11 +137,11 @@ def test_grid_lih_321g_hf_density_some_points():
     obasis = load_obasis(fn)
     mol = load_mdata(fn)
 
-    # check for one point the compute_grid_point1 method
+    # check for one point the _compute_grid_point1 method
     output = np.zeros(obasis.nbasis, float)
     point = np.array([0.0, 0.0, 1.0]) * angstrom
-    grid_fn = GB1DMGridDensityFn(obasis.max_shell_type)
-    obasis.compute_grid_point1(output, point, grid_fn)
+    grid_fn = _GB1DMGridDensityFn(obasis.max_shell_type)
+    obasis._compute_grid_point1(output, point, grid_fn)
     # first basis function is contraction of three s-type gaussians
     assert obasis.nprims[0] == 3
     scales = obasis.get_scales()
@@ -408,12 +408,18 @@ def test_gob_normalization():
     assert abs(gob_cart_normalization(0.344, np.array([1, 1, 0])) - 0.440501466) < 1e-8
     assert abs(gob_cart_normalization(0.246, np.array([1, 1, 1])) - 0.242998767) < 1e-8
     assert abs(gob_cart_normalization(0.238, np.array([2, 1, 1])) - 0.127073818) < 1e-8
-    assert abs(gob_pure_normalization(0.3, 0) - gob_cart_normalization(0.3, np.array([0, 0, 0]))) < 1e-10
-    assert abs(gob_pure_normalization(0.7, 0) - gob_cart_normalization(0.7, np.array([0, 0, 0]))) < 1e-10
-    assert abs(gob_pure_normalization(1.9, 0) - gob_cart_normalization(1.9, np.array([0, 0, 0]))) < 1e-10
-    assert abs(gob_pure_normalization(0.3, 1) - gob_cart_normalization(0.3, np.array([1, 0, 0]))) < 1e-10
-    assert abs(gob_pure_normalization(0.7, 1) - gob_cart_normalization(0.7, np.array([0, 1, 0]))) < 1e-10
-    assert abs(gob_pure_normalization(1.9, 1) - gob_cart_normalization(1.9, np.array([0, 0, 1]))) < 1e-10
+    assert abs(
+        gob_pure_normalization(0.3, 0) - gob_cart_normalization(0.3, np.array([0, 0, 0]))) < 1e-10
+    assert abs(
+        gob_pure_normalization(0.7, 0) - gob_cart_normalization(0.7, np.array([0, 0, 0]))) < 1e-10
+    assert abs(
+        gob_pure_normalization(1.9, 0) - gob_cart_normalization(1.9, np.array([0, 0, 0]))) < 1e-10
+    assert abs(
+        gob_pure_normalization(0.3, 1) - gob_cart_normalization(0.3, np.array([1, 0, 0]))) < 1e-10
+    assert abs(
+        gob_pure_normalization(0.7, 1) - gob_cart_normalization(0.7, np.array([0, 1, 0]))) < 1e-10
+    assert abs(
+        gob_pure_normalization(1.9, 1) - gob_cart_normalization(1.9, np.array([0, 0, 1]))) < 1e-10
 
 
 def test_cart_pure_switch():

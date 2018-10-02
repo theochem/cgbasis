@@ -18,13 +18,16 @@
 //
 //--
 
-// UPDATELIBDOCTITLE: Iterators over Gaussian basis functions
+/**
+ * @file iter_gb.h
+ * @brief Iterators over Gaussian basis functions
+ */
 
 #ifndef GBASIS_ITER_GB_H_
 #define GBASIS_ITER_GB_H_
 
 #include "gbasis.h"
-
+//! A 1 basis function iterator. Not used very much except to define basic structure.
 class IterGB1 {
  private:
   // input fields
@@ -33,8 +36,9 @@ class IterGB1 {
 
  public:
   explicit IterGB1(GBasis *gbasis);
-  IterGB1(const IterGB1& other) = delete;
+  IterGB1(const IterGB1 &other) = delete;
 
+  //! Increments the shell index
   int inc_shell();
 
   void update_shell();
@@ -48,15 +52,16 @@ class IterGB1 {
   // 'public' iterator fields
   long shell_type0;
   double con_coeff, alpha0;
-  const double *r0;  // current centers
-  const double *scales0;  // normalization constants
-  long ibasis0;  // basis function counters (for output storage)
+  const double *r0;  /// The current center
+  const double *scales0;  /// Normalization constants
+  long ibasis0;  /// Basis function counters (for output storage)
 
   // 'private' iterator fields
-  long ishell0;  // shell counters
-  long nprim0, iprim0, oprim0;  // primitive counters
+  long ishell0;  /// Shell counters
+  long nprim0, iprim0, oprim0;  /// Primitive counters
 };
 
+//! A 2-basis function iterator. Used for 1-electron integrals.
 class IterGB2 {
  private:
   // input fields
@@ -65,34 +70,65 @@ class IterGB2 {
 
  public:
   explicit IterGB2(GBasis *gbasis);
-  IterGB2(const IterGB2& other) = delete;
+  IterGB2(const IterGB2 &other) = delete;
 
+  /// Increment the shell counters (oprims, ishells) Takes into account 2-fold symmetry.
   int inc_shell();
 
+  /// Update fields that depend on primitive counters (centres, shells types, nprim) from the gbasis instance.
   void update_shell();
 
+  /// Increment the primitive counters (iprims)
   int inc_prim();
 
+  /// Update fields that depend on primitive counters (alphas, contraction coeffs, and scaling factors) from gbasis.
   void update_prim();
 
+  /**
+   * Write the current shell, stored in work, into the output array. Only works for dense storage at the moment.
+   *
+   * @param work array of pure basis functions for the current shell.
+   * @param output array storing the entire integral.
+   */
   void store(const double *work, double *output);
+
+  /**
+   * Dot product of the current shell, stored in work, with dm.
+   *
+   * @param work array of pure basis functions for the current shell.
+   * @param dm array which will be dotted with the current shell.
+   *
+   * @return the dot product of the current shell with the array dm.
+   */
 
   double dot(const double *work, const double *dm);
 
   // 'public' iterator fields
+
+  /// Shell types
   long shell_type0, shell_type1;
-  double con_coeff, alpha0, alpha1;
-  const double *r0;  // current centers
-  const double *r1;  // current centers
-  const double *scales0;  // normalization constants
-  const double *scales1;  // normalization constants
-  long ibasis0, ibasis1;  // basis function counters (for output storage)
+  /// Contraction coefficient
+  double con_coeff;
+  /// Exponents
+  double alpha0, alpha1;
+  /// Current gaussian centers
+  const double *r0;
+  const double *r1;
+  /// Normalization constants
+  const double *scales0;
+  const double *scales1;
+  /// Basis function counters
+  long ibasis0, ibasis1;
 
   // 'private' iterator fields
-  long ishell0, ishell1;  // shell counters
-  long nprim0, nprim1, iprim0, iprim1, oprim0, oprim1;  // primitive counters
+
+  /// Shell counters
+  long ishell0, ishell1;
+  /// Primitive counters
+  long nprim0, nprim1, iprim0, iprim1, oprim0, oprim1;
 };
 
+//! Iterates over 4 basis functions in order. Used for 2-electron integrals.
 class IterGB4 {
  private:
   // input fields
@@ -101,36 +137,58 @@ class IterGB4 {
 
  public:
   explicit IterGB4(GBasis *gbasis);
-  IterGB4(const IterGB4& other) = delete;
+  IterGB4(const IterGB4 &other) = delete;
 
+  /// Increment the shell counters (oprims, ishells) Takes into account 8-fold symmetry.
   int inc_shell();
 
+  /// Update fields that depend on primitive counters (centres, shells types, nprim) from the gbasis instance.
   void update_shell();
 
+  /// Increment the primitive counters (iprims)
   int inc_prim();
 
+  /// Update fields that depend on primitive counters (alphas, contraction coeffs, and scaling factors) from gbasis.
   void update_prim();
-
+  /**
+   * Write the current shell, stored in work, into the output array. Only works for dense storage at the moment.
+   *
+   * @param work array of pure basis functions for the current shell.
+   * @param output array storing the entire integral.
+   */
   void store(const double *work, double *output);
 
   // 'public' iterator fields
+
+  /// shell types
   long shell_type0, shell_type1, shell_type2, shell_type3;
-  double con_coeff, alpha0, alpha1, alpha2, alpha3;
-  const double *r0;  // current centers
-  const double *r1;  // current centers
-  const double *r2;  // current centers
-  const double *r3;  // current centers
-  const double *scales0;  // normalization constants
-  const double *scales1;  // normalization constants
-  const double *scales2;  // normalization constants
-  const double *scales3;  // normalization constants
-  long ibasis0, ibasis1, ibasis2, ibasis3;  // basis function counters (for output storage)
+  /// Contraction coefficient
+  double con_coeff;
+  /// Exponents
+  double alpha0, alpha1, alpha2, alpha3;
+  /// current gaussian centers
+  const double *r0;
+  const double *r1;
+  const double *r2;
+  const double *r3;
+  /// normalization constants
+  const double *scales0;
+  const double *scales1;
+  const double *scales2;
+  const double *scales3;
+  /// basis function counters
+  long ibasis0, ibasis1, ibasis2, ibasis3;
 
   // 'private' iterator fields
-  long ishell0, ishell1, ishell2, ishell3;  // shell counters
+
+  /// shell counters
+  long ishell0, ishell1, ishell2, ishell3;
   long ishell3_max;
-  long nprim0, nprim1, nprim2, nprim3;  // primitive counters
+  /// number of primitives
+  long nprim0, nprim1, nprim2, nprim3;
+  /// primitive counters
   long iprim0, iprim1, iprim2, iprim3;
+  /// primitive offsets
   long oprim0, oprim1, oprim2, oprim3;
 };
 

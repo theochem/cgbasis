@@ -18,7 +18,10 @@
 //
 //--
 
-// UPDATELIBDOCTITLE: Cholesky decomposition of (any) four-center integrals
+/**
+ * @file cholesky.h
+ * @brief Cholesky decomposition of (any) four-center integrals
+ */
 
 #ifndef GBASIS_CHOLESKY_H_
 #define GBASIS_CHOLESKY_H_

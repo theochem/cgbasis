@@ -60,11 +60,12 @@ def get_gobasis(coordinates: np.ndarray, numbers: np.ndarray, default: Union[str
 
     Returns
     -------
-    A GOBasis instance which can be used to calculate integrals for the molecule.
+        A GOBasis instance which can be used to calculate integrals for the molecule.
 
     Examples
     --------
     >>>> gbasis = get_gobasis(np.array([[0,0,0], [0,0,1]]), np.array([1,1]), "sto-3g")
+
     >>>> gbasis.compute_overlap()
 
     """
@@ -254,6 +255,7 @@ class GOBasisFamily:
         Examples
         --------
         >>>> mybasisset = GOBasisFamily("complete_basis", filename="complete_basis.nwchem")
+
         >>>> get_gobasis(np.array([[0,0,0],]), np.array([1]), default=mybasisset)
 
         Raises
@@ -278,7 +280,7 @@ class GOBasisFamily:
 
         Returns
         -------
-        An instance of GOBasisAtom
+            An instance of GOBasisAtom
         """
         if self.basis_atom_map is None:
             self.load()
@@ -430,20 +432,7 @@ class GOBasisAtom:
 
 
 class GOBasisContraction:
-    """A basis set shell. Can represent either a segmented or a generalized contraction.
-
-    Attributes
-    ----------
-    shell_type : int
-        The angular momentum of the shell. 0 = S, 1 = P, 2 = D (cartesian), -2 = D (pure)
-            3 = F (cartesian), -3 = F (pure).
-    alphas : np.ndarray
-        The exponent of each primitive.
-    con_coeffs : np.ndarray
-        The contraction coefficients of the shell. It can be either segmented (1d),
-        or generalized (2d).
-
-    """
+    """A basis set shell. Can represent either a segmented or a generalized contraction."""
 
     def __init__(self, shell_type: int, alphas: Iterable, con_coeffs: Iterable):
         """

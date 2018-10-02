@@ -18,7 +18,10 @@
 //
 //--
 
-// UPDATELIBDOCTITLE: A four-center integral wrapper for the Cholesky code
+/**
+ * @file gbw.h
+ * @brief A four-center integral wrapper for the Cholesky code
+ */
 
 #ifndef GBASIS_GBW_H_
 #define GBASIS_GBW_H_

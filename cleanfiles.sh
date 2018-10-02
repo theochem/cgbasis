@@ -8,4 +8,8 @@ rm -vr doctrees
 rm -v gbasis/cext.cpp
 rm -v gbasis/*/cext.cpp
 rm -v .coverage
+rm -v doc/xml/*
+rm -vr doc/cxxapi/*
+rm -vr doc/pyapi/*
+rm -vr doc/_build/*
 exit 0

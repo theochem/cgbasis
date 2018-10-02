@@ -23,7 +23,7 @@
 
 int iter_pow1_inc(long *n) {
   // Modify the indexes in place as to move to the next combination of powers
-  // withing one angular momentum.
+  // within one angular momentum.
   // Note: shell_type = n[0] + n[1] + n[2];
   if (n[1] == 0) {
     if (n[0] == 0) {

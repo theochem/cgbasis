@@ -25,8 +25,8 @@ from nose.tools import assert_raises
 from nose.plugins.attrib import attr
 
 from .common import load_olp, load_kin, load_na
-from .. import (GB4ElectronRepulsionIntegralLibInt, GB2OverlapIntegral, get_shell_nbasis,
-                cart_to_pure_low, get_max_shell_type)
+from gbasis.cext import (_GB4ElectronRepulsionIntegralLibInt, _GB2OverlapIntegral, _get_shell_nbasis,
+                         _cart_to_pure_low, _get_max_shell_type)
 
 
 tfs = {
@@ -65,39 +65,39 @@ tfs = {
 def test_cart_pure_s():
     work_cart = np.random.normal(0, 1, 1)
     work_pure = np.random.normal(0, 1, 1)
-    cart_to_pure_low(work_cart, work_pure, shell_type=0, nant=1, npost=1)
+    _cart_to_pure_low(work_cart, work_pure, shell_type=0, nant=1, npost=1)
     assert abs(work_cart - work_pure).max() < 1e-10
 
     work_cart = np.random.normal(0, 1, 10)
     work_pure = np.random.normal(0, 1, 10)
-    cart_to_pure_low(work_cart, work_pure, shell_type=0, nant=2, npost=5)
+    _cart_to_pure_low(work_cart, work_pure, shell_type=0, nant=2, npost=5)
     assert abs(work_cart - work_pure).max() < 1e-10
 
 
 def test_cart_pure_p():
     work_cart = np.random.normal(0, 1, 3)
     work_pure = np.random.normal(0, 1, 3)
-    cart_to_pure_low(work_cart, work_pure, shell_type=1, nant=1, npost=1)
+    _cart_to_pure_low(work_cart, work_pure, shell_type=1, nant=1, npost=1)
     assert abs(work_cart[[2, 0, 1]] - work_pure).max() < 1e-10
 
     work_cart = np.random.normal(0, 1, (10, 3))
     work_pure = np.random.normal(0, 1, (10, 3))
-    cart_to_pure_low(work_cart.reshape(-1), work_pure.reshape(-1), shell_type=1, nant=10, npost=1)
+    _cart_to_pure_low(work_cart.reshape(-1), work_pure.reshape(-1), shell_type=1, nant=10, npost=1)
     assert abs(work_cart[:, [2, 0, 1]] - work_pure).max() < 1e-10
 
     work_cart = np.random.normal(0, 1, (10, 3, 2))
     work_pure = np.random.normal(0, 1, (10, 3, 2))
-    cart_to_pure_low(work_cart.reshape(-1), work_pure.reshape(-1), shell_type=1, nant=10, npost=2)
+    _cart_to_pure_low(work_cart.reshape(-1), work_pure.reshape(-1), shell_type=1, nant=10, npost=2)
     assert abs(work_cart[:, [2, 0, 1], :] - work_pure).max() < 1e-10
 
     work_cart = np.random.normal(0, 1, (3, 6))
     work_pure = np.random.normal(0, 1, (3, 6))
-    cart_to_pure_low(work_cart.reshape(-1), work_pure.reshape(-1), shell_type=1, nant=1, npost=6)
+    _cart_to_pure_low(work_cart.reshape(-1), work_pure.reshape(-1), shell_type=1, nant=1, npost=6)
     assert abs(work_cart[[2, 0, 1], :] - work_pure).max() < 1e-10
 
     work_cart = np.random.normal(0, 1, (5, 2, 3, 2, 3))
     work_pure = np.random.normal(0, 1, (5, 2, 3, 2, 3))
-    cart_to_pure_low(work_cart.reshape(-1), work_pure.reshape(-1), shell_type=1, nant=10, npost=6)
+    _cart_to_pure_low(work_cart.reshape(-1), work_pure.reshape(-1), shell_type=1, nant=10, npost=6)
     assert abs(work_cart[:, :, [2, 0, 1], :, :] - work_pure).max() < 1e-10
 
 
@@ -106,17 +106,17 @@ def test_cart_pure_d():
 
     work_cart = np.random.normal(0, 1, 6)
     work_pure = np.random.normal(0, 1, 5)
-    cart_to_pure_low(work_cart, work_pure, shell_type=2, nant=1, npost=1)
+    _cart_to_pure_low(work_cart, work_pure, shell_type=2, nant=1, npost=1)
     assert abs(np.dot(tf, work_cart) - work_pure[:5]).max() < 1e-10
 
     work_cart = np.random.normal(0, 1, (10, 6))
     work_pure = np.random.normal(0, 1, (10, 5))
-    cart_to_pure_low(work_cart.reshape(-1), work_pure.reshape(-1), shell_type=2, nant=10, npost=1)
+    _cart_to_pure_low(work_cart.reshape(-1), work_pure.reshape(-1), shell_type=2, nant=10, npost=1)
     assert abs(np.dot(work_cart, tf.T) - work_pure).max() < 1e-10
 
     work_cart = np.random.normal(0, 1, (6, 10))
     work_pure = np.random.normal(0, 1, (5, 10))
-    cart_to_pure_low(work_cart.reshape(-1), work_pure.reshape(-1), shell_type=2, nant=1, npost=10)
+    _cart_to_pure_low(work_cart.reshape(-1), work_pure.reshape(-1), shell_type=2, nant=1, npost=10)
     assert abs(np.dot(tf, work_cart) - work_pure).max() < 1e-10
 
 
@@ -125,24 +125,24 @@ def test_cart_pure_g():
 
     work_cart = np.random.normal(0, 1, 15)
     work_pure = np.random.normal(0, 1, 9)
-    cart_to_pure_low(work_cart, work_pure, shell_type=4, nant=1, npost=1)
+    _cart_to_pure_low(work_cart, work_pure, shell_type=4, nant=1, npost=1)
     assert abs(np.dot(tf, work_cart) - work_pure).max() < 1e-10
 
     work_cart = np.random.normal(0, 1, (3, 15))
     work_pure = np.random.normal(0, 1, (3, 9))
-    cart_to_pure_low(work_cart.reshape(-1), work_pure.reshape(-1), shell_type=4, nant=3, npost=1)
+    _cart_to_pure_low(work_cart.reshape(-1), work_pure.reshape(-1), shell_type=4, nant=3, npost=1)
     assert abs(np.dot(work_cart[:, :15], tf.T) - work_pure).max() < 1e-10
 
 
 def test_gb2_overlap_integral_class():
     max_shell_type = 4
-    max_nbasis = get_shell_nbasis(max_shell_type)
+    max_nbasis = _get_shell_nbasis(max_shell_type)
     r0 = np.array([2.645617, 0.377945, -0.188973])
     r1 = np.array([1.254878, 0.123456, 0.188973])
     scales0 = np.ones(15, float)
     scales1 = np.ones(10, float)
 
-    gb2oi = GB2OverlapIntegral(max_shell_type)
+    gb2oi = _GB2OverlapIntegral(max_shell_type)
     assert gb2oi.max_nbasis == max_nbasis
 
     gb2oi.reset(-4, -3, r0, r1)
@@ -162,14 +162,14 @@ def test_cart_pure_domain():
     work_cart = np.random.normal(0, 1, (3, 70))
     work_pure = np.random.normal(0, 1, (3, 70))
     with assert_raises(ValueError):
-        cart_to_pure_low(work_cart.reshape(-1), work_pure.reshape(-1), shell_type=get_max_shell_type() + 1, nant=1,
-                         npost=1)
+        _cart_to_pure_low(work_cart.reshape(-1), work_pure.reshape(-1), shell_type=_get_max_shell_type() + 1, nant=1,
+                          npost=1)
     with assert_raises(ValueError):
-        cart_to_pure_low(work_cart.reshape(-1), work_pure.reshape(-1), shell_type=-1, nant=1, npost=1)
+        _cart_to_pure_low(work_cart.reshape(-1), work_pure.reshape(-1), shell_type=-1, nant=1, npost=1)
     with assert_raises(ValueError):
-        cart_to_pure_low(work_cart.reshape(-1), work_pure.reshape(-1), shell_type=3, nant=0, npost=1)
+        _cart_to_pure_low(work_cart.reshape(-1), work_pure.reshape(-1), shell_type=3, nant=0, npost=1)
     with assert_raises(ValueError):
-        cart_to_pure_low(work_cart.reshape(-1), work_pure.reshape(-1), shell_type=3, nant=1, npost=0)
+        _cart_to_pure_low(work_cart.reshape(-1), work_pure.reshape(-1), shell_type=3, nant=1, npost=0)
 
 
 @attr('slow')
@@ -195,7 +195,7 @@ def gb4_helper(sign0, sign1, sign2, sign3):
     assert abs(sign2) == 1
     assert abs(sign3) == 1
     max_shell_type = 4
-    max_nbasis = get_shell_nbasis(max_shell_type)
+    max_nbasis = _get_shell_nbasis(max_shell_type)
     r0 = np.array([0.57092, 0.29608, -0.758])
     r1 = np.array([0.83984, 0.65053, 0.36087])
     r2 = np.array([-0.70841, 0.22864, 0.79589])
@@ -205,7 +205,7 @@ def gb4_helper(sign0, sign1, sign2, sign3):
     scales2 = np.ones(6, float)
     scales3 = np.ones(6, float)
 
-    gb4oi = GB4ElectronRepulsionIntegralLibInt(max_shell_type)
+    gb4oi = _GB4ElectronRepulsionIntegralLibInt(max_shell_type)
     assert gb4oi.max_nbasis == max_nbasis
     assert gb4oi.nwork == max_nbasis ** 4
 
@@ -216,10 +216,10 @@ def gb4_helper(sign0, sign1, sign2, sign3):
     gb4oi.add(0.3, 0.500, 0.500, 5.398, 0.320, scales0, scales1, scales2, scales3)
     work0 = gb4oi.get_work(15, 10, 6, 6)
     gb4oi.cart_to_pure()
-    n0 = get_shell_nbasis(sign0 * 4)
-    n1 = get_shell_nbasis(sign1 * 3)
-    n2 = get_shell_nbasis(sign2 * 2)
-    n3 = get_shell_nbasis(sign3 * 2)
+    n0 = _get_shell_nbasis(sign0 * 4)
+    n1 = _get_shell_nbasis(sign1 * 3)
+    n2 = _get_shell_nbasis(sign2 * 2)
+    n3 = _get_shell_nbasis(sign3 * 2)
     work1 = gb4oi.get_work(n0, n1, n2, n3)
     return work0, work1
 

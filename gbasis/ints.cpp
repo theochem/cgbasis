@@ -28,23 +28,7 @@
 
 using std::abs;
 
-/*
 
-    The implementation of the two-index operators in this module are based on
-    the paper "Gaussian-Expansion Methods for Molecular Integrals", H. Taketa,
-    S. Huzinga, K. O-ohata, Journal of the Physical Society of Japan, vol. 21,
-    p. 2313, y. 1966. Be aware that there are some misprints in the paper:
-
-    - eq. 2.18: CP_x should be p_x, i.e. change of sign.
-    - list of expressions at the bottom of p. 2319:
-        case l_1+l_2=2, G_1 = -f_1*p - f_2/(2*gamma)
-
-    The implementation of the (multipole) moment integrals in this module are
-    based on the paper "Efficient recursive computation of molecular integrals
-    over Cartesian Gaussian functions", S. Obara, A. Saika, Journal of Chemical
-    Physics, vol. 84, p. 3963, y. 1986.
-
-*/
 
 
 /*
@@ -225,7 +209,7 @@ GB2AttractionIntegral::add(double coeff, double alpha0, double alpha1, const dou
   pb[2] = gpt_center[2] - r1[2];
 
   for (long icharge = 0; icharge < ncharge; icharge++) {
-    // thrid center for the current charge
+    // three center for the current charge
     pc[0] = gpt_center[0] - centers[icharge * 3];
     pc[1] = gpt_center[1] - centers[icharge * 3 + 1];
     pc[2] = gpt_center[2] - centers[icharge * 3 + 2];

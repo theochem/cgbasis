@@ -27,7 +27,7 @@ from nose.tools import assert_raises
 from .lightgrid import generate_molecular_grid, integrate
 from .common import (load_obasis, load_dm, load_mdata, load_orbsa_coeffs, load_orbsb_coeffs,
                      load_orbsa_occs, load_orbsb_occs, load_orbsa_dms, load_orbsb_dms, check_delta)
-from .. import (GOBasis, GOBasisAtom, GOBasisContraction, GB1DMGridGradientFn, GB1DMGridDensityFn,
+from .. import (GOBasis, GOBasisAtom, GOBasisContraction, _GB1DMGridGradientFn, _GB1DMGridDensityFn,
                 get_gobasis)
 
 
@@ -86,21 +86,21 @@ def check_functional_deriv(fn, comp, dm_method, fock_method):
 
 def test_exceptions():
     with assert_raises(ValueError):
-        GB1DMGridDensityFn(-1)
+        _GB1DMGridDensityFn(-1)
 
     center = np.array([-0.1, 0.6, -0.3])
     point = np.array([0.5, -0.2, 0.7])
 
     with assert_raises(ValueError):
-        grid_fn = GB1DMGridDensityFn(2)
+        grid_fn = _GB1DMGridDensityFn(2)
         grid_fn.reset(-3, center, point)
     with assert_raises(ValueError):
-        grid_fn = GB1DMGridDensityFn(2)
+        grid_fn = _GB1DMGridDensityFn(2)
         grid_fn.reset(3, center, point)
 
 
 def test_grid_fn_s():
-    grid_fn = GB1DMGridDensityFn(0)
+    grid_fn = _GB1DMGridDensityFn(0)
     assert grid_fn.nwork == 1
     assert grid_fn.max_shell_type == 0
     assert grid_fn.max_nbasis == 1
@@ -124,7 +124,7 @@ def test_grid_fn_s():
 
 
 def test_grid_fn_p():
-    grid_fn = GB1DMGridDensityFn(1)
+    grid_fn = _GB1DMGridDensityFn(1)
     assert grid_fn.nwork == 3
     assert grid_fn.max_shell_type == 1
     assert grid_fn.max_nbasis == 3
@@ -150,7 +150,7 @@ def test_grid_fn_p():
 
 
 def test_grid_fn_p_contraction():
-    grid_fn = GB1DMGridDensityFn(1)
+    grid_fn = _GB1DMGridDensityFn(1)
     assert grid_fn.nwork == 3
     assert grid_fn.max_shell_type == 1
     assert grid_fn.max_nbasis == 3
@@ -182,7 +182,7 @@ def test_grid_fn_p_contraction():
 
 
 def test_grid_fn_d_contraction():
-    grid_fn = GB1DMGridDensityFn(3)
+    grid_fn = _GB1DMGridDensityFn(3)
     assert grid_fn.nwork == 10
     assert grid_fn.max_shell_type == 3
     assert grid_fn.max_nbasis == 10
@@ -338,7 +338,7 @@ def check_dm_gradient(obasis, dm_full, p0, p1):
     p0, p1 : np.ndarray, shape=(3, ), dtype=float
         The two points for the finite difference test.
     """
-    grid_fn = GB1DMGridGradientFn(obasis.max_shell_type)
+    grid_fn = _GB1DMGridGradientFn(obasis.max_shell_type)
 
     gradrhos0 = np.zeros((1, 3), float)
     obasis._compute_grid1_dm(dm_full, p0, grid_fn, gradrhos0)

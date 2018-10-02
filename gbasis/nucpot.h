@@ -18,7 +18,10 @@
 //
 //--
 
-// UPDATELIBDOCTITLE: Low-level implementation of nuclear potential on a grid
+/**
+ * @file nucpot.h
+ * @brief Low-level implementation of nuclear potential on a grid
+ */
 
 
 #ifndef GBASIS_NUCPOT_H_

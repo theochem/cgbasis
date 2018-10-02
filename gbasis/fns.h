@@ -18,8 +18,6 @@
 //
 //--
 
-// UPDATELIBDOCTITLE: Evaluate functions on grids and derive Fock matrices from potentials on grids.
-
 /**
     @file fns.h
     @brief Evaluate functions on grids and derive Fock matrices from potentials on grids.

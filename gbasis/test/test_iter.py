@@ -23,61 +23,62 @@
 import numpy as np
 from nose.tools import assert_raises
 
-from .. import (GOBasis, IterGB1, IterGB2, IterGB4, IterPow1, IterPow2, iter_pow1_inc,
-                get_shell_nbasis)
+from .. import (GOBasis, _IterGB1, _IterGB2, _IterGB4, _IterPow1, _IterPow2, _iter_pow1_inc, )
+
+from gbasis.cext import _get_shell_nbasis
 
 
 def test_iter_pow1_inc_l0():
     indexes = np.zeros(3, int)
-    result = iter_pow1_inc(indexes)
+    result = _iter_pow1_inc(indexes)
     assert (indexes == (0, 0, 0)).all()
     assert result is False
 
 
 def test_iter_pow1_inc_l1():
     indexes = np.array([1, 0, 0])
-    result = iter_pow1_inc(indexes)
+    result = _iter_pow1_inc(indexes)
     assert (indexes == (0, 1, 0)).all()
     assert result is True
-    result = iter_pow1_inc(indexes)
+    result = _iter_pow1_inc(indexes)
     assert (indexes == (0, 0, 1)).all()
     assert result is True
-    result = iter_pow1_inc(indexes)
+    result = _iter_pow1_inc(indexes)
     assert (indexes == (1, 0, 0)).all()
     assert result is False
 
 
 def test_iter_pow1_inc_l2():
     indexes = np.array([2, 0, 0])
-    result = iter_pow1_inc(indexes)
+    result = _iter_pow1_inc(indexes)
     assert (indexes == (1, 1, 0)).all()
     assert result is True
-    result = iter_pow1_inc(indexes)
+    result = _iter_pow1_inc(indexes)
     assert (indexes == (1, 0, 1)).all()
     assert result is True
-    result = iter_pow1_inc(indexes)
+    result = _iter_pow1_inc(indexes)
     assert (indexes == (0, 2, 0)).all()
     assert result is True
-    result = iter_pow1_inc(indexes)
+    result = _iter_pow1_inc(indexes)
     assert (indexes == (0, 1, 1)).all()
     assert result is True
-    result = iter_pow1_inc(indexes)
+    result = _iter_pow1_inc(indexes)
     assert (indexes == (0, 0, 2)).all()
     assert result is True
-    result = iter_pow1_inc(indexes)
+    result = _iter_pow1_inc(indexes)
     assert (indexes == (2, 0, 0)).all()
     assert result is False
 
 
 def test_iter_pow1_l0():
-    ip1 = IterPow1(0)
+    ip1 = _IterPow1(0)
     assert ip1.fields == (0, 0, 0, 0)
     assert ip1.inc() is False
     assert ip1.fields == (0, 0, 0, 0)
 
 
 def test_iter_pow1_l1():
-    ip1 = IterPow1(1)
+    ip1 = _IterPow1(1)
     assert ip1.fields == (1, 0, 0, 0)
     assert ip1.inc() is True
     assert ip1.fields == (0, 1, 0, 1)
@@ -88,7 +89,7 @@ def test_iter_pow1_l1():
 
 
 def test_iter_pow1_l2():
-    ip1 = IterPow1(2)
+    ip1 = _IterPow1(2)
     assert ip1.fields == (2, 0, 0, 0)
     assert ip1.inc() is True
     assert ip1.fields == (1, 1, 0, 1)
@@ -105,14 +106,14 @@ def test_iter_pow1_l2():
 
 
 def test_iter_pow2_l0l0():
-    ip2 = IterPow2(0, 0)
+    ip2 = _IterPow2(0, 0)
     assert ip2.fields == (0, 0, 0, 0, 0, 0, 0, 0, 0)
     assert ip2.inc() is False
     assert ip2.fields == (0, 0, 0, 0, 0, 0, 0, 0, 0)
 
 
 def test_iter_pow2_l1l0():
-    ip2 = IterPow2(1, 0)
+    ip2 = _IterPow2(1, 0)
     assert ip2.fields == (1, 0, 0, 0, 0, 0, 0, 0, 0)
     assert ip2.inc() is True
     assert ip2.fields == (0, 1, 0, 0, 0, 0, 1, 1, 0)
@@ -123,7 +124,7 @@ def test_iter_pow2_l1l0():
 
 
 def test_iter_pow2_l2l1():
-    ip2 = IterPow2(2, 1)
+    ip2 = _IterPow2(2, 1)
     assert ip2.fields == (2, 0, 0, 1, 0, 0, 0, 0, 0)
     assert ip2.inc() is True
     assert ip2.fields == (2, 0, 0, 0, 1, 0, 1, 0, 1)
@@ -143,9 +144,9 @@ def test_iter_pow2_l2l1():
 
 def test_iter_pow2_raise():
     with assert_raises(ValueError):
-        IterPow2(-1, 1)
+        _IterPow2(-1, 1)
     with assert_raises(ValueError):
-        IterPow2(1, -1)
+        _IterPow2(1, -1)
 
 
 def get_itergb1():
@@ -157,7 +158,7 @@ def get_itergb1():
     alphas = np.random.uniform(0.5, 2, nprims.sum())
     con_coeffs = np.random.uniform(-1, 1, nprims.sum())
     gobasis = GOBasis(centers, shell_map, nprims, shell_types, alphas, con_coeffs)
-    return IterGB1(gobasis), gobasis
+    return _IterGB1(gobasis), gobasis
 
 
 def test_itergb1_inc_shell():
@@ -274,7 +275,7 @@ def get_itergb2():
     alphas = np.random.uniform(0.5, 2, nprims.sum())
     con_coeffs = np.random.uniform(-1, 1, nprims.sum())
     gobasis = GOBasis(centers, shell_map, nprims, shell_types, alphas, con_coeffs)
-    return IterGB2(gobasis), gobasis
+    return _IterGB2(gobasis), gobasis
 
 
 def test_itergb2_inc_shell():
@@ -506,7 +507,7 @@ def get_itergb4():
     alphas = np.random.uniform(0.5, 2, nprims.sum())
     con_coeffs = np.random.uniform(-1, 1, nprims.sum())
     gobasis = GOBasis(centers, shell_map, nprims, shell_types, alphas, con_coeffs)
-    return IterGB4(gobasis), gobasis
+    return _IterGB4(gobasis), gobasis
 
 
 def test_itergb4_idea_inc_shell():
@@ -556,7 +557,7 @@ def test_itergb4_inc_shell():
     basis_offsets = np.zeros(gobasis.nshell, int)
     for i in range(1, gobasis.nshell):
         oprims[i] = oprims[i - 1] + gobasis.nprims[i - 1]
-        basis_offsets[i] = basis_offsets[i - 1] + get_shell_nbasis(gobasis.shell_types[i - 1])
+        basis_offsets[i] = basis_offsets[i - 1] + _get_shell_nbasis(gobasis.shell_types[i - 1])
 
     def check_fields(is0, is1, is2, is3):
         assert i4.private_fields == (
@@ -651,7 +652,7 @@ def test_itergb4_inc_prim():
     basis_offsets = np.zeros(gobasis.nshell, int)
     for i in range(1, gobasis.nshell):
         oprims[i] = oprims[i - 1] + gobasis.nprims[i - 1]
-        basis_offsets[i] = basis_offsets[i - 1] + get_shell_nbasis(gobasis.shell_types[i - 1])
+        basis_offsets[i] = basis_offsets[i - 1] + _get_shell_nbasis(gobasis.shell_types[i - 1])
 
     def check_fields(is0, is1, is2, is3, ip0, ip1, ip2, ip3):
         assert i4.private_fields == (

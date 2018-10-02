@@ -22,7 +22,7 @@
 import numpy as np
 
 from .common import load_mdata
-from .. import get_gobasis, get_2index_slice, select_2index, compute_diagonal
+from .. import get_gobasis, _get_2index_slice, _select_2index, _compute_diagonal
 
 
 def get_h2o_er():
@@ -38,7 +38,7 @@ def test_select_2index():
     lookups = obasis.shell_lookup
     for index0 in np.arange(obasis.nbasis):
         for index2 in np.arange(obasis.nbasis):
-            pbegin0, pend0, pbegin2, pend2 = select_2index(obasis, index0, index2)
+            pbegin0, pend0, pbegin2, pend2 = _select_2index(obasis, index0, index2)
 
             shell0 = lookups[index0]
             shell2 = lookups[index2]
@@ -61,7 +61,7 @@ def test_compute_diagonal():
 
     ref_diag = np.einsum('iijj->ij', er)
     test_diag = np.zeros_like(ref_diag)
-    compute_diagonal(obasis, test_diag)
+    _compute_diagonal(obasis, test_diag)
 
     assert np.allclose(ref_diag, test_diag)
 
@@ -73,6 +73,6 @@ def test_get_2index_slice():
         for index2 in np.arange(obasis.nbasis):
             ref_slice = er[index0, :, index2, :]
             test_slice = np.zeros_like(ref_slice)
-            get_2index_slice(obasis, index0, index2, test_slice)
+            _get_2index_slice(obasis, index0, index2, test_slice)
             assert np.allclose(ref_slice, test_slice), (index0, index2,
                                                         ref_slice, test_slice)

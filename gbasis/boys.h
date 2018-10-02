@@ -18,7 +18,10 @@
 //
 //--
 
-// UPDATELIBDOCTITLE: The Boys function
+/**
+ * @file boys.h
+ * @brief The Boys function
+ */
 
 #ifndef GBASIS_BOYS_H_
 #define GBASIS_BOYS_H_

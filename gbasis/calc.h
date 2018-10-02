@@ -18,7 +18,10 @@
 //
 //--
 
-// UPDATELIBDOCTITLE: Base class for any integral/evaluation of Gaussian functions
+/**
+ * @file calc.h
+ * @brief Base class for any integral/evaluation of Gaussian functions
+ */
 
 #ifndef GBASIS_CALC_H_
 #define GBASIS_CALC_H_
@@ -34,8 +37,8 @@
 class GBCalculator {
  protected:
   long nwork, max_shell_type, max_nbasis;
-  double *work_pure, *work_cart;  // contiguous work arrays sufficiently large for max_shell_type
-  void swap_work();
+  double *work_pure, *work_cart;  /// contiguous work arrays sufficiently large for max_shell_type
+  void swap_work(); /// write work_pure into work_cart
 
  public:
   /** @brief
