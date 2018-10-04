@@ -29,7 +29,7 @@ from .lightgrid import generate_molecular_grid, integrate
 from .. import (_GB4RAlphaIntegralLibInt, _GB4ErfIntegralLibInt, _GB4GaussIntegralLibInt,
                 _GB4ElectronRepulsionIntegralLibInt, _GB2ErfAttractionIntegral, _GB2KineticIntegral,
                 _GB2GaussAttractionIntegral, _GB2NuclearAttractionIntegral, _GB2OverlapIntegral,
-                gob_cart_normalization, _iter_pow1_inc)
+                _gob_cart_normalization, _iter_pow1_inc)
 
 from gbasis.cext import (_get_shell_nbasis, _nuclear_attraction_helper, _gpt_coeff,
                          _gb_overlap_int1d, _binom,)
@@ -123,7 +123,7 @@ def test_overlap_norm():
             indexes = np.array([shell_type, 0, 0])
             counter = 0
             while True:
-                check = diag[counter] * gob_cart_normalization(alpha, indexes) ** 2
+                check = diag[counter] * _gob_cart_normalization(alpha, indexes) ** 2
                 assert abs(check - 1) < 1e-10
                 if not _iter_pow1_inc(indexes):
                     break

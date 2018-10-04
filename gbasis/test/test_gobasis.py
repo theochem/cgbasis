@@ -26,7 +26,7 @@ import numpy as np
 from nose.plugins.attrib import attr
 from nose.tools import assert_raises
 
-from gbasis.cext import (gob_pure_normalization, gob_cart_normalization, GOBasis,
+from gbasis.cext import (_gob_pure_normalization, _gob_cart_normalization, GOBasis,
                          _GB1DMGridDensityFn, _get_shell_nbasis, _get_max_shell_type)
 from gbasis.gobasis import GOBasisDesc, get_gobasis, go_basis_families
 from .common import load_obasis, load_mdata, load_dm, load_orbsa_coeffs
@@ -58,7 +58,7 @@ def test_gobasis_consistency():
     assert gb.nbasis == 29
     assert gb.max_shell_type == 3
     scales = gb.get_scales()
-    assert abs(scales[0] - gob_cart_normalization(alphas[0], np.array([2, 0, 0]))) < 1e-10
+    assert abs(scales[0] - _gob_cart_normalization(alphas[0], np.array([2, 0, 0]))) < 1e-10
     assert (gb.basis_offsets == np.array([0, 6, 9, 10, 15, 25, 26])).all()
     assert (gb.shell_lookup == np.array([0, 0, 0, 0, 0, 0, 1, 1, 1, 2, 3,
                                          3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4,
@@ -149,7 +149,7 @@ def test_grid_lih_321g_hf_density_some_points():
     for i in range(3):
         alpha = obasis.alphas[i]
         coeff = obasis.con_coeffs[i]
-        nrml = gob_cart_normalization(alpha, np.zeros(3, int))
+        nrml = _gob_cart_normalization(alpha, np.zeros(3, int))
         # check scale
         assert abs(scales[i] - nrml) < 1e-10
         # check that we are on the first atom
@@ -403,23 +403,23 @@ def test_grid_two_index_ne():
 
 
 def test_gob_normalization():
-    assert abs(gob_pure_normalization(0.09515, 0) - 0.122100288) < 1e-5
-    assert abs(gob_pure_normalization(0.1687144, 1) - 0.154127551) < 1e-5
-    assert abs(gob_cart_normalization(0.344, np.array([1, 1, 0])) - 0.440501466) < 1e-8
-    assert abs(gob_cart_normalization(0.246, np.array([1, 1, 1])) - 0.242998767) < 1e-8
-    assert abs(gob_cart_normalization(0.238, np.array([2, 1, 1])) - 0.127073818) < 1e-8
+    assert abs(_gob_pure_normalization(0.09515, 0) - 0.122100288) < 1e-5
+    assert abs(_gob_pure_normalization(0.1687144, 1) - 0.154127551) < 1e-5
+    assert abs(_gob_cart_normalization(0.344, np.array([1, 1, 0])) - 0.440501466) < 1e-8
+    assert abs(_gob_cart_normalization(0.246, np.array([1, 1, 1])) - 0.242998767) < 1e-8
+    assert abs(_gob_cart_normalization(0.238, np.array([2, 1, 1])) - 0.127073818) < 1e-8
     assert abs(
-        gob_pure_normalization(0.3, 0) - gob_cart_normalization(0.3, np.array([0, 0, 0]))) < 1e-10
+        _gob_pure_normalization(0.3, 0) - _gob_cart_normalization(0.3, np.array([0, 0, 0]))) < 1e-10
     assert abs(
-        gob_pure_normalization(0.7, 0) - gob_cart_normalization(0.7, np.array([0, 0, 0]))) < 1e-10
+        _gob_pure_normalization(0.7, 0) - _gob_cart_normalization(0.7, np.array([0, 0, 0]))) < 1e-10
     assert abs(
-        gob_pure_normalization(1.9, 0) - gob_cart_normalization(1.9, np.array([0, 0, 0]))) < 1e-10
+        _gob_pure_normalization(1.9, 0) - _gob_cart_normalization(1.9, np.array([0, 0, 0]))) < 1e-10
     assert abs(
-        gob_pure_normalization(0.3, 1) - gob_cart_normalization(0.3, np.array([1, 0, 0]))) < 1e-10
+        _gob_pure_normalization(0.3, 1) - _gob_cart_normalization(0.3, np.array([1, 0, 0]))) < 1e-10
     assert abs(
-        gob_pure_normalization(0.7, 1) - gob_cart_normalization(0.7, np.array([0, 1, 0]))) < 1e-10
+        _gob_pure_normalization(0.7, 1) - _gob_cart_normalization(0.7, np.array([0, 1, 0]))) < 1e-10
     assert abs(
-        gob_pure_normalization(1.9, 1) - gob_cart_normalization(1.9, np.array([0, 0, 1]))) < 1e-10
+        _gob_pure_normalization(1.9, 1) - _gob_cart_normalization(1.9, np.array([0, 0, 1]))) < 1e-10
 
 
 def test_cart_pure_switch():

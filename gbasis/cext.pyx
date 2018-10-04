@@ -60,7 +60,7 @@ __all__ = [
     # '_gpt_coeff', '_gb_overlap_int1d', '_nuclear_attraction_helper',
     # '_cit', '_jfac', '_dtaylor',
     # gbasis
-    'gob_cart_normalization', 'gob_pure_normalization',
+    '_gob_cart_normalization', '_gob_pure_normalization',
     'GOBasis',
     # gbw (testing)
     '_get_2index_slice', '_compute_diagonal', '_select_2index',
@@ -226,12 +226,12 @@ def _dtaylor(int n, double alpha, double t, double tfactor):
 #
 
 
-def gob_cart_normalization(double alpha, long[::1] n not None):
+def _gob_cart_normalization(double alpha, long[::1] n not None):
     assert n.shape[0] == 3
     return gbasis.gob_cart_normalization(alpha, &n[0])
 
 
-def gob_pure_normalization(double alpha, long l):
+def _gob_pure_normalization(double alpha, long l):
     return gbasis.gob_pure_normalization(alpha, l)
 
 
