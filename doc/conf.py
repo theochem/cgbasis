@@ -26,11 +26,13 @@ on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
 if on_rtd:
     subprocess.call('doxygen', shell=True)
+    subprocess.call('source activate latest')
     print(os.getcwd())
     print(os.listdir("../"))
     cprefix = os.environ.get("CONDA_PREFIX")
     print(cprefix)
-    subprocess.call('../setup.py build_ext -i -I{}/include/libint2'.format(cprefix))
+    os.chdir("../")
+    subprocess.call('python setup.py build_ext -i -I{}/include/libint2'.format(cprefix))
 
 # -- Project information -----------------------------------------------------
 
