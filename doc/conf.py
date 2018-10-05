@@ -28,7 +28,7 @@ if on_rtd:
     subprocess.call('doxygen', shell=True)
     print(os.getcwd())
     print(os.listdir("../"))
-    subprocess.call('../setup.py build_ext -i -I$CONDA_PREFIX/include/libint2')
+    subprocess.call('python ../setup.py build_ext -i -I$CONDA_PREFIX/include/libint2')
 
 # -- Project information -----------------------------------------------------
 
