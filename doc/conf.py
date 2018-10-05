@@ -25,14 +25,17 @@ sys.path.insert(0, os.path.abspath('..'))
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
 if on_rtd:
+    branch = os.environ.get("READTHEDOCS_VERSION", "latest")
+    conda_prefix = "/home/docs/checkouts/readthedocs.org/user_builds/gbasis/conda/{}/".format(branch)
+    os.environ["PATH"] = "{}:{}/bin".format(os.environ["PATH"], conda_prefix)
+    os.environ["CC"] = "{}/bin/x86_64-conda_cos6-linux-gnu-cc".format(conda_prefix)
+    os.environ["CXX"] = "{}/bin/x86_64-conda_cos6-linux-gnu-c++".format(conda_prefix)
+    os.environ["LD"] = "{}/bin/x86_64-conda_cos6-linux-gnu-ld".format(conda_prefix)
+
     subprocess.call('doxygen', shell=True)
-    subprocess.call('source activate latest')
-    print(os.getcwd())
-    print(os.listdir("../"))
-    cprefix = os.environ.get("CONDA_PREFIX")
-    print(cprefix)
     os.chdir("../")
-    subprocess.call('python setup.py build_ext -i -I{}/include/libint2'.format(cprefix))
+    subprocess.call('python setup.py build_ext -i -I{}/include/libint2'.format(conda_prefix))
+    os.chdir("doc")
 
 # -- Project information -----------------------------------------------------
 
