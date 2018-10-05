@@ -32,15 +32,13 @@ if on_rtd:
     os.environ["CXX"] = "{}/bin/x86_64-conda_cos6-linux-gnu-c++".format(conda_prefix)
     os.environ["LD"] = "{}/bin/x86_64-conda_cos6-linux-gnu-ld".format(conda_prefix)
 
-    if not os.path.exists("cxxapi"):
-        subprocess.call('doxygen', shell=True)
-    if not os.path.exists("pyapi"):
-        os.chdir("../")
-        print(os.listdir())
-        subprocess.call(['python', 'setup.py', 'build_ext', '-i',
-                         '-I {}/include/libint2'.format(conda_prefix)], shell=True)
-        os.chdir("doc")
-        subprocess.call('./gen_docs.sh', shell=True)
+    subprocess.call('doxygen', shell=True)
+    os.chdir("../")
+    print(os.listdir())
+    subprocess.call(['python', 'setup.py', 'build_ext', '-i',
+                     '-I {}/include/libint2'.format(conda_prefix)], shell=True)
+    os.chdir("doc")
+    subprocess.call('./gen_docs.sh', shell=True)
 
 # -- Project information -----------------------------------------------------
 
