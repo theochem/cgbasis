@@ -9,7 +9,8 @@ GBasis
 
 About
 -----
-GBasis is a HORTON3 package for calculating Gaussian Basis integrals.
+GBasis is a HORTON3 package for calculating Gaussian Basis integrals. To read
+the documentation, please see here: https://gbasis.readthedocs.io/en/latest/index.html.
 
 License
 -------
