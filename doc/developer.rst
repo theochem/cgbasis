@@ -226,11 +226,43 @@ The following is the entirety of the GB2OverlapIntegral class header:
 
 There is only one function implemented, the overlap integral kernel within :code:`add`,
 and the rest is inherited from the parent GB2Integral class. **To implement your own 1-electron
-integrals, all you need to do is to make a new child class of GB2Integral and implement the
-add function.** You must also expose said function in ``ints.pxd`` and ``cext.pyx`` as mentioned
+integrals, all you need to do is to make a new child class of GB2Integral and implement the**
+:code:`add` **function.** You must also expose said function in ``ints.pxd`` and ``cext.pyx`` as mentioned
 in the section :ref:`calling_cxx`. A complete implementation which
 will be acceptable for merging into master will also have unit tests in ``test_ints.py`` and follow
 coding standards. More details on merging contributions are available in :ref:`dev_building`
+
+The machinery within :code:`add` is rather complex. We will now describe that portion of the code.
+Note that the algorithm used is documented in Section 2 of
+`Taketa et al. (1966) <https://doi.org/10.1143/JPSJ.21.2313>`_.
+
+.. code-block:: c++
+    :caption: ints.cpp
+
+    void GB2OverlapIntegral::add(double coeff, double alpha0, double alpha1, const double *scales0,
+                                 const double *scales1) {
+      double pre, gamma_inv;
+      double gpt_center[3];
+
+      gamma_inv = 1.0 / (alpha0 + alpha1);
+      pre = coeff * exp(-alpha0 * alpha1 * gamma_inv * dist_sq(r0, r1));
+      compute_gpt_center(alpha0, r0, alpha1, r1, gamma_inv, gpt_center);
+      i2p.reset(abs(shell_type0), abs(shell_type1));
+      do {
+        work_cart[i2p.offset] += pre * (
+            gb_overlap_int1d(i2p.n0[0], i2p.n1[0], gpt_center[0] - r0[0], gpt_center[0] - r1[0], gamma_inv) *
+            gb_overlap_int1d(i2p.n0[1], i2p.n1[1], gpt_center[1] - r0[1], gpt_center[1] - r1[1], gamma_inv) *
+            gb_overlap_int1d(i2p.n0[2], i2p.n1[2], gpt_center[2] - r0[2], gpt_center[2] - r1[2], gamma_inv) *
+            scales0[i2p.ibasis0] * scales1[i2p.ibasis1]);
+      } while (i2p.inc());
+    }
+
+The code in :code:`add` implements equation 2.12 of Taketa et al. (1966). The 3D gaussian
+primitive is divided into a prefactor, and 1D cartesian gaussian primitives, calculated in
+:code:`gb_overlap_int1d`. The iterator over cartesian gaussians :code:`i2p` is inherited
+from :code:`GB2Integral` and defined in ``iter_pow.h``. Notably, the :code:`i2p` class is
+what determines the ordering of the basis functions within each shell. If a different sub-shell
+ordering is desired, it should be implemented here.
 
 Implementing 2-electron integrals
 ---------------------------------

@@ -1,0 +1,15 @@
+name: rtd-gbasis
+channels:
+  - theochem
+dependencies:
+  - libint
+  - python=3.7
+  - numpy
+  - gcc_linux-64
+  - gxx_linux-64
+  - cython
+  - breathe
+  - pip:
+      - exhale
+      - sphinx-autodoc-typehints
+

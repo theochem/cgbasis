@@ -252,16 +252,16 @@ class GOBasisFamily:
             a basis set that doesn't already exist in the library. The extension of
             the file must be `.nwchem` or `.gbs`.
 
+        Raises
+        ------
+        ValueError
+            If neither `basis_atom_map` nor `filename` are provided.
+
         Examples
         --------
         >>>> mybasisset = GOBasisFamily("complete_basis", filename="complete_basis.nwchem")
 
         >>>> get_gobasis(np.array([[0,0,0],]), np.array([1]), default=mybasisset)
-
-        Raises
-        ------
-        ValueError
-            If neither `basis_atom_map` nor `filename` are provided.
 
         """
         if basis_atom_map is None and filename is None:

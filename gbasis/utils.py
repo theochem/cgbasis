@@ -52,8 +52,8 @@ def typecheck_geo(coordinates: np.ndarray = None, numbers: np.ndarray = None,
 
     Returns
     -------
-    A list consisting of `natom` and all arguments that were type checked. The
-    pseudo_numbers argument is converted to a floating point array.
+        A list consisting of `natom` and all arguments that were type checked. The
+        pseudo_numbers argument is converted to a floating point array.
 
     """
     # Determine natom
@@ -113,7 +113,7 @@ def to_bset_path(fn: str) -> str:
 
     Returns
     -------
-    The absolute path of the basis file
+        The absolute path of the basis file
 
     """
     return pkg_resources.resource_filename("gbasis.bsets", fn)
