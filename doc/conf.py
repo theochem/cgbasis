@@ -32,12 +32,15 @@ if on_rtd:
     os.environ["CXX"] = "{}/bin/x86_64-conda_cos6-linux-gnu-c++".format(conda_prefix)
     os.environ["LD"] = "{}/bin/x86_64-conda_cos6-linux-gnu-ld".format(conda_prefix)
 
-    subprocess.call('doxygen', shell=True)
-    os.chdir("../")
-    print(os.listdir())
-    subprocess.call(['python', 'setup.py', 'build_ext', '-i',
-                     '-I {}/include/libint2'.format(conda_prefix)], shell=True)
-    os.chdir("doc")
+    if not os.path.exists("cxxapi"):
+        subprocess.call('doxygen', shell=True)
+    if not os.path.exists("pyapi"):
+        os.chdir("../")
+        print(os.listdir())
+        subprocess.call(['python', 'setup.py', 'build_ext', '-i',
+                         '-I {}/include/libint2'.format(conda_prefix)], shell=True)
+        os.chdir("doc")
+        subprocess.call('./gen_docs.sh', shell=True)
 
 # -- Project information -----------------------------------------------------
 
@@ -79,17 +82,18 @@ add_module_names = False
 
 exhale_args = {
     # These arguments are required
-    "containmentFolder":     "./cxxapi",
-    "rootFileName":          "library_root.rst",
-    "rootFileTitle":         "C++ Backend API",
-    "doxygenStripFromPath":  "..",
+    "containmentFolder": "./cxxapi",
+    "rootFileName": "library_root.rst",
+    "rootFileTitle": "C++ Backend API",
+    "doxygenStripFromPath": "..",
     # Suggested optional arguments
-    "createTreeView":        True,
+    "createTreeView": True,
     # TIP: if using the sphinx-bootstrap-theme, you need
     # "treeViewIsBootstrap": True,
     "exhaleExecutesDoxygen": False,
     # "exhaleDoxygenStdin":    "INPUT = ../include"
 }
+
 
 # autodoc_default_values = {
 #     'members': True,
@@ -101,14 +105,15 @@ exhale_args = {
 #     'exclude-members': '__dict__,__weakref__,__module__',
 # }
 
-
 def skip(app, what, name, obj, skip, options):
     if name == "__init__":
         return False
     return skip
 
+
 def setup(app):
     app.connect("autodoc-skip-member", skip)
+
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
