@@ -27,7 +27,7 @@ on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 if on_rtd:
     subprocess.call('doxygen', shell=True)
     print(os.getcwd())
-    subprocess.call('../setup.py build_ext -i -I$CONDA_PREFIX/include/libint2')
+    subprocess.call('../../setup.py build_ext -i -I$CONDA_PREFIX/include/libint2')
 
 # -- Project information -----------------------------------------------------
 
