@@ -8,8 +8,8 @@ dependencies:
   - gcc_linux-64
   - gxx_linux-64
   - cython
-  - breathe
   - pip:
+      - breathe
       - exhale
       - sphinx-autodoc-typehints
 
