@@ -13,3 +13,4 @@ dependencies:
       - exhale
       - sphinx-autodoc-typehints
       - sphinxcontrib-mermaid
+      - sphinxcontrib-napoleon
