@@ -177,38 +177,38 @@ def _cart_to_pure_low(double[::1] work_cart not None,
 #
 
 
-def _fac(long n):
+cpdef _fac(long n):
     return common.fac(n)
 
 
-def _fac2(long n):
+cpdef _fac2(long n):
     return common.fac2(n)
 
 
-def _binom(long n, long m):
+cpdef _binom(long n, long m):
     return common.binom(n, m)
 
 
-def _get_shell_nbasis(long shell_type):
+cpdef _get_shell_nbasis(long shell_type):
     result = common.get_shell_nbasis(shell_type)
     if result <= 0:
         raise ValueError("shell_type -1 is not supported.")
     return result
 
 
-def _get_max_shell_type():
+cpdef _get_max_shell_type():
     return common.get_max_shell_type()
 
 
-def _gpt_coeff(long k, long n0, long n1, double pa, double pb):
+cpdef _gpt_coeff(long k, long n0, long n1, double pa, double pb):
     return common.gpt_coeff(k, n0, n1, pa, pb)
 
 
-def _gb_overlap_int1d(long n0, long n1, double pa, double pb, double inv_gamma):
+cpdef _gb_overlap_int1d(long n0, long n1, double pa, double pb, double inv_gamma):
     return common.gb_overlap_int1d(n0, n1, pa, pb, inv_gamma)
 
 
-def _nuclear_attraction_helper(double[::1] work_g not None,
+cpdef _nuclear_attraction_helper(double[::1] work_g not None,
                               long n0, long n1, double pa, double pb, double cp,
                               double gamma_inv):
     assert work_g.shape[0] == n0+n1+1
