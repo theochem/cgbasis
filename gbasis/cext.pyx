@@ -25,7 +25,6 @@
 """C++ extensions"""
 from typing import Iterable, Tuple, Type, List, Union
 
-cimport numpy as np
 import numpy as np
 
 np.import_array()
@@ -209,8 +208,8 @@ cpdef _gb_overlap_int1d(long n0, long n1, double pa, double pb, double inv_gamma
 
 
 cpdef _nuclear_attraction_helper(double[::1] work_g not None,
-                              long n0, long n1, double pa, double pb, double cp,
-                              double gamma_inv):
+                                 long n0, long n1, double pa, double pb, double cp,
+                                 double gamma_inv):
     assert work_g.shape[0] == n0+n1+1
     common.nuclear_attraction_helper(&work_g[0], n0, n1, pa, pb, cp, gamma_inv)
 

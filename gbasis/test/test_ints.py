@@ -4311,7 +4311,6 @@ def get_gauss_repulsion(alphas0, alphas1, alphas2, alphas3, r0, r1, r2, r3,
 
     Parameters
     ----------
-
     alpha0, alpha1, alpha2, alpha3 : float
         Exponents of the four primitive shells.
     r0, r1, r2, r3 : np.ndarray, shape=(3,), dtype=float
@@ -4324,6 +4323,7 @@ def get_gauss_repulsion(alphas0, alphas1, alphas2, alphas3, r0, r1, r2, r3,
         The coefficient of the Gaussian function.
     alpha : float
         The exponent of the Gaussian function.
+
     """
     max_shell_type = 4
     gb4i = _GB4GaussIntegralLibInt(max_shell_type, c, alpha)
@@ -4349,7 +4349,6 @@ def check_delta_repulsion(alphas0, alphas1, alphas2, alphas3, r0, r1, r2, r3, sc
 
     Parameters
     ----------
-
     alpha0, alpha1, alpha2, alpha3 : float
         Exponents of the four primitive shells.
     r0, r1, r2, r3 : np.ndarray, shape=(3,), dtype=float
@@ -4360,6 +4359,7 @@ def check_delta_repulsion(alphas0, alphas1, alphas2, alphas3, r0, r1, r2, r3, sc
         Shell types of the four primitive shells.
     result0 : np.ndarray, shape=(nbasis, nbasis, nbasis, nbasis), dtype=float
         The expected result.
+
     """
     max_shell_type = 4
     max_nbasis = _get_shell_nbasis(max_shell_type)
@@ -4488,7 +4488,6 @@ def check_intracule_integrals(alphas0, alphas1, alphas2, alphas3, r0, r1, r2, r3
 
     Parameters
     ----------
-
     alpha0, alpha1, alpha2, alpha3 : float
         Exponents of the four primitive shells.
     r0, r1, r2, r3 : np.ndarray, shape=(3,), dtype=float
@@ -4499,6 +4498,7 @@ def check_intracule_integrals(alphas0, alphas1, alphas2, alphas3, r0, r1, r2, r3
         Shell types of the four primitive shells.
     result0 : np.ndarray, shape=(nbasis, nbasis, nbasis, nbasis), dtype=float
         The expected result.
+
     """
     max_shell_type = 4
     max_nbasis = _get_shell_nbasis(max_shell_type)
