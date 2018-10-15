@@ -176,34 +176,34 @@ def _cart_to_pure_low(double[::1] work_cart not None,
 #
 
 
-cpdef _fac(long n):
+def _fac(long n):
     return common.fac(n)
 
 
-cpdef _fac2(long n):
+def _fac2(long n):
     return common.fac2(n)
 
 
-cpdef _binom(long n, long m):
+def _binom(long n, long m):
     return common.binom(n, m)
 
 
-cpdef _get_shell_nbasis(long shell_type):
+def _get_shell_nbasis(long shell_type):
     result = common.get_shell_nbasis(shell_type)
     if result <= 0:
         raise ValueError("shell_type -1 is not supported.")
     return result
 
 
-cpdef _get_max_shell_type():
+def _get_max_shell_type():
     return common.get_max_shell_type()
 
 
-cpdef _gpt_coeff(long k, long n0, long n1, double pa, double pb):
+def _gpt_coeff(long k, long n0, long n1, double pa, double pb):
     return common.gpt_coeff(k, n0, n1, pa, pb)
 
 
-cpdef _gb_overlap_int1d(long n0, long n1, double pa, double pb, double inv_gamma):
+def _gb_overlap_int1d(long n0, long n1, double pa, double pb, double inv_gamma):
     return common.gb_overlap_int1d(n0, n1, pa, pb, inv_gamma)
 
 
