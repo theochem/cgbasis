@@ -74,6 +74,10 @@ extensions = [
     'exhale',
 ]
 
+mathjax_config = {
+    'extensions': ['fast-preview.js', ]
+}
+
 breathe_projects = {'GBasis': 'xml'}
 breathe_default_project = "GBasis"
 add_module_names = False
