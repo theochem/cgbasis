@@ -26,6 +26,7 @@
 from typing import Iterable, Tuple, Type, List, Union
 
 import numpy as np
+cimport numpy as np
 
 np.import_array()
 
