@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# pylint: disable=C0103
 # HORTON: Helpful Open-source Research TOol for N-fermion systems.
 # Copyright (C) 2011-2017 The HORTON Development Team
 #
@@ -23,6 +24,8 @@
 import numpy as np
 from nose.tools import assert_raises
 
+from gbasis.cext import (_get_shell_nbasis, _nuclear_attraction_helper, _gpt_coeff,
+                         _gb_overlap_int1d, _binom)
 from .common import (load_obasis, load_mdata, load_dm, load_er, load_quad, load_dipole, load_na,
                      load_kin, load_olp, load_json)
 from .lightgrid import generate_molecular_grid, integrate
@@ -31,9 +34,6 @@ from .. import (_GB4RAlphaIntegralLibInt, _GB4ErfIntegralLibInt, _GB4GaussIntegr
                 _GB2GaussAttractionIntegral, _GB2NuclearAttractionIntegral, _GB2OverlapIntegral,
                 _gob_cart_normalization, _iter_pow1_inc, _GB4DeltaIntegralLibInt,
                 _GB4IntraDensIntegralLibInt)
-
-from gbasis.cext import (_get_shell_nbasis, _nuclear_attraction_helper, _gpt_coeff,
-                         _gb_overlap_int1d, _binom)
 
 
 def test_gpt_coeff():
@@ -4305,12 +4305,13 @@ def test_ralpha_repulsion_4_3_2_1():
 
 
 def get_gauss_repulsion(alphas0, alphas1, alphas2, alphas3, r0, r1, r2, r3,
-                      scales0, scales1, scales2, scales3,
-                      shell_type0, shell_type1, shell_type2, shell_type3, c, alpha):
+                        scales0, scales1, scales2, scales3,
+                        shell_type0, shell_type1, shell_type2, shell_type3, c, alpha):
     """Get the short-range damped Erf integrals for a primitive shell.
 
     Parameters
     ----------
+
     alpha0, alpha1, alpha2, alpha3 : float
         Exponents of the four primitive shells.
     r0, r1, r2, r3 : np.ndarray, shape=(3,), dtype=float
@@ -4348,6 +4349,7 @@ def check_delta_repulsion(alphas0, alphas1, alphas2, alphas3, r0, r1, r2, r3, sc
 
     Parameters
     ----------
+
     alpha0, alpha1, alpha2, alpha3 : float
         Exponents of the four primitive shells.
     r0, r1, r2, r3 : np.ndarray, shape=(3,), dtype=float
@@ -4478,14 +4480,15 @@ def test_delta_repulsion_0_0_0_0_simple4():
 
 
 def check_intracule_integrals(alphas0, alphas1, alphas2, alphas3, r0, r1, r2, r3, scales0,
-                          scales1, scales2, scales3, shell_type0, shell_type1,
-                          shell_type2, shell_type3, point, result0):
+                              scales1, scales2, scales3, shell_type0, shell_type1,
+                              shell_type2, shell_type3, point, result0):
     """Compare output from HORTON Delta 4-center integrals with reference data.
 
     The reference data was generated using very pointy Gauss 4-center integrals.
 
     Parameters
     ----------
+
     alpha0, alpha1, alpha2, alpha3 : float
         Exponents of the four primitive shells.
     r0, r1, r2, r3 : np.ndarray, shape=(3,), dtype=float

@@ -794,7 +794,7 @@ class GB4DIntegralLibInt : public GB4Integral {
           Output array. The size must be at least mmax + 1.
    */
   virtual void laplace_of_potential(double prefac, double rho, double t, double* p,
-		  		    double* q, long mmax, double* output) = 0;
+                                    double* q, long mmax, double* output) = 0;
 
  private:
   Libint_eri_t erieval;         //!< LibInt runtime object.
