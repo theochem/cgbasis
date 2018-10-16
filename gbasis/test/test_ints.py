@@ -24,8 +24,6 @@
 import numpy as np
 from nose.tools import assert_raises
 
-from gbasis.cext import (_get_shell_nbasis, _nuclear_attraction_helper, _gpt_coeff,
-                         _gb_overlap_int1d, _binom)
 from .common import (load_obasis, load_mdata, load_dm, load_er, load_quad, load_dipole, load_na,
                      load_kin, load_olp, load_json)
 from .lightgrid import generate_molecular_grid, integrate
@@ -34,6 +32,8 @@ from .. import (_GB4RAlphaIntegralLibInt, _GB4ErfIntegralLibInt, _GB4GaussIntegr
                 _GB2GaussAttractionIntegral, _GB2NuclearAttractionIntegral, _GB2OverlapIntegral,
                 _gob_cart_normalization, _iter_pow1_inc, _GB4DeltaIntegralLibInt,
                 _GB4IntraDensIntegralLibInt)
+from ..cext import (_get_shell_nbasis, _nuclear_attraction_helper, _gpt_coeff,
+                    _gb_overlap_int1d, _binom)
 
 
 def test_gpt_coeff():
