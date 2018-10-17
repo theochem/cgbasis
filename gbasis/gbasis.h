@@ -220,6 +220,25 @@ class GOBasis : public GBasis {
   void compute_ralpha_repulsion(double *output, double alpha);
 
   /** @brief
+          Computes the Dirac-Delta electron repulsion integrals.
+
+      @param output
+          The output array with the integrals.
+   */
+  void compute_delta_repulsion(double* output);
+
+  /** @brief
+          Computes the Intracule core integrals.
+
+      @param output
+          The output array with the integrals.
+
+      @param point
+          The intracular coordinate.
+   */
+  void compute_intra_density(double* output, double* point);
+
+  /** @brief
           Computes the (multipole) moment integrals.
 
       @param xyz
