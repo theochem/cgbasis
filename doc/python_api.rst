@@ -1,3 +1,5 @@
+.. _pyapi:
+
 Python API
 ==========
 

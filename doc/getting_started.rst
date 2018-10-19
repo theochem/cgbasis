@@ -77,6 +77,21 @@ user-defined grid.
 * Electron density Laplacian (via density matrix)
 * Hartree potential (via density matrix)
 * Electrostatic potential (via density matrix)
-*
 
 
+.. _ref_gaussian_basis_standard_sets:
+
+Packaged Basis Sets
+-------------------
+
+The following basis sets have been shipped with GBasis. You can easily add your own ``.nwchem``
+format basis sets though.
+
+.. cssclass:: table-striped
+
+.. include:: basis.rst.inc
+
+Note that the basis set names are case-insensitive in GBasis. These basis sets
+were taken from the EMSL library (https://bse.pnl.gov/bse/portal). When
+publishing results obtained with these basis sets, please cite the following
+references [feller1996]_ and [Didier2007]_.
