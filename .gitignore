@@ -9,6 +9,13 @@ gbasis/version.py
 # C extensions
 *.so
 
+# Doc files
+doc/_build
+doc/basis.rst.inc
+doc/pyapi
+doc/cxxapi
+doc/xml
+
 # Distribution / packaging
 .Python
 env/
