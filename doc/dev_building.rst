@@ -39,6 +39,32 @@ The instructions for compiling with Conda are listed in
 :ref:`install_from_source`. This is the build which will be executed
 by Travis-CI when making a pull request.
 
+Documentation changes
+---------------------
+
+Most of the documentation builds happen automatically. The ``.rst`` files within ``doc/``
+are processed by Sphinx and associated scripts. Docstring changes in the code are automatically
+included in the new docs. If write user documentation for your feature (which would be
+greatly appreciated), you can add a new ``.rst`` or modify an existing one. The docs will then
+be built by ReadTheDocs upon merging to master.
+
+You can test your docs beforehand by running this command in the ``docs`` directory. Note that
+this will not work unless you have all the doc building dependencies installed.
+
+.. code-block:: bash
+
+    ./gen_docs.sh
+    make html
+
+Since Sphinx cannot parse docstring unless it imports the module, this means:
+
+1. Your code must be syntactically correct and importable
+2. If your code contains Cython modules, they must be built before building the docs.
+
+More concretely, if you ran ``cleanfiles.sh`` and ``gen_docs.sh`` immediately afterwards, you
+will get errors. Also, if you build using Conda-build, your docs will not build unless you install
+the package into your environment first.
+
 Introducing new dependencies
 ----------------------------
 
