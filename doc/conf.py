@@ -51,6 +51,7 @@ if on_rtd:
     os.chdir("../")
     print(os.listdir())
     print(os.environ)
+    subprocess.call("./cleanfiles.sh", shell=True)
     subprocess.call(['python', 'setup.py', 'build_ext', '-i',
                      '-I{}/include/libint2'.format(conda_prefix),
                      '-L{}/lib'.format(conda_prefix)])
