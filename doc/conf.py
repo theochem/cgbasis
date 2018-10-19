@@ -40,10 +40,10 @@ if on_rtd:
     # os.environ["LD_GOLD"] = "{}/bin/x86_64-conda_cos6-linux-gnu-ld.gold".format(conda_prefix)
     # os.environ["STRINGS"] = "{}/bin/x86_64-conda_cos6-linux-gnu-strings".format(conda_prefix)
     # os.environ["CXXFILT"] = "{}/bin/x86_64-conda_cos6-linux-gnu-c++filt".format(conda_prefix)
-    # os.environ["CFLAGS"] = "-ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -pipe"
-    # os.environ["CXXFLAGS"] = "-std=c++17 -fmessage-length=0 -ftree-vectorize -fPIC " \
-    #                          "-fstack-protector-strong -fno-plt -O2 -pipe"
-    # os.environ["CPPFLAGS"] = "-DNDEBUG -D_FORTIFY_SOURCE=2 -O2"
+    os.environ["CFLAGS"] = "-ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -pipe"
+    os.environ["CXXFLAGS"] = "-std=c++17 -fmessage-length=0 -ftree-vectorize -fPIC " \
+                             "-fstack-protector-strong -fno-plt -O2 -pipe"
+    os.environ["CPPFLAGS"] = "-DNDEBUG -D_FORTIFY_SOURCE=2 -O2"
 
 
     os.chdir("../")
