@@ -52,7 +52,6 @@ The following dependencies will be necessary for GBasis to build properly,
 * gcc/clang with C++ 1x support
 * Cython
 
-
 Testing
 -------
 
@@ -62,3 +61,21 @@ them again on your own machine:
 .. code-block:: bash
 
     $ nosetests -v gbasis
+
+Building Docs
+-------------
+
+To build the documentation locally (a necessity for any contributions back to master), install
+the following additional requirements:
+
+* Sphinx
+* sphinx-rtd-theme
+* sphinxcontrib-napoleon
+* sphinx-autodoc-typehints
+* sphinxcontrib-mermaid
+* Doxygen
+* breathe
+* exhale
+
+FYI, most are not available within Conda. Pip will still happily install them into
+an active conda environment though.
