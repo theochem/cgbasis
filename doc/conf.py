@@ -44,13 +44,16 @@ if on_rtd:
     os.environ["CXXFLAGS"] = "-std=c++17 -fmessage-length=0 -ftree-vectorize -fPIC " \
                              "-fstack-protector-strong -fno-plt -O2 -pipe"
     os.environ["CPPFLAGS"] = "-DNDEBUG -D_FORTIFY_SOURCE=2 -O2"
+    os.environ["LDFLAGS"] = "-Wl,-O2 -Wl,--sort-common -Wl,--as-needed -Wl,-z,relro -Wl,-z,now " \
+                            "-Wl,--disable-new-dtags"
 
 
     os.chdir("../")
     print(os.listdir())
     print(os.environ)
     subprocess.call(['python', 'setup.py', 'build_ext', '-i',
-                     '-I{}/include/libint2'.format(conda_prefix)])
+                     '-I{}/include/libint2'.format(conda_prefix),
+                     '-L{}/lib'.format(conda_prefix)])
     os.chdir("doc")
     subprocess.call('./gen_docs.sh', shell=True)
 
