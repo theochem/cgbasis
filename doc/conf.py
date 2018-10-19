@@ -32,7 +32,6 @@ if on_rtd:
     os.environ["CXX"] = "{}/bin/x86_64-conda_cos6-linux-gnu-c++".format(conda_prefix)
     os.environ["LD"] = "{}/bin/x86_64-conda_cos6-linux-gnu-ld".format(conda_prefix)
 
-    subprocess.call('doxygen', shell=True)
     os.chdir("../")
     print(os.listdir())
     subprocess.call(['python', 'setup.py', 'build_ext', '-i',
