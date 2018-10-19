@@ -17,6 +17,8 @@ User Documentation
    getting_started
    install
    python_interface
+   tech_ref_gaussian_basis
+   numerical_integration
 
 Developer Documentation
 ^^^^^^^^^^^^^^^^^^^^^^^

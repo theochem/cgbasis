@@ -29,11 +29,26 @@ if on_rtd:
     conda_prefix = "/home/docs/checkouts/readthedocs.org/user_builds/gbasis/conda/{}".format(branch)
     os.environ["PATH"] = "{}:{}/bin".format(os.environ["PATH"], conda_prefix)
     os.environ["CC"] = "{}/bin/x86_64-conda_cos6-linux-gnu-cc".format(conda_prefix)
+    os.environ["CPP"] = "{}/bin/x86_64-conda_cos6-linux-gnu-cpp".format(conda_prefix)
     os.environ["CXX"] = "{}/bin/x86_64-conda_cos6-linux-gnu-c++".format(conda_prefix)
-    os.environ["LD"] = "{}/bin/x86_64-conda_cos6-linux-gnu-ld".format(conda_prefix)
+    # os.environ["LD"] = "{}/bin/x86_64-conda_cos6-linux-gnu-ld".format(conda_prefix)
+    # os.environ["AR"] = "{}/bin/x86_64-conda_cos6-linux-gnu-ar".format(conda_prefix)
+    # os.environ["AS"] = "{}/bin/x86_64-conda_cos6-linux-gnu-as".format(conda_prefix)
+    # os.environ["GCC_NM"] = "{}/bin/x86_64-conda_cos6-linux-gnu-nm".format(conda_prefix)
+    # os.environ["NM"] = "{}/bin/x86_64-conda_cos6-linux-gnu-nm".format(conda_prefix)
+    # os.environ["SIZE"] = "{}/bin/x86_64-conda_cos6-linux-gnu-size".format(conda_prefix)
+    # os.environ["LD_GOLD"] = "{}/bin/x86_64-conda_cos6-linux-gnu-ld.gold".format(conda_prefix)
+    # os.environ["STRINGS"] = "{}/bin/x86_64-conda_cos6-linux-gnu-strings".format(conda_prefix)
+    # os.environ["CXXFILT"] = "{}/bin/x86_64-conda_cos6-linux-gnu-c++filt".format(conda_prefix)
+    # os.environ["CFLAGS"] = "-ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -pipe"
+    # os.environ["CXXFLAGS"] = "-std=c++17 -fmessage-length=0 -ftree-vectorize -fPIC " \
+    #                          "-fstack-protector-strong -fno-plt -O2 -pipe"
+    # os.environ["CPPFLAGS"] = "-DNDEBUG -D_FORTIFY_SOURCE=2 -O2"
+
 
     os.chdir("../")
     print(os.listdir())
+    print(os.environ)
     subprocess.call(['python', 'setup.py', 'build_ext', '-i',
                      '-I{}/include/libint2'.format(conda_prefix)])
     os.chdir("doc")
