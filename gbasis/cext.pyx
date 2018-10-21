@@ -25,8 +25,8 @@
 """C++ extensions"""
 from typing import Iterable, Tuple, Type, List, Union
 
-import numpy as np
 cimport numpy as np
+import numpy as np
 
 np.import_array()
 
@@ -129,7 +129,7 @@ cdef _prepare_array(array: Union[np.ndarray, None], shape: Tuple[int], name: str
 
     Returns
     -------
-    array
+    np.ndarray
 
     Raises
     ------
@@ -306,6 +306,9 @@ cdef class GBasis:
     def __cinit__(self, centers: Iterable, shell_map: Iterable, nprims: Iterable,
                   shell_types: Iterable, alphas: Iterable, con_coeffs: Iterable):
         """
+        A C++ wrapper class for interfacing with all the gaussian integral and numerical integral
+        code.
+
         Parameters
         ----------
         centers
@@ -333,11 +336,12 @@ cdef class GBasis:
 
 
         Copies are made of the arguments and stored internally, and are not meant
-        to be modified once the GOBasis object is created.
+        to be modified once the GBasis object is created.
 
         Returns
         -------
-        An instance of GOBasis
+        GBasis
+            An instance of GBasis
 
         """
         # Make private copies of the input arrays.
@@ -403,6 +407,8 @@ cdef class GBasis:
     def __init__(self, centers: Iterable, shell_map: Iterable, nprims: Iterable,
                   shell_types: Iterable, alphas: Iterable, con_coeffs: Iterable):
         """
+        A C++ wrapper class for interfacing with all the gaussian integral and numerical integral
+        code.
 
         Parameters
         ----------
@@ -435,7 +441,8 @@ cdef class GBasis:
 
         Returns
         -------
-        An instance of GOBasis
+        GBasis
+            An instance of GOBasis
 
         """
         if self.__class__ == GBasis:
@@ -458,8 +465,9 @@ cdef class GBasis:
 
         Returns
         -------
-        An instance of Gbasis (or its children) with its attributes concatenated together from
-        the arguments.
+        GBasis
+            An instance of Gbasis (or its children) with its attributes concatenated together from
+            the arguments.
         """
 
         # check if the classes match
@@ -620,7 +628,7 @@ cdef class GBasis:
 
         Returns
         -------
-        GBasis instance
+        GBasis
             An instance of the same class as self containing only
             the basis functions that correspond to the select shells in
             the ``ishells`` list.
@@ -667,7 +675,7 @@ cdef class GBasis:
         # return stuff
         return basis, ibasis_list
 
-    def get_basis_atoms(self, coordinates):
+    def get_basis_atoms(self, coordinates: np.ndarray) -> List[Tuple[GBasis, List]]:
         """Return a list of atomic basis sets for a set of coordinates
 
         Parameters
@@ -735,8 +743,11 @@ cdef class GOBasis(GBasis):
             raise TypeError('coeffs.shape[1] should not be below the number of occupation '
                             'numbers. Got {}. Expected at least {}.'.format(coeffs.shape[1], nocc))
 
-    def compute_overlap(self, double[:, ::1] output=None):
-        """Compute the overlap integrals in a Gaussian orbital basis.
+    def compute_overlap(self, double[:, ::1] output=None) -> np.ndarray:
+        r"""Compute the overlap integrals in a Gaussian orbital basis.
+
+        .. math::
+            \braket{\chi_{i}}{\chi_{j}}
 
         Parameters
         ----------
@@ -745,14 +756,18 @@ cdef class GOBasis(GBasis):
 
         Returns
         -------
-        output
+        np.ndarray, shape=(nbasis, nbasis) dtype=float
+            If output is provided it, it will be returned. Otherwise, a new array will be returned.
         """
         output = _prepare_array(output, (self.nbasis, self.nbasis), 'output')
         (<gbasis.GOBasis*>self._this).compute_overlap(&output[0, 0])
         return np.asarray(output)
 
-    def compute_kinetic(self, double[:, ::1] output=None):
-        """Compute the kinetic energy integrals in a Gaussian orbital basis.
+    def compute_kinetic(self, double[:, ::1] output=None) -> np.ndarray:
+        r"""Compute the kinetic energy integrals in a Gaussian orbital basis.
+
+        .. math::
+            \mel{\chi_{i}}{\frac{\nabla^{2}}{2}}{\chi_{j}}
 
         Parameters
         ----------
@@ -761,15 +776,20 @@ cdef class GOBasis(GBasis):
 
         Returns
         -------
-        output
+        np.ndarray, shape=(nbasis, nbasis) dtype=float
+            If output is provided it, it will be returned. Otherwise, a new array will be returned.
         """
         output = _prepare_array(output, (self.nbasis, self.nbasis), 'output')
         (<gbasis.GOBasis*>self._this).compute_kinetic(&output[0, 0])
         return np.asarray(output)
 
     def compute_nuclear_attraction(self, double[:, ::1] coordinates not None,
-                                   double[::1] charges not None, double[:, ::1] output=None):
-        """Compute the nuclear attraction integral in a Gaussian orbital basis.
+                                   double[::1] charges not None,
+                                   double[:, ::1] output=None) -> np.ndarray:
+        r"""Compute the nuclear attraction integral in a Gaussian orbital basis.
+
+        .. math::
+            \mel{\chi_{i}}{\frac{1}{\abs{r-R}}}{\chi_{j}}
 
         Parameters
         ----------
@@ -784,7 +804,8 @@ cdef class GOBasis(GBasis):
 
         Returns
         -------
-        output
+        np.ndarray, shape=(nbasis, nbasis) dtype=float
+            If output is provided it, it will be returned. Otherwise, a new array will be returned.
         """
         # type checking
         _check_shape(coordinates, (-1, 3), 'coordinates')
@@ -798,13 +819,11 @@ cdef class GOBasis(GBasis):
 
     def compute_erf_attraction(self, double[:, ::1] coordinates not None,
                                double[::1] charges not None, double mu=0.0,
-                               double[:, ::1] output=None):
+                               double[:, ::1] output=None) -> np.ndarray:
         r"""Compute the model nuclear attraction integral with the long-range potential
 
-        The potential has the following form:
-
         .. math::
-            v = \frac{\mathrm{erf}(\mu r)}{r}
+            \mel{\chi_{i}}{\frac{\mathrm{erf}(\mu r)}{r}}{\chi_{j}}
 
         Parameters
         ----------
@@ -821,9 +840,9 @@ cdef class GOBasis(GBasis):
 
         Returns
         -------
-        output
+        np.ndarray, shape=(nbasis, nbasis) dtype=float
+            If output is provided it, it will be returned. Otherwise, a new array will be returned.
 
-        Keywords: :index:`two-center integrals`
         """
         # type checking
         _check_shape(coordinates, (-1, 3), 'coordinates')
@@ -837,13 +856,11 @@ cdef class GOBasis(GBasis):
 
     def compute_gauss_attraction(self, double[:, ::1] coordinates not None,
                                  double[::1] charges not None, double c=1.0,
-                                 double alpha=1.0, double[:, ::1] output=None, ):
+                                 double alpha=1.0, double[:, ::1] output=None) -> np.ndarray:
         r"""Compute the model nuclear attraction with a Gaussian potential.
 
-        The potential has the following form:
-
         .. math::
-            v = c \exp(-\alpha r^2)
+            \mel{\chi_{i}}{c\exp(-\alpha r^{2})}{\chi_{j}}
 
         Parameters
         ----------
@@ -862,9 +879,9 @@ cdef class GOBasis(GBasis):
 
         Returns
         -------
-        output
+        np.ndarray, shape=(nbasis, nbasis) dtype=float
+            If output is provided it, it will be returned. Otherwise, a new array will be returned.
 
-        Keywords: :index:`two-center integrals`
         """
         # type checking
         _check_shape(coordinates, (-1, 3), 'coordinates')
@@ -877,10 +894,11 @@ cdef class GOBasis(GBasis):
         return np.asarray(output)
 
     def compute_multipole_moment(self, long[::1] xyz, double[::1] center not None,
-                                 double[:, ::1] output=None):
+                                 double[:, ::1] output=None) -> np.ndarray:
         """Compute the (multipole) moment integrals in a Gaussian orbital basis.
 
-        Calculates the integral < gto_a | (x - C_x)^l (y - C_y)^m (z - C_z)^n | gto_b >
+        .. math::
+            \mel{\chi_{i}}{(x-C_{x})^{l}(y-C_{y})^{m}(z-C_{z})^{n}}{\chi_{j}}
 
         Parameters
         ----------
@@ -895,7 +913,8 @@ cdef class GOBasis(GBasis):
 
         Returns
         -------
-        output
+        np.ndarray, shape=(nbasis, nbasis) dtype=float
+            If output is provided it, it will be returned. Otherwise, a new array will be returned.
         """
         # type checking
         _check_shape(center, (3,), 'center')
@@ -909,13 +928,11 @@ cdef class GOBasis(GBasis):
             &xyz[0], &center[0], &output[0, 0])
         return np.asarray(output)
 
-    def compute_electron_repulsion(self, double[:, :, :, ::1] output=None):
+    def compute_electron_repulsion(self, double[:, :, :, ::1] output=None) -> np.ndarray:
         r"""Compute electron-electron repulsion integrals.
 
-        The potential has the following form:
-
         .. math::
-            v = \frac{1}{r}
+            \mel{\chi_{i}\chi_{j}}{\frac{1}{\abs{r_{1}-r_{2}}}}{\chi_{k}\chi_{l}}
 
         Parameters
         ----------
@@ -924,9 +941,9 @@ cdef class GOBasis(GBasis):
 
         Returns
         -------
-        output
+        np.ndarray, shape=(nbasis, nbasis, nbasis, nbasis) dtype=float
+            If output is provided it, it will be returned. Otherwise, a new array will be returned.
 
-        Keywords: :index:`ERI`, :index:`four-center integrals`
         """
         self._biblio.append(('valeev2014',
                     'the efficient implementation of four-center electron repulsion integrals'))
@@ -934,13 +951,11 @@ cdef class GOBasis(GBasis):
         (<gbasis.GOBasis*>self._this).compute_electron_repulsion(&output[0, 0, 0, 0])
         return np.asarray(output)
 
-    def compute_erf_repulsion(self, double mu=0.0, double[:, :, :, ::1] output=None):
+    def compute_erf_repulsion(self, double mu=0.0, double[:, :, :, ::1] output=None) -> np.ndarray:
         r"""Compute short-range electron repulsion integrals.
 
-        The potential has the following form:
-
         .. math::
-            v = \frac{\mathrm{erf}(\mu r)}{r}
+            \mel{\chi_{i}\chi_{j}}{\frac{1}{\abs{r_{1}-r_{2}}}}{\chi_{k}\chi_{l}}
 
         Parameters
         ----------
@@ -951,9 +966,9 @@ cdef class GOBasis(GBasis):
 
         Returns
         -------
-        output
+        np.ndarray, shape=(nbasis, nbasis, nbasis, nbasis) dtype=float
+            If output is provided it, it will be returned. Otherwise, a new array will be returned.
 
-        Keywords: :index:`ERI`, :index:`four-center integrals`
         """
         self._biblio.append(('valeev2014',
                  'the efficient implementation of four-center electron repulsion integrals'))
@@ -964,13 +979,11 @@ cdef class GOBasis(GBasis):
         return np.asarray(output)
 
     def compute_gauss_repulsion(self, double c=1.0, double alpha=1.0,
-                                double[:, :, :, ::1] output=None):
+                                double[:, :, :, ::1] output=None) -> np.ndarray:
         r"""Compute gaussian repulsion four-center integrals.
 
-        The potential has the following form:
-
         .. math::
-            v = c \exp(-\alpha r^2)
+            \mel{\chi_{i}\chi_{j}}{c\exp(-\alpha r^{2})}{\chi_{k}\chi_{l}}
 
         Parameters
         ----------
@@ -983,9 +996,9 @@ cdef class GOBasis(GBasis):
 
         Returns
         -------
-        output
+        np.ndarray, shape=(nbasis, nbasis, nbasis, nbasis) dtype=float
+            If output is provided it, it will be returned. Otherwise, a new array will be returned.
 
-        Keywords: :index:`ERI`, :index:`four-center integrals`
         """
         self._biblio.append(('valeev2014',
                  'the efficient implementation of four-center electron repulsion integrals'))
@@ -999,13 +1012,14 @@ cdef class GOBasis(GBasis):
         (<gbasis.GOBasis*>self._this).compute_gauss_repulsion(&output[0, 0, 0, 0], c, alpha)
         return np.asarray(output)
 
-    def compute_ralpha_repulsion(self, double alpha=-1.0, double[:, :, :, ::1] output=None):
+    def compute_ralpha_repulsion(self, double alpha=-1.0,
+                                 double[:, :, :, ::1] output=None) -> np.ndarray:
         r"""Compute r^alpha repulsion four-center integrals.
 
         The potential has the following form:
 
         .. math::
-            v = r^{\alpha}
+            \mel{\chi_{i}\chi_{j}}{r^{\alpha}}{\chi_{k}\chi_{l}}
 
         with :math:`\alpha > -3`.
 
@@ -1018,9 +1032,10 @@ cdef class GOBasis(GBasis):
 
         Returns
         -------
-        output
+        np.ndarray, shape=(nbasis, nbasis, nbasis, nbasis) dtype=float
+            If output is provided it, it will be returned. Otherwise, a new array will be returned.
 
-        Keywords: :index:`ERI`, :index:`four-center integrals`
+
         """
         self._biblio.append(('valeev2014',
                  'the efficient implementation of four-center electron repulsion integrals'))
@@ -1030,13 +1045,11 @@ cdef class GOBasis(GBasis):
         (<gbasis.GOBasis*>self._this).compute_ralpha_repulsion(&output[0, 0, 0, 0], alpha)
         return np.asarray(output)
 
-    def compute_delta_repulsion(self, double[:, :, :, ::1] output=None):
+    def compute_delta_repulsion(self, double[:, :, :, ::1] output=None) -> np.ndarray:
         r"""Compute electron-electron repulsion integrals.
 
-        The potential has the following form:
-
         .. math::
-            v = \delta(\mathbf{r})
+            \mel{\chi_{i}\chi_{j}}{\delta(\mathbf{r})}{\chi_{k}\chi_{l}}
 
         Parameters
         ----------
@@ -1045,9 +1058,9 @@ cdef class GOBasis(GBasis):
 
         Returns
         -------
-        output
+        np.ndarray, shape=(nbasis, nbasis, nbasis, nbasis) dtype=float
+            If output is provided it, it will be returned. Otherwise, a new array will be returned.
 
-        Keywords: :index:`ERI`, :index:`four-center integrals`
         """
         self.biblio.append(('valeev2014',
                     'the efficient implementation of four-center electron repulsion integrals'))
@@ -1056,13 +1069,11 @@ cdef class GOBasis(GBasis):
         return np.asarray(output)
 
     def compute_intra_density(self, double[:, :, :, ::1] output=None,
-                              double[:, ::1] point=None):
+                              double[:, ::1] point=None) -> np.ndarray:
         r"""Compute electron-electron repulsion integrals.
 
-        The potential has the following form:
-
         .. math::
-            v = \delta(\mathbf{r})
+            \mel{\chi_{i}\chi_{j}}{\delta(\mathbf{r})}{\chi_{k}\chi_{l}}
 
         Parameters
         ----------
@@ -1073,9 +1084,9 @@ cdef class GOBasis(GBasis):
 
         Returns
         -------
-        output
+        np.ndarray, shape=(nbasis, nbasis, nbasis, nbasis) dtype=float
+            If output is provided it, it will be returned. Otherwise, a new array will be returned.
 
-        Keywords: :index:`ERI`, :index:`four-center integrals`
         """
         self.biblio.append(('valeev2014',
                     'the efficient implementation of four-center electron repulsion integrals'))
@@ -1087,7 +1098,7 @@ cdef class GOBasis(GBasis):
         return np.asarray(output)
 
 
-    def _compute_cholesky(self, _GB4Integral gb4int, double threshold=1e-8):
+    def _compute_cholesky(self, _GB4Integral gb4int, double threshold=1e-8) -> np.ndarray:
         """Apply the Cholesky code to a given type of four-center integrals.
 
         Parameters
@@ -1099,7 +1110,7 @@ cdef class GOBasis(GBasis):
 
         Returns
         -------
-        array : np.ndarray, shape(nvec, nbasis, nbasis), dtype=float
+        np.ndarray, shape(nvec, nbasis, nbasis), dtype=float
             The Cholesky-decomposed four-center integrals
         """
         cdef gbw.GB4IntegralWrapper* gb4w = NULL
@@ -1123,7 +1134,7 @@ cdef class GOBasis(GBasis):
 
         return result
 
-    def compute_electron_repulsion_cholesky(self, double threshold=1e-8):
+    def compute_electron_repulsion_cholesky(self, double threshold=1e-8) -> np.ndarray:
         r"""Compute Cholesky decomposition of electron repulsion four-center integrals.
 
         Parameters
@@ -1133,14 +1144,13 @@ cdef class GOBasis(GBasis):
 
         Returns
         -------
-        array : np.ndarray, shape(nvec, nbasis, nbasis), dtype=float
+        np.ndarray, shape(nvec, nbasis, nbasis), dtype=float
             The Cholesky-decomposed four-center integrals
 
-        Keywords: :index:`ERI`, :index:`four-center integrals`
         """
         return self._compute_cholesky(_GB4ElectronRepulsionIntegralLibInt(self.max_shell_type))
 
-    def compute_erf_repulsion_cholesky(self, double mu=0.0, double threshold=1e-8):
+    def compute_erf_repulsion_cholesky(self, double mu=0.0, double threshold=1e-8) -> np.ndarray:
         r"""Compute Cholesky decomposition of Erf repulsion four-center integrals.
 
         The potential has the following form:
@@ -1157,15 +1167,14 @@ cdef class GOBasis(GBasis):
 
         Returns
         -------
-        array : np.ndarray, shape(nvec, nbasis, nbasis), dtype=float
+        np.ndarray, shape(nvec, nbasis, nbasis), dtype=float
             The Cholesky-decomposed four-center integrals
 
-        Keywords: :index:`ERI`, :index:`four-center integrals`
         """
         return self._compute_cholesky(_GB4ErfIntegralLibInt(self.max_shell_type, mu))
 
     def compute_gauss_repulsion_cholesky(self, double c=1.0, double alpha=1.0,
-                                         double threshold=1e-8):
+                                         double threshold=1e-8) -> np.ndarray:
         r"""Compute Cholesky decomposition of Gauss repulsion four-center integrals.
 
         The potential has the following form:
@@ -1184,14 +1193,15 @@ cdef class GOBasis(GBasis):
 
         Returns
         -------
-        array : np.ndarray, shape(nvec, nbasis, nbasis), dtype=float
+        np.ndarray, shape(nvec, nbasis, nbasis), dtype=float
             The Cholesky-decomposed four-center integrals
 
-        Keywords: :index:`ERI`, :index:`four-center integrals`
+
         """
         return self._compute_cholesky(_GB4GaussIntegralLibInt(self.max_shell_type, c, alpha))
 
-    def compute_ralpha_repulsion_cholesky(self, double alpha=-1.0, double threshold=1e-8):
+    def compute_ralpha_repulsion_cholesky(self, double alpha=-1.0,
+                                          double threshold=1e-8) -> np.ndarray:
         r"""Compute Cholesky decomposition of ralpha repulsion four-center integrals.
 
         The potential has the following form:
@@ -1209,15 +1219,16 @@ cdef class GOBasis(GBasis):
 
         Returns
         -------
-        array : np.ndarray, shape(nvec, nbasis, nbasis), dtype=float
+        np.ndarray, shape(nvec, nbasis, nbasis), dtype=float
             The Cholesky-decomposed four-center integrals
 
-        Keywords: :index:`ERI`, :index:`four-center integrals`
+
         """
         return self._compute_cholesky(_GB4RAlphaIntegralLibInt(self.max_shell_type, alpha))
 
     def compute_grid_orbitals_exp(self, double[:, ::1] coeffs, double[:, ::1] points not None,
-                                  long[::1] iorbs not None, double[:, ::1] output=None):
+                                  long[::1] iorbs not None,
+                                  double[:, ::1] output=None) -> np.ndarray:
         r"""Compute the orbitals on a grid for a given set of expansion coefficients.
 
         **Warning:** the results are added to the output array!
@@ -1237,7 +1248,7 @@ cdef class GOBasis(GBasis):
 
         Returns
         -------
-        output : np.ndarray, shape=(npoint, n), dtype=float
+        np.ndarray, shape=(npoint, n), dtype=float
             the output array. (It is allocated when not given.)
         """
         # Do some type checking
@@ -1254,7 +1265,8 @@ cdef class GOBasis(GBasis):
         return np.asarray(output)
 
     def compute_grid_orb_gradient_exp(self, double[:, ::1] coeffs, double[:, ::1] points not None,
-                                      long[::1] iorbs not None, double[:, :, ::1] output=None):
+                                      long[::1] iorbs not None,
+                                      double[:, :, ::1] output=None) -> np.ndarray:
         r"""Compute the orbital gradient on a grid for a given set of expansion coefficients.
 
         **Warning:** the results are added to the output array!
@@ -1291,7 +1303,7 @@ cdef class GOBasis(GBasis):
 
     def _compute_grid1_dm(self, double[:, ::1] dm not None, double[:, ::1] points not None,
                           _GB1DMGridFn grid_fn not None, double[:, ::1] output not None,
-                          double epsilon=0):
+                          double epsilon=0) -> np.ndarray:
         """Compute some density function on a grid for a given density matrix.
 
         **Warning:** the results are added to the output array! This may be useful to
@@ -1310,6 +1322,11 @@ cdef class GOBasis(GBasis):
         epsilon : float
             Allow errors on the density of this magnitude for the sake of
             efficiency. Some grid_fn implementations may ignore this.
+
+        Returns
+        -------
+        np.ndarray, shape=(npoint, n) dtype=float
+            If output is provided it, it will be returned. Otherwise, a new array will be returned.
         """
         # Check the array shapes
         _check_shape(dm, (self.nbasis, self.nbasis,), 'dm')
@@ -1325,7 +1342,7 @@ cdef class GOBasis(GBasis):
 
     def compute_grid_density_dm(self, double[:, ::1] dm not None,
                                 double[:, ::1] points not None, double[::1] output=None,
-                                double epsilon=0):
+                                double epsilon=0) -> np.ndarray:
         """Compute the electron density on a grid for a given density matrix.
 
         **Warning:** the results are added to the output array! This may be useful to
@@ -1355,7 +1372,8 @@ cdef class GOBasis(GBasis):
         return np.asarray(output)
 
     def compute_grid_gradient_dm(self, double[:, ::1] dm not None,
-                                 double[:, ::1] points not None, double[:, ::1] output=None):
+                                 double[:, ::1] points not None,
+                                 double[:, ::1] output=None) -> np.ndarray:
         """Compute the electron density gradient on a grid for a given density matrix.
 
         **Warning:** the results are added to the output array! This may be useful to
@@ -1381,7 +1399,8 @@ cdef class GOBasis(GBasis):
         return np.asarray(output)
 
     def compute_grid_gga_dm(self, double[:, ::1] dm not None,
-                            double[:, ::1] points not None, double[:, ::1] output=None):
+                            double[:, ::1] points not None,
+                            double[:, ::1] output=None) -> np.ndarray:
         """Compute the electron density and gradient on a grid for a given density matrix.
 
         **Warning:** the results are added to the output array! This may be useful to
@@ -1408,7 +1427,8 @@ cdef class GOBasis(GBasis):
         return np.asarray(output)
 
     def compute_grid_kinetic_dm(self, double[:, ::1] dm not None,
-                                double[:, ::1] points not None, double[::1] output=None):
+                                double[:, ::1] points not None,
+                                double[::1] output=None) -> np.ndarray:
         """Compute the positive definite kinetic energy density on a grid for a given density matrix.
 
         **Warning:** the results are added to the output array! This may be useful to
@@ -1434,7 +1454,8 @@ cdef class GOBasis(GBasis):
         return np.asarray(output)
 
     def compute_grid_hessian_dm(self, double[:, ::1] dm not None,
-                                double[:, ::1] points not None, double[:, ::1] output=None):
+                                double[:, ::1] points not None,
+                                double[:, ::1] output=None) -> np.ndarray:
         """Compute the electron density Hessian on a grid for a given density matrix.
 
         **Warning:** the results are added to the output array! This may be useful to
@@ -1468,7 +1489,8 @@ cdef class GOBasis(GBasis):
         return np.asarray(output)
 
     def compute_grid_mgga_dm(self, double[:, ::1] dm not None,
-                             double[:, ::1] points not None, double[:, ::1] output=None):
+                             double[:, ::1] points not None,
+                             double[:, ::1] output=None) -> np.ndarray:
         """Compute the MGGA quantities for a given density matrix.
 
         **Warning:** the results are added to the output array! This may be useful to
@@ -1505,7 +1527,8 @@ cdef class GOBasis(GBasis):
         return np.asarray(output)
 
     def compute_grid_hartree_dm(self, double[:, ::1] dm not None,
-                                double[:, ::1] points not None, double[::1] output=None):
+                                double[:, ::1] points not None,
+                                double[::1] output=None) -> np.ndarray:
         """Compute the Hartree potential on a grid for a given density matrix.
 
         **Warning:** the results are added to the output array! This may be useful to
@@ -1537,7 +1560,8 @@ cdef class GOBasis(GBasis):
 
     def compute_grid_esp_dm(self, double[:, ::1] dm not None,
                             double[:, ::1] coordinates not None, double[::1] charges not None,
-                            double[:, ::1] points not None, double[::1] output=None):
+                            double[:, ::1] points not None,
+                            double[::1] output=None) -> np.ndarray:
         """Compute the electrostatic potential on a grid for a given density matrix.
 
         **Warning:** the results are added to the output array! This may be useful to
@@ -1569,7 +1593,7 @@ cdef class GOBasis(GBasis):
 
     def _compute_grid1_fock(self, double[:, ::1] points not None, double[::1] weights not None,
                             double[:, :] pots not None, _GB1DMGridFn grid_fn not None,
-                            double[:, ::1] fock=None):
+                            double[:, ::1] fock=None) -> np.ndarray:
         """Compute a Fock operator from a some sort of potential.
 
         **Warning:** the results are added to the Fock operator!
@@ -1587,6 +1611,12 @@ cdef class GOBasis(GBasis):
             Implements the function to be evaluated on the grid.
         fock : np.ndarray, shape=(nbasis, nbasis), dtype=float
             Output two-index object.
+
+        Returns
+        -------
+        fock : np.ndarray, shape=(nbasis, nbasis), dtype=float
+            If fock is provided, it will be **added** to. If not, a new array is allocated and
+            returned.
         """
         fock = _prepare_array(fock, (self.nbasis, self.nbasis), 'fock')
         _check_shape(points, (-1, 3), 'points')
@@ -1607,7 +1637,7 @@ cdef class GOBasis(GBasis):
 
     def compute_grid_density_fock(self, double[:, ::1] points not None,
                                   double[::1] weights not None, double[:] pots not None,
-                                  double[:, ::1] fock=None):
+                                  double[:, ::1] fock=None) -> np.ndarray:
         """Compute a Fock operator from a density potential.
 
         **Warning:** the results are added to the Fock operator!
@@ -1625,7 +1655,9 @@ cdef class GOBasis(GBasis):
 
         Returns
         -------
-        fock
+        fock : np.ndarray, shape=(nbasis, nbasis), dtype=float
+            If fock is provided, it will be **added** to. If not, a new array is allocated and
+            returned.
         """
         fock = self._compute_grid1_fock(
             points, weights, pots[:, None], _GB1DMGridDensityFn(self.max_shell_type), fock)
@@ -1633,7 +1665,7 @@ cdef class GOBasis(GBasis):
 
     def compute_grid_gradient_fock(self, double[:, ::1] points not None,
                                    double[::1] weights not None, double[:, :] pots not None,
-                                   double[:, ::1] fock=None):
+                                   double[:, ::1] fock=None) -> np.ndarray:
         """Compute a Fock operator from a density gradient potential.
 
         **Warning:** the results are added to the Fock operator!
@@ -1652,7 +1684,9 @@ cdef class GOBasis(GBasis):
 
         Returns
         -------
-        fock
+        fock : np.ndarray, shape=(nbasis, nbasis), dtype=float
+            If fock is provided, it will be **added** to. If not, a new array is allocated and
+            returned.
         """
         fock = self._compute_grid1_fock(
             points, weights, pots, _GB1DMGridGradientFn(self.max_shell_type), fock)
@@ -1660,7 +1694,7 @@ cdef class GOBasis(GBasis):
 
     def compute_grid_gga_fock(self, double[:, ::1] points not None,
                               double[::1] weights not None, double[:, :] pots not None,
-                              double[:, ::1] fock=None):
+                              double[:, ::1] fock=None) -> np.ndarray:
         """Compute a Fock operator from GGA potential data.
 
         **Warning:** the results are added to the Fock operator!
@@ -1679,7 +1713,9 @@ cdef class GOBasis(GBasis):
 
         Returns
         -------
-        fock
+        fock : np.ndarray, shape=(nbasis, nbasis), dtype=float
+            If fock is provided, it will be **added** to. If not, a new array is allocated and
+            returned.
         """
         fock = self._compute_grid1_fock(
             points, weights, pots, _GB1DMGridGGAFn(self.max_shell_type), fock)
@@ -1687,7 +1723,7 @@ cdef class GOBasis(GBasis):
 
     def compute_grid_kinetic_fock(self, double[:, ::1] points not None,
                                   double[::1] weights not None, double[:] pots not None,
-                                  double[:, ::1] fock=None):
+                                  double[:, ::1] fock=None) -> np.ndarray :
         """Compute a Fock operator from a kientic-energy-density potential.
 
         **Warning:** the results are added to the Fock operator!
@@ -1705,7 +1741,9 @@ cdef class GOBasis(GBasis):
 
         Returns
         -------
-        fock
+        fock : np.ndarray, shape=(nbasis, nbasis), dtype=float
+            If fock is provided, it will be **added** to. If not, a new array is allocated and
+            returned.
         """
         fock = self._compute_grid1_fock(
             points, weights, pots[:, None], _GB1DMGridKineticFn(self.max_shell_type), fock)
@@ -1713,7 +1751,7 @@ cdef class GOBasis(GBasis):
 
     def compute_grid_hessian_fock(self, double[:, ::1] points not None,
                                   double[::1] weights not None, double[:, :] pots not None,
-                                  double[:, ::1] fock=None):
+                                  double[:, ::1] fock=None) -> np.ndarray:
         """Compute a Fock operator from a density hessian potential.
 
         **Warning:** the results are added to the Fock operator!
@@ -1740,7 +1778,9 @@ cdef class GOBasis(GBasis):
 
         Returns
         -------
-        fock
+        fock : np.ndarray, shape=(nbasis, nbasis), dtype=float
+            If fock is provided, it will be **added** to. If not, a new array is allocated and
+            returned.
         """
         fock = self._compute_grid1_fock(
             points, weights, pots, _GB1DMGridHessianFn(self.max_shell_type), fock)
@@ -1748,7 +1788,7 @@ cdef class GOBasis(GBasis):
 
     def compute_grid_mgga_fock(self, double[:, ::1] points not None,
                                double[::1] weights not None, double[:, :] pots not None,
-                               double[:, ::1] fock=None):
+                               double[:, ::1] fock=None) -> np.ndarray:
         """Compute a Fock operator from MGGA potential data.
 
         **Warning:** the results are added to the Fock operator!
@@ -1775,7 +1815,9 @@ cdef class GOBasis(GBasis):
 
         Returns
         -------
-        fock
+        fock : np.ndarray, shape=(nbasis, nbasis), dtype=float
+            If fock is provided, it will be **added** to. If not, a new array is allocated and
+            returned.
         """
         fock = self._compute_grid1_fock(
             points, weights, pots, _GB1DMGridMGGAFn(self.max_shell_type), fock)
@@ -2481,7 +2523,7 @@ cdef class _IterPow2:
 def compute_grid_nucpot(double[:, ::1] coordinates not None,
                         double[::1] charges not None,
                         double[:, ::1] points not None,
-                        double[::1] output not None):
+                        double[::1] output not None) -> np.ndarray:
     """Compute the potential due to a set of (nuclear) point charges
 
     Parameters
@@ -2496,6 +2538,10 @@ def compute_grid_nucpot(double[:, ::1] coordinates not None,
         computed.
     output
         An (M,) output array in which the potential is stored.
+
+    Returns
+    -------
+    output : np.ndarray, shape=(M, ), dtype=float
     """
     # type checking
     assert coordinates.shape[1] == 3

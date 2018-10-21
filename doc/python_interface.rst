@@ -3,16 +3,10 @@
 Python Interface
 ================
 
-TODO:
-
-* Concatenate two basis sets together
-* Define basis by atom type
-* Define custom basic/contractions
-
 The user Python interface is fairly minimal, with the majority of the code
 implemented in C++. There are substantial bits of Python code for testing
-the C++ machinery, but they have been marked as private. The user Python API
-is documented in :ref:`pyapi`.
+the C++ machinery, but they have been marked as private. The full user Python API
+is documented in :ref:`pyapi`. If you would like to extend the Python API, see :ref:`developer`.
 
 Some common operations using the Python API:
 
@@ -27,12 +21,12 @@ This can be done by a function call.
     obasis = get_gobasis(coordinates, numbers, 'cc-pvdz')
 
 where ``mol.coordinates`` and ``mol.numbers`` are numpy arrays (see
-:ref:`read-molgeometry`), and ``cc-pvdz`` is the cc-pVDZ basis set.
+:py:class:`~gbasis.cext.GOBasis`), and ``cc-pvdz`` is the cc-pVDZ basis set.
 
 HORTON is distributed with most of the popular basis sets. A list of currently
 supported built-in basis sets can be found here:
 :ref:`ref_gaussian_basis_standard_sets`. The basis set for a given molecule is
-constructed with the function :py:func:`~horton.gbasis.gobasis.get_gobasis`
+constructed with the function :py:func:`~gbasis.gobasis.get_gobasis`
 
 
 Specifying different basis sets for different atoms
@@ -48,8 +42,8 @@ example, you might like to use the 3-21G basis set for the hydrogen atom, the
                          element_map={'H':'3-21g', 'C':'6-31g'})
 
 where `mol.coordinates` and `mol.numbers` are read from file (see
-:ref:`read-molgeometry`),  and ``sto-3g``, ``3-21g`` and ``6-31g`` are the basis
-set names (see :ref:`tech_ref_gaussian_basis.rst`)
+:py:class:`~gbasis.cext.GOBasis`),  and ``sto-3g``, ``3-21g`` and ``6-31g`` are the basis
+set names (see ::ref:`ref_gaussian_basis_standard_sets`).
 
 Alternatively, the same result can be obtained by substituting the H and C symbols
 with their atomic numbers:

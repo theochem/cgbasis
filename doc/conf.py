@@ -47,7 +47,6 @@ if on_rtd:
     os.environ["LDFLAGS"] = "-Wl,-O2 -Wl,--sort-common -Wl,--as-needed -Wl,-z,relro -Wl,-z,now " \
                             "-Wl,--disable-new-dtags"
 
-
     os.chdir("../")
     print(os.listdir())
     print(os.environ)
@@ -75,6 +74,22 @@ release = '0.2.0'
 #
 # needs_sphinx = '1.0'
 
+mathjax_config = {
+    'extensions': ['fast-preview.js'],
+    'TeX': {
+        'Macros': {
+            'abs': ["{\\left\\vert { #1 } \\right\\vert}", 1],
+            'ket': ["{\\left\\vert { #1 } \\right\\rangle}", 1],
+            'bra': ["{\\left\\langle { #1} \\right\\vert}", 1],
+            'braket': ["{\\left\\langle {#1} \\mid { #2} \\right\\rangle}", 2],
+            'ketbra': ["{\\left\\vert { #1 } \\right\\rangle\\left\\langle { #2} \\right\\vert}",
+                       2],
+            'ev': ["{\\left\\langle {#2} \\vert {#1} \\vert {#2} \\right\\rangle}", 2],
+            'mel': ["{\\left\\langle{ #1 }\\right\\vert{ #2 }\\left\\vert{#3}\\right\\rangle}", 3]
+        }
+    },
+}
+
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
@@ -91,10 +106,6 @@ extensions = [
     'breathe',
     'exhale',
 ]
-
-mathjax_config = {
-    'extensions': ['fast-preview.js', ]
-}
 
 breathe_projects = {'GBasis': 'xml'}
 breathe_default_project = "GBasis"
@@ -115,24 +126,14 @@ exhale_args = {
 }
 
 
-# autodoc_default_values = {
-#     'members': True,
-#     'undoc-members': True,
-#     'special-members': '__init__,__cinit__',
-#     'show-inheritance': True,
-#     'inherited_members': True,
-#     'member-order': 'bysource',
-#     'exclude-members': '__dict__,__weakref__,__module__',
-# }
-
-def skip(app, what, name, obj, skip, options):
-    if name == "__init__":
-        return False
-    return skip
-
-
-def setup(app):
-    app.connect("autodoc-skip-member", skip)
+# def skip(app, what, name, obj, skip, options):
+#     if name == "__init__":
+#         return False
+#     return skip
+#
+#
+# def setup(app):
+#     app.connect("autodoc-skip-member", skip)
 
 
 # Add any paths that contain templates here, relative to this directory.
