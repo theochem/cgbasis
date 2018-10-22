@@ -1137,6 +1137,9 @@ cdef class GOBasis(GBasis):
     def compute_electron_repulsion_cholesky(self, double threshold=1e-8) -> np.ndarray:
         r"""Compute Cholesky decomposition of electron repulsion four-center integrals.
 
+        .. math::
+            L_{ik}^{v}\cdot L_{jl}^{v}=\mel{\chi_{i}\chi_{j}}{\frac{1}{\abs{r_{1}-r_{2}}}}{\chi_{k}\chi_{l}}
+
         Parameters
         ----------
         threshold
@@ -1153,10 +1156,8 @@ cdef class GOBasis(GBasis):
     def compute_erf_repulsion_cholesky(self, double mu=0.0, double threshold=1e-8) -> np.ndarray:
         r"""Compute Cholesky decomposition of Erf repulsion four-center integrals.
 
-        The potential has the following form:
-
         .. math::
-            v = \frac{\mathrm{erf}(\mu r)}{r}
+            L_{ik}^{v}\cdot L_{jl}^{v}=\mel{\chi_{i}\chi_{j}}{\frac{\mathrm{erf}(\mu r)}{r}}{\chi_{k}\chi_{l}}
 
         Parameters
         ----------
@@ -1177,10 +1178,8 @@ cdef class GOBasis(GBasis):
                                          double threshold=1e-8) -> np.ndarray:
         r"""Compute Cholesky decomposition of Gauss repulsion four-center integrals.
 
-        The potential has the following form:
-
         .. math::
-            v = c \exp(-\alpha r^2)
+            L_{ik}^{v}\cdot L_{jl}^{v}=\mel{\chi_{i}\chi_{j}}{c\exp(-\alpha r^{2})}{\chi_{k}\chi_{l}}
 
         Parameters
         ----------
@@ -1204,10 +1203,8 @@ cdef class GOBasis(GBasis):
                                           double threshold=1e-8) -> np.ndarray:
         r"""Compute Cholesky decomposition of ralpha repulsion four-center integrals.
 
-        The potential has the following form:
-
         .. math::
-            v = r^{\alpha}
+            L_{ik}^{v}\cdot L_{jl}^{v}=\mel{\chi_{i}\chi_{j}}{r^{\alpha}}{\chi_{k}\chi_{l}}
 
         with :math:`\alpha > -3`.
         Parameters
