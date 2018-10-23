@@ -35,8 +35,6 @@ from cython.operator cimport dereference as deref
 
 from numpy_wrapper cimport PyArray_ENABLEFLAGS
 
-cimport boys
-cimport cartpure
 cimport common
 cimport gbasis
 cimport ints
