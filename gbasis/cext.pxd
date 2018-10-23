@@ -11,3 +11,6 @@ cdef class GBasis:
     cdef np.ndarray _shell_types
     cdef np.ndarray _alphas
     cdef np.ndarray _con_coeffs
+cdef class GOBasis(GBasis):
+    cdef public list _biblio
+    cdef gbasis.GOBasis* _this

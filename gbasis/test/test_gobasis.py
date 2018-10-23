@@ -27,7 +27,8 @@ from nose.plugins.attrib import attr
 from nose.tools import assert_raises
 
 from gbasis.cext import (_gob_pure_normalization, _gob_cart_normalization, GOBasis,
-                         _GB1DMGridDensityFn, _get_shell_nbasis, _get_max_shell_type)
+                         _GB1DMGridDensityFn, _get_shell_nbasis,)
+from gbasis.test.cext import _get_max_shell_type
 from gbasis.gobasis import GOBasisDesc, get_gobasis, go_basis_families
 from .common import load_obasis, load_mdata, load_dm, load_orbsa_coeffs
 from .lightgrid import generate_molecular_grid

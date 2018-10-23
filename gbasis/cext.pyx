@@ -30,7 +30,6 @@ import numpy as np
 
 np.import_array()
 
-cimport libc.string
 from libcpp.vector cimport vector
 from cython.operator cimport dereference as deref
 
@@ -51,19 +50,11 @@ cimport nucpot
 import atexit
 
 __all__ = [
-    # boys
-    '_boys_function', '_boys_function_array',
-    # cartpure
-    '_cart_to_pure_low',
     # common
-    '_fac', '_fac2', '_binom', '_get_shell_nbasis', '_get_max_shell_type',
-    '_gpt_coeff', '_gb_overlap_int1d', '_nuclear_attraction_helper',
-    '_cit', '_jfac', '_dtaylor',
+    '_get_shell_nbasis',
     # gbasis
     '_gob_cart_normalization', '_gob_pure_normalization',
     'GOBasis',
-    # gbw (testing)
-    '_get_2index_slice', '_compute_diagonal', '_select_2index',
     # ints
     '_GB4Integral',
     '_GB4ElectronRepulsionIntegralLibInt',
@@ -137,51 +128,9 @@ cdef _prepare_array(array: Union[np.ndarray, None], shape: Tuple[int], name: str
         _check_shape(array, shape, name)
     return array
 
-
 #
-# boys wrappers (for testing only)
+# common.cpp wrappers
 #
-
-
-def _boys_function(long m, double t):
-    return boys.boys_function(m, t)
-
-
-def _boys_function_array(long mmax, double t):
-    cdef double[::1] output = np.zeros(mmax+1)
-    boys.boys_function_array(mmax, t, &output[0])
-    return output
-
-
-#
-# cartpure wrappers (for testing only)
-#
-
-
-def _cart_to_pure_low(double[::1] work_cart not None,
-                     double[::1] work_pure not None,
-                     long shell_type, long nant, long npost):
-    cartpure.cart_to_pure_low(
-        &work_cart[0], &work_pure[0], shell_type, nant,
-        npost
-    )
-
-
-#
-# common wrappers
-#
-
-
-def _fac(long n):
-    return common.fac(n)
-
-
-def _fac2(long n):
-    return common.fac2(n)
-
-
-def _binom(long n, long m):
-    return common.binom(n, m)
 
 
 cpdef _get_shell_nbasis(long shell_type):
@@ -189,34 +138,6 @@ cpdef _get_shell_nbasis(long shell_type):
     if result <= 0:
         raise ValueError("shell_type -1 is not supported.")
     return result
-
-
-def _get_max_shell_type():
-    return common.get_max_shell_type()
-
-
-def _gpt_coeff(long k, long n0, long n1, double pa, double pb):
-    return common.gpt_coeff(k, n0, n1, pa, pb)
-
-
-def _gb_overlap_int1d(long n0, long n1, double pa, double pb, double inv_gamma):
-    return common.gb_overlap_int1d(n0, n1, pa, pb, inv_gamma)
-
-
-def _nuclear_attraction_helper(double[::1] work_g not None,
-                                long n0, long n1, double pa, double pb, double cp,
-                                double gamma_inv):
-    assert work_g.shape[0] == n0+n1+1
-    common.nuclear_attraction_helper(&work_g[0], n0, n1, pa, pb, cp, gamma_inv)
-
-def _cit(int i, double t, int m):
-        return common.cit(i, t, m)
-
-def _jfac(int j, int n):
-    return common.jfac(j, n)
-
-def _dtaylor(int n, double alpha, double t, double tfactor):
-    return common.dtaylor(n, alpha, t, tfactor)
 
 
 #
@@ -708,9 +629,6 @@ cdef class GBasis:
 
 
 cdef class GOBasis(GBasis):
-    cdef public list _biblio
-    cdef gbasis.GOBasis* _this
-
     def __cinit__(self, centers, shell_map, nprims, shell_types, alphas, con_coeffs):
         self._this = new gbasis.GOBasis(
             <double*>self._centers.data, <long*>self._shell_map.data,
@@ -1808,89 +1726,7 @@ cdef class GOBasis(GBasis):
         return np.asarray(fock)
 
 
-#
-# gbw wrappers
-#
 
-def _select_2index(GOBasis gobasis, long index0, long index2):
-    """Select 2index 2e ints to compute. For cholesky testing only"""
-    assert 0 <= index0 < gobasis.nbasis
-    assert 0 <= index2 < gobasis.nbasis
-
-    cdef ints.GB4ElectronRepulsionIntegralLibInt* gb4int = NULL
-    cdef gbw.GB4IntegralWrapper* gb4w = NULL
-
-    cdef long pbegin0
-    cdef long pend0
-    cdef long pbegin2
-    cdef long pend2
-
-    try:
-        gb4int = new ints.GB4ElectronRepulsionIntegralLibInt(
-                            gobasis.max_shell_type)
-        gb4w = new gbw.GB4IntegralWrapper(gobasis._this,
-                            <ints.GB4Integral*> gb4int)
-        gb4w.select_2index(index0, index2, &pbegin0, &pend0, &pbegin2, &pend2)
-    finally:
-        if gb4int is not NULL:
-            del gb4int
-        if gb4w is not NULL:
-            del gb4w
-    return pbegin0, pend0, pbegin2, pend2
-
-
-def _compute_diagonal(GOBasis gobasis, double[:, ::1] diagonal not None):
-    """Get the diagonal 2e ints. For cholesky testing only"""
-    cdef ints.GB4ElectronRepulsionIntegralLibInt* gb4int = NULL
-    cdef gbw.GB4IntegralWrapper* gb4w = NULL
-    cdef double[:, ::1] output
-    output = diagonal
-
-    try:
-        gb4int = new ints.GB4ElectronRepulsionIntegralLibInt(
-                            gobasis.max_shell_type)
-        gb4w = new gbw.GB4IntegralWrapper(gobasis._this,
-                            <ints.GB4Integral*> gb4int)
-        gb4w.compute_diagonal(&output[0, 0])
-
-    finally:
-        if gb4int is not NULL:
-            del gb4int
-        if gb4w is not NULL:
-            del gb4w
-
-def _get_2index_slice(GOBasis gobasis, long index0, long index2,
-                     double[:, ::1] index_slice not None):
-    """Get a 2-index slice. For cholesky testing only."""
-    cdef ints.GB4ElectronRepulsionIntegralLibInt* gb4int = NULL
-    cdef gbw.GB4IntegralWrapper* gb4w = NULL
-    assert index_slice.shape[0] == gobasis.nbasis
-    assert index_slice.shape[1] == gobasis.nbasis
-
-    cdef long pbegin0
-    cdef long pend0
-    cdef long pbegin2
-    cdef long pend2
-    cdef double* output
-    try:
-        gb4int = new ints.GB4ElectronRepulsionIntegralLibInt(
-                            gobasis.max_shell_type)
-        gb4w = new gbw.GB4IntegralWrapper(gobasis._this,
-                            <ints.GB4Integral*> gb4int)
-        gb4w.select_2index(index0, index2, &pbegin0, &pend0, &pbegin2, &pend2)
-        gb4w.compute()
-        output = gb4w.get_2index_slice(index0, index2)
-        print(output[0])
-        print(sizeof(double)*gobasis.nbasis*gobasis.nbasis)
-        libc.string.memcpy(&index_slice[0, 0], output,
-                           sizeof(double) * gobasis.nbasis * gobasis.nbasis)
-        print(index_slice[0, 0])
-
-    finally:
-        if gb4int is not NULL:
-            del gb4int
-        if gb4w is not NULL:
-            del gb4w
 
 
 #

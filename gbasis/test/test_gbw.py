@@ -22,7 +22,8 @@
 import numpy as np
 
 from .common import load_mdata
-from .. import get_gobasis, _get_2index_slice, _select_2index, _compute_diagonal
+from gbasis import get_gobasis
+from gbasis.test.cext import _get_2index_slice, _select_2index, _compute_diagonal
 
 
 def get_h2o_er():

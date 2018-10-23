@@ -20,7 +20,7 @@
 # --
 
 
-from gbasis.cext import _fac, _fac2, _jfac, _cit, _binom
+from gbasis.test.cext import _fac, _fac2, _jfac, _cit, _binom
 
 
 def test_fac():

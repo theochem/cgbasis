@@ -23,7 +23,7 @@
 import numpy as np
 from nose.tools import assert_raises
 
-from gbasis.cext import _boys_function, _boys_function_array, _get_max_shell_type
+from gbasis.test.cext import _boys_function, _boys_function_array, _get_max_shell_type
 
 
 def test_boys_functions():

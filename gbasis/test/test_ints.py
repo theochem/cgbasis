@@ -32,11 +32,14 @@ from .. import (_GB4RAlphaIntegralLibInt, _GB4ErfIntegralLibInt, _GB4GaussIntegr
                 _gob_cart_normalization, _GB4DeltaIntegralLibInt,
                 _GB4IntraDensIntegralLibInt)
 
-from gbasis.cext import (_get_shell_nbasis, _nuclear_attraction_helper, _gpt_coeff,
-                    _gb_overlap_int1d, _binom)
+from gbasis.cext import _get_shell_nbasis
 
 from gbasis.test.cext import (_iter_pow1_inc, _GB2ErfAttractionIntegral, _GB2KineticIntegral,
-                _GB2GaussAttractionIntegral, _GB2NuclearAttractionIntegral, _GB2OverlapIntegral,)
+                              _GB2GaussAttractionIntegral, _GB2NuclearAttractionIntegral,
+                              _GB2OverlapIntegral,
+                              _nuclear_attraction_helper, _gpt_coeff,
+                              _gb_overlap_int1d, _binom
+                              )
 
 def test_gpt_coeff():
     def py_gpt_coeff(k, n0, n1, pa, pb):

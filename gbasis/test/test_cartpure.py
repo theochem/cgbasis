@@ -25,9 +25,8 @@ from nose.tools import assert_raises
 from nose.plugins.attrib import attr
 
 from .common import load_olp, load_kin, load_na
-from gbasis.cext import (_GB4ElectronRepulsionIntegralLibInt, _get_shell_nbasis,
-                         _cart_to_pure_low, _get_max_shell_type)
-from gbasis.test.cext import _GB2OverlapIntegral
+from gbasis.cext import _GB4ElectronRepulsionIntegralLibInt, _get_shell_nbasis
+from gbasis.test.cext import _GB2OverlapIntegral, _cart_to_pure_low, _get_max_shell_type
 
 
 tfs = {
