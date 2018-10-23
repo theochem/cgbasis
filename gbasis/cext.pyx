@@ -1225,7 +1225,7 @@ cdef class GOBasis(GBasis):
 
     def compute_grid_orbitals_exp(self, double[:, ::1] coeffs, double[:, ::1] points not None,
                                   long[::1] iorbs not None,
-                                  double[:, ::1] output=None) -> np.ndarray:
+                                  double[:, ::1] output=None):
         r"""Compute the orbitals on a grid for a given set of expansion coefficients.
 
         **Warning:** the results are added to the output array!
@@ -1263,7 +1263,7 @@ cdef class GOBasis(GBasis):
 
     def compute_grid_orb_gradient_exp(self, double[:, ::1] coeffs, double[:, ::1] points not None,
                                       long[::1] iorbs not None,
-                                      double[:, :, ::1] output=None) -> np.ndarray:
+                                      double[:, :, ::1] output=None):
         r"""Compute the orbital gradient on a grid for a given set of expansion coefficients.
 
         **Warning:** the results are added to the output array!
@@ -1300,7 +1300,7 @@ cdef class GOBasis(GBasis):
 
     def _compute_grid1_dm(self, double[:, ::1] dm not None, double[:, ::1] points not None,
                           _GB1DMGridFn grid_fn not None, double[:, ::1] output not None,
-                          double epsilon=0) -> np.ndarray:
+                          double epsilon=0):
         """Compute some density function on a grid for a given density matrix.
 
         **Warning:** the results are added to the output array! This may be useful to
@@ -1339,7 +1339,7 @@ cdef class GOBasis(GBasis):
 
     def compute_grid_density_dm(self, double[:, ::1] dm not None,
                                 double[:, ::1] points not None, double[::1] output=None,
-                                double epsilon=0) -> np.ndarray:
+                                double epsilon=0):
         """Compute the electron density on a grid for a given density matrix.
 
         **Warning:** the results are added to the output array! This may be useful to
@@ -1370,7 +1370,7 @@ cdef class GOBasis(GBasis):
 
     def compute_grid_gradient_dm(self, double[:, ::1] dm not None,
                                  double[:, ::1] points not None,
-                                 double[:, ::1] output=None) -> np.ndarray:
+                                 double[:, ::1] output=None):
         """Compute the electron density gradient on a grid for a given density matrix.
 
         **Warning:** the results are added to the output array! This may be useful to
@@ -1397,7 +1397,7 @@ cdef class GOBasis(GBasis):
 
     def compute_grid_gga_dm(self, double[:, ::1] dm not None,
                             double[:, ::1] points not None,
-                            double[:, ::1] output=None) -> np.ndarray:
+                            double[:, ::1] output=None):
         """Compute the electron density and gradient on a grid for a given density matrix.
 
         **Warning:** the results are added to the output array! This may be useful to
@@ -1425,7 +1425,7 @@ cdef class GOBasis(GBasis):
 
     def compute_grid_kinetic_dm(self, double[:, ::1] dm not None,
                                 double[:, ::1] points not None,
-                                double[::1] output=None) -> np.ndarray:
+                                double[::1] output=None):
         """Compute the positive definite kinetic energy density on a grid for a given density matrix.
 
         **Warning:** the results are added to the output array! This may be useful to
@@ -1452,7 +1452,7 @@ cdef class GOBasis(GBasis):
 
     def compute_grid_hessian_dm(self, double[:, ::1] dm not None,
                                 double[:, ::1] points not None,
-                                double[:, ::1] output=None) -> np.ndarray:
+                                double[:, ::1] output=None):
         """Compute the electron density Hessian on a grid for a given density matrix.
 
         **Warning:** the results are added to the output array! This may be useful to
@@ -1487,7 +1487,7 @@ cdef class GOBasis(GBasis):
 
     def compute_grid_mgga_dm(self, double[:, ::1] dm not None,
                              double[:, ::1] points not None,
-                             double[:, ::1] output=None) -> np.ndarray:
+                             double[:, ::1] output=None):
         """Compute the MGGA quantities for a given density matrix.
 
         **Warning:** the results are added to the output array! This may be useful to
@@ -1525,7 +1525,7 @@ cdef class GOBasis(GBasis):
 
     def compute_grid_hartree_dm(self, double[:, ::1] dm not None,
                                 double[:, ::1] points not None,
-                                double[::1] output=None) -> np.ndarray:
+                                double[::1] output=None):
         """Compute the Hartree potential on a grid for a given density matrix.
 
         **Warning:** the results are added to the output array! This may be useful to
@@ -1558,7 +1558,7 @@ cdef class GOBasis(GBasis):
     def compute_grid_esp_dm(self, double[:, ::1] dm not None,
                             double[:, ::1] coordinates not None, double[::1] charges not None,
                             double[:, ::1] points not None,
-                            double[::1] output=None) -> np.ndarray:
+                            double[::1] output=None):
         """Compute the electrostatic potential on a grid for a given density matrix.
 
         **Warning:** the results are added to the output array! This may be useful to
@@ -1590,7 +1590,7 @@ cdef class GOBasis(GBasis):
 
     def _compute_grid1_fock(self, double[:, ::1] points not None, double[::1] weights not None,
                             double[:, :] pots not None, _GB1DMGridFn grid_fn not None,
-                            double[:, ::1] fock=None) -> np.ndarray:
+                            double[:, ::1] fock=None):
         """Compute a Fock operator from a some sort of potential.
 
         **Warning:** the results are added to the Fock operator!
@@ -1634,7 +1634,7 @@ cdef class GOBasis(GBasis):
 
     def compute_grid_density_fock(self, double[:, ::1] points not None,
                                   double[::1] weights not None, double[:] pots not None,
-                                  double[:, ::1] fock=None) -> np.ndarray:
+                                  double[:, ::1] fock=None):
         """Compute a Fock operator from a density potential.
 
         **Warning:** the results are added to the Fock operator!
@@ -1662,7 +1662,7 @@ cdef class GOBasis(GBasis):
 
     def compute_grid_gradient_fock(self, double[:, ::1] points not None,
                                    double[::1] weights not None, double[:, :] pots not None,
-                                   double[:, ::1] fock=None) -> np.ndarray:
+                                   double[:, ::1] fock=None):
         """Compute a Fock operator from a density gradient potential.
 
         **Warning:** the results are added to the Fock operator!
@@ -1691,7 +1691,7 @@ cdef class GOBasis(GBasis):
 
     def compute_grid_gga_fock(self, double[:, ::1] points not None,
                               double[::1] weights not None, double[:, :] pots not None,
-                              double[:, ::1] fock=None) -> np.ndarray:
+                              double[:, ::1] fock=None):
         """Compute a Fock operator from GGA potential data.
 
         **Warning:** the results are added to the Fock operator!
@@ -1720,7 +1720,7 @@ cdef class GOBasis(GBasis):
 
     def compute_grid_kinetic_fock(self, double[:, ::1] points not None,
                                   double[::1] weights not None, double[:] pots not None,
-                                  double[:, ::1] fock=None) -> np.ndarray :
+                                  double[:, ::1] fock=None) :
         """Compute a Fock operator from a kientic-energy-density potential.
 
         **Warning:** the results are added to the Fock operator!
@@ -1748,7 +1748,7 @@ cdef class GOBasis(GBasis):
 
     def compute_grid_hessian_fock(self, double[:, ::1] points not None,
                                   double[::1] weights not None, double[:, :] pots not None,
-                                  double[:, ::1] fock=None) -> np.ndarray:
+                                  double[:, ::1] fock=None):
         """Compute a Fock operator from a density hessian potential.
 
         **Warning:** the results are added to the Fock operator!
@@ -1785,7 +1785,7 @@ cdef class GOBasis(GBasis):
 
     def compute_grid_mgga_fock(self, double[:, ::1] points not None,
                                double[::1] weights not None, double[:, :] pots not None,
-                               double[:, ::1] fock=None) -> np.ndarray:
+                               double[:, ::1] fock=None):
         """Compute a Fock operator from MGGA potential data.
 
         **Warning:** the results are added to the Fock operator!
