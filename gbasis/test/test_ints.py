@@ -28,14 +28,15 @@ from .common import (load_obasis, load_mdata, load_dm, load_er, load_quad, load_
                      load_kin, load_olp, load_json)
 from .lightgrid import generate_molecular_grid, integrate
 from .. import (_GB4RAlphaIntegralLibInt, _GB4ErfIntegralLibInt, _GB4GaussIntegralLibInt,
-                _GB4ElectronRepulsionIntegralLibInt, _GB2ErfAttractionIntegral, _GB2KineticIntegral,
-                _GB2GaussAttractionIntegral, _GB2NuclearAttractionIntegral, _GB2OverlapIntegral,
+                _GB4ElectronRepulsionIntegralLibInt,
                 _gob_cart_normalization, _GB4DeltaIntegralLibInt,
                 _GB4IntraDensIntegralLibInt)
-from ..cext import (_get_shell_nbasis, _nuclear_attraction_helper, _gpt_coeff,
+
+from gbasis.cext import (_get_shell_nbasis, _nuclear_attraction_helper, _gpt_coeff,
                     _gb_overlap_int1d, _binom)
 
-from gbasis.test.cext import _iter_pow1_inc
+from gbasis.test.cext import (_iter_pow1_inc, _GB2ErfAttractionIntegral, _GB2KineticIntegral,
+                _GB2GaussAttractionIntegral, _GB2NuclearAttractionIntegral, _GB2OverlapIntegral,)
 
 def test_gpt_coeff():
     def py_gpt_coeff(k, n0, n1, pa, pb):

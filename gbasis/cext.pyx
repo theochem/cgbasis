@@ -65,10 +65,7 @@ __all__ = [
     # gbw (testing)
     '_get_2index_slice', '_compute_diagonal', '_select_2index',
     # ints
-    '_GB2OverlapIntegral', '_GB2KineticIntegral',
-    '_GB2ErfAttractionIntegral',
-    '_GB2GaussAttractionIntegral',
-    '_GB2NuclearAttractionIntegral', '_GB4Integral',
+    '_GB4Integral',
     '_GB4ElectronRepulsionIntegralLibInt',
     '_GB4ErfIntegralLibInt', '_GB4GaussIntegralLibInt',
     '_GB4RAlphaIntegralLibInt',
@@ -1897,155 +1894,8 @@ def _get_2index_slice(GOBasis gobasis, long index0, long index2,
 
 
 #
-# ints wrappers (for testing only)
+# ints wrappers (for testing and use in Cholesky iterators only)
 #
-
-
-cdef class _GB2Integral:
-    """Wrapper for ints.GB2Integral, for testing only"""
-    cdef ints.GB2Integral* _baseptr
-
-    def __dealloc__(self):
-        del self._baseptr
-
-    @property
-    def nwork(self):
-        return self._baseptr.get_nwork()
-
-    @property
-    def max_shell_type(self):
-        return self._baseptr.get_max_shell_type()
-
-    @property
-    def max_nbasis(self):
-        return self._baseptr.get_max_nbasis()
-
-    def reset(self, long shell_type0, long shell_type1,
-              double[::1] r0 not None,
-              double[::1] r1 not None):
-        assert r0.shape[0] == 3
-        assert r1.shape[0] == 3
-        self._baseptr.reset(shell_type0, shell_type1, &r0[0], &r1[0])
-
-    def add(self, double coeff, double alpha0, double alpha1,
-            double[::1] scales0 not None,
-            double[::1] scales1 not None):
-        assert scales0.shape[0] == _get_shell_nbasis(abs(self._baseptr.get_shell_type0()))
-        assert scales1.shape[0] == _get_shell_nbasis(abs(self._baseptr.get_shell_type1()))
-        self._baseptr.add(coeff, alpha0, alpha1, &scales0[0], &scales1[0])
-
-    def cart_to_pure(self):
-        self._baseptr.cart_to_pure()
-
-    def get_work(self, shape0, shape1):
-        """This returns a **copy** of the c++ work array.
-
-           Returning a numpy array with a buffer created in c++ is dangerous.
-           If the c++ array becomes deallocated, the numpy array may still
-           point to the deallocated memory. For that reason, a copy is returned.
-           Speed is not an issue as this class is only used for testing.
-        """
-        cdef np.npy_intp shape[2]
-        assert shape0 > 0
-        assert shape1 > 0
-        assert shape0 <= self.max_nbasis
-        assert shape1 <= self.max_nbasis
-        shape[0] = shape0
-        shape[1] = shape1
-        tmp = np.PyArray_SimpleNewFromData(2, shape, np.NPY_DOUBLE, <void*> self._baseptr.get_work())
-        return tmp.copy()
-
-
-cdef class _GB2OverlapIntegral(_GB2Integral):
-    """Wrapper for ints.GB2OverlapIntegral, for testing only"""
-    cdef ints.GB2OverlapIntegral* _this
-
-    def __cinit__(self, long max_nbasis):
-        self._this = new ints.GB2OverlapIntegral(max_nbasis)
-        self._baseptr = <ints.GB2Integral*> self._this
-
-
-cdef class _GB2KineticIntegral(_GB2Integral):
-    """Wrapper for ints.GB2KineticIntegral, for testing only"""
-    cdef ints.GB2KineticIntegral* _this
-
-    def __cinit__(self, long max_nbasis):
-        self._this = new ints.GB2KineticIntegral(max_nbasis)
-        self._baseptr = <ints.GB2Integral*> self._this
-
-
-cdef class _GB2NuclearAttractionIntegral(_GB2Integral):
-    """Wrapper for ints.GB2NuclearAttractionIntegral, for testing only"""
-    # make an additional reference to these arguments to avoid deallocation
-    cdef double[::1] _charges
-    cdef double[:, ::1] _centers
-    cdef ints.GB2NuclearAttractionIntegral* _this
-
-    def __cinit__(self, long max_nbasis,
-                  double[::1] charges not None,
-                  double[:, ::1] centers not None):
-        cdef long ncharge = charges.shape[0]
-        assert centers.shape[0] == ncharge
-        self._charges = charges
-        self._centers = centers
-        self._this = new ints.GB2NuclearAttractionIntegral(
-           max_nbasis, &charges[0], &centers[0, 0], ncharge
-        )
-        self._baseptr = <ints.GB2Integral*> self._this
-
-
-cdef class _GB2ErfAttractionIntegral(_GB2Integral):
-    """Wrapper for ints.GB2ErfAttractionIntegral, for testing only"""
-    # make an additional reference to these arguments to avoid deallocation
-    cdef double[::1] _charges
-    cdef double[:, ::1] _centers
-    cdef ints.GB2ErfAttractionIntegral* _this
-
-    def __cinit__(self, long max_nbasis,
-                  double[::1] charges not None,
-                  double[:, ::1] centers not None, double mu):
-        cdef long ncharge = charges.shape[0]
-        assert centers.shape[0] == ncharge
-        self._charges = charges
-        self._centers = centers
-        self._this = new ints.GB2ErfAttractionIntegral(
-            max_nbasis, &charges[0], &centers[0, 0], ncharge, mu
-        )
-        self._baseptr = <ints.GB2Integral*> self._this
-
-    @property
-    def mu(self):
-        return self._this.get_mu()
-
-
-cdef class _GB2GaussAttractionIntegral(_GB2Integral):
-    """Wrapper for ints.GB2GaussAttractionIntegral, for testing only"""
-    # make an additional reference to these arguments to avoid deallocation
-    cdef double[::1] _charges
-    cdef double[:, ::1] _centers
-    cdef ints.GB2GaussAttractionIntegral* _this
-
-    def __cinit__(self, long max_nbasis,
-                  double[::1] charges not None,
-                  double[:, ::1] centers not None, double c,
-                  double alpha):
-        cdef long ncharge = charges.shape[0]
-        assert centers.shape[0] == ncharge
-        self._charges = charges
-        self._centers = centers
-        self._this = new ints.GB2GaussAttractionIntegral(
-            max_nbasis, &charges[0], &centers[0, 0], ncharge, c, alpha
-        )
-        self._baseptr = <ints.GB2Integral*> self._this
-
-    @property
-    def c(self):
-        return self._this.get_c()
-
-    @property
-    def alpha(self):
-        return self._this.get_alpha()
-
 
 ints.libint2_static_init()
 def libint2_static_cleanup():
