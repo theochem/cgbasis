@@ -294,7 +294,7 @@ cdef class GBasis:
         calculation.
     """
 
-    cdef gbasis.GBasis* _this
+    cdef gbasis.GBasis* _baseptr
     # Keep reference to arrays to make sure they will not be deallocated.
     cdef np.ndarray _centers
     cdef np.ndarray _shell_map
@@ -451,7 +451,7 @@ cdef class GBasis:
         self._biblio = []
 
     def __dealloc__(self):
-        del self._this
+        del self._baseptr
 
     @classmethod
     def concatenate(cls, *gbs: Type[GBasis]) -> Type[GBasis]:
@@ -553,31 +553,31 @@ cdef class GBasis:
     @property
     def nbasis(self):
         """The number of basis functions"""
-        return self._this.get_nbasis()
+        return self._baseptr.get_nbasis()
 
     @property
     def shell_lookup(self):
         cdef np.npy_intp* shape = [self.nbasis]
         tmp = np.PyArray_SimpleNewFromData(1, shape,
-                np.NPY_LONG, <void*> self._this.get_shell_lookup())
+                np.NPY_LONG, <void*> self._baseptr.get_shell_lookup())
         return tmp.copy()
 
     @property
     def basis_offsets(self):
         cdef np.npy_intp* shape = [self.nshell]
         tmp = np.PyArray_SimpleNewFromData(1, shape, np.NPY_LONG,
-                    <void*> self._this.get_basis_offsets())
+                    <void*> self._baseptr.get_basis_offsets())
         return tmp.copy()
 
     @property
     def nscales(self):
         """The number of normalization constants"""
-        return self._this.get_nscales()
+        return self._baseptr.get_nscales()
 
     @property
     def max_shell_type(self):
         """The largest shell angular momentum in this basis object."""
-        return self._this.get_max_shell_type()
+        return self._baseptr.get_max_shell_type()
 
     def _log_init(self):
         """Write a summary of the basis to the screen logger"""
@@ -607,7 +607,7 @@ cdef class GBasis:
         """Return a copy of the normalization constants."""
         cdef np.npy_intp shape[1]
         shape[0] = self.nscales
-        tmp = np.PyArray_SimpleNewFromData(1, shape, np.NPY_DOUBLE, <void*> self._this.get_scales(0))
+        tmp = np.PyArray_SimpleNewFromData(1, shape, np.NPY_DOUBLE, <void*> self._baseptr.get_scales(0))
         return tmp.copy()
 
     # low-level compute routines, for debugging only
@@ -616,7 +616,7 @@ cdef class GBasis:
                             _GB1DMGridFn grid_fn not None):
         assert output.shape[0] == self.nbasis
         assert point.shape[0] == 3
-        self._this.compute_grid_point1(&output[0], &point[0], grid_fn._this)
+        self._baseptr.compute_grid_point1(&output[0], &point[0], grid_fn._baseptr)
 
     def get_subset(self, ishells: List) -> Type[GBasis]:
         """Construct a sub basis set for a selection of shells
@@ -723,14 +723,15 @@ cdef class GBasis:
 
 cdef class GOBasis(GBasis):
     cdef public list _biblio
+    cdef gbasis.GOBasis* _this
 
     def __cinit__(self, centers, shell_map, nprims, shell_types, alphas, con_coeffs):
-        self._this = <gbasis.GBasis*> new gbasis.GOBasis(
+        self._this = new gbasis.GOBasis(
             <double*>self._centers.data, <long*>self._shell_map.data,
             <long*>self._nprims.data, <long*>self._shell_types.data,
             <double*>self._alphas.data, <double*>self._con_coeffs.data,
-            self._centers.shape[0], self._shell_types.shape[0], self._alphas.shape[0]
-        )
+            self._centers.shape[0], self._shell_types.shape[0], self._alphas.shape[0])
+        self._baseptr = <gbasis.GBasis*> self._this
 
     def check_coeffs(self, double[:, ::1] coeffs, nocc=None):
         if coeffs.shape[0] != self.nbasis:
@@ -760,7 +761,7 @@ cdef class GOBasis(GBasis):
             If output is provided it, it will be returned. Otherwise, a new array will be returned.
         """
         output = _prepare_array(output, (self.nbasis, self.nbasis), 'output')
-        (<gbasis.GOBasis*>self._this).compute_overlap(&output[0, 0])
+        self._this.compute_overlap(&output[0, 0])
         return np.asarray(output)
 
     def compute_kinetic(self, double[:, ::1] output=None) -> np.ndarray:
@@ -780,7 +781,7 @@ cdef class GOBasis(GBasis):
             If output is provided it, it will be returned. Otherwise, a new array will be returned.
         """
         output = _prepare_array(output, (self.nbasis, self.nbasis), 'output')
-        (<gbasis.GOBasis*>self._this).compute_kinetic(&output[0, 0])
+        self._this.compute_kinetic(&output[0, 0])
         return np.asarray(output)
 
     def compute_nuclear_attraction(self, double[:, ::1] coordinates not None,
@@ -813,7 +814,7 @@ cdef class GOBasis(GBasis):
         _check_shape(charges, (natom,), 'charges')
         output = _prepare_array(output, (self.nbasis, self.nbasis), 'output')
         # actual job
-        (<gbasis.GOBasis*>self._this).compute_nuclear_attraction(
+        self._this.compute_nuclear_attraction(
             &charges[0], &coordinates[0, 0], natom, &output[0, 0])
         return np.asarray(output)
 
@@ -850,7 +851,7 @@ cdef class GOBasis(GBasis):
         _check_shape(charges, (natom,), 'charges')
         output = _prepare_array(output, (self.nbasis, self.nbasis), 'output')
         # actual job
-        (<gbasis.GOBasis*>self._this).compute_erf_attraction(
+        self._this.compute_erf_attraction(
             &charges[0], &coordinates[0, 0], natom, &output[0, 0], mu)
         return np.asarray(output)
 
@@ -889,7 +890,7 @@ cdef class GOBasis(GBasis):
         _check_shape(charges, (natom,), 'charges')
         output = _prepare_array(output, (self.nbasis, self.nbasis), 'output')
         # actual job
-        (<gbasis.GOBasis*>self._this).compute_gauss_attraction(
+        self._this.compute_gauss_attraction(
             &charges[0], &coordinates[0, 0], natom, &output[0, 0], c, alpha)
         return np.asarray(output)
 
@@ -924,7 +925,7 @@ cdef class GOBasis(GBasis):
                              'positive and may not sum to zero.')
         output = _prepare_array(output, (self.nbasis, self.nbasis), 'output')
         # actual job
-        (<gbasis.GOBasis*>self._this).compute_multipole_moment(
+        self._this.compute_multipole_moment(
             &xyz[0], &center[0], &output[0, 0])
         return np.asarray(output)
 
@@ -948,7 +949,7 @@ cdef class GOBasis(GBasis):
         self._biblio.append(('valeev2014',
                     'the efficient implementation of four-center electron repulsion integrals'))
         output = _prepare_array(output, (self.nbasis, self.nbasis, self.nbasis, self.nbasis), 'output')
-        (<gbasis.GOBasis*>self._this).compute_electron_repulsion(&output[0, 0, 0, 0])
+        self._this.compute_electron_repulsion(&output[0, 0, 0, 0])
         return np.asarray(output)
 
     def compute_erf_repulsion(self, double mu=0.0, double[:, :, :, ::1] output=None) -> np.ndarray:
@@ -975,7 +976,7 @@ cdef class GOBasis(GBasis):
         self._biblio.append(('ahlrichs2006',
                  'the methodology to implement various types of four-center integrals.'))
         output = _prepare_array(output, (self.nbasis, self.nbasis, self.nbasis, self.nbasis), 'output')
-        (<gbasis.GOBasis*>self._this).compute_erf_repulsion(&output[0, 0, 0, 0], mu)
+        self._this.compute_erf_repulsion(&output[0, 0, 0, 0], mu)
         return np.asarray(output)
 
     def compute_gauss_repulsion(self, double c=1.0, double alpha=1.0,
@@ -1009,7 +1010,7 @@ cdef class GOBasis(GBasis):
         self._biblio.append(('toulouse2004',
                  'four-center integrals with a Gaussian interaction potential.'))
         output = _prepare_array(output, (self.nbasis, self.nbasis, self.nbasis, self.nbasis), 'output')
-        (<gbasis.GOBasis*>self._this).compute_gauss_repulsion(&output[0, 0, 0, 0], c, alpha)
+        self._this.compute_gauss_repulsion(&output[0, 0, 0, 0], c, alpha)
         return np.asarray(output)
 
     def compute_ralpha_repulsion(self, double alpha=-1.0,
@@ -1042,7 +1043,7 @@ cdef class GOBasis(GBasis):
         self._biblio.append(('ahlrichs2006',
                  'the methodology to implement various types of four-center integrals.'))
         output = _prepare_array(output, (self.nbasis, self.nbasis, self.nbasis, self.nbasis), 'output')
-        (<gbasis.GOBasis*>self._this).compute_ralpha_repulsion(&output[0, 0, 0, 0], alpha)
+        self._this.compute_ralpha_repulsion(&output[0, 0, 0, 0], alpha)
         return np.asarray(output)
 
     def compute_delta_repulsion(self, double[:, :, :, ::1] output=None) -> np.ndarray:
@@ -1065,7 +1066,7 @@ cdef class GOBasis(GBasis):
         self.biblio.append(('valeev2014',
                     'the efficient implementation of four-center electron repulsion integrals'))
         output = _prepare_array(output, (self.nbasis, self.nbasis, self.nbasis, self.nbasis), 'output')
-        (<gbasis.GOBasis*>self._this).compute_delta_repulsion(&output[0, 0, 0, 0])
+        self._this.compute_delta_repulsion(&output[0, 0, 0, 0])
         return np.asarray(output)
 
     def compute_intra_density(self, double[:, :, :, ::1] output=None,
@@ -1094,7 +1095,7 @@ cdef class GOBasis(GBasis):
         if point is None:
             point = np.zeros((-1, 3))
         output = _prepare_array(output, (self.nbasis, self.nbasis, self.nbasis, self.nbasis), 'output')
-        (<gbasis.GOBasis*>self._this).compute_intra_density(&output[0, 0, 0, 0], &point[0, 0])
+        self._this.compute_intra_density(&output[0, 0, 0, 0], &point[0, 0])
         return np.asarray(output)
 
 
@@ -1119,8 +1120,8 @@ cdef class GOBasis(GBasis):
         cdef np.ndarray result
 
         try:
-            gb4w = new gbw.GB4IntegralWrapper(<gbasis.GOBasis*> self._this,
-                                              <ints.GB4Integral*> gb4int._this)
+            gb4w = new gbw.GB4IntegralWrapper(self._this,
+                                              gb4int._baseptr)
             vectors = new vector[double]()
             nvec = cholesky.cholesky(gb4w, vectors, threshold)
             dims[0] = <np.npy_intp> nvec
@@ -1256,7 +1257,7 @@ cdef class GOBasis(GBasis):
         norb = iorbs.shape[0]
         output = _prepare_array(output, (npoint, norb), 'output')
         # compute
-        (<gbasis.GOBasis*>self._this).compute_grid1_exp(
+        self._this.compute_grid1_exp(
             nfn, &coeffs[0, 0], npoint, &points[0, 0],
             norb, &iorbs[0], &output[0, 0])
         return np.asarray(output)
@@ -1293,7 +1294,7 @@ cdef class GOBasis(GBasis):
         norb = iorbs.shape[0]
         output = _prepare_array(output, (npoint, norb, 3), 'output')
         # compute
-        (<gbasis.GOBasis*>self._this).compute_grid1_grad_exp(
+        self._this.compute_grid1_grad_exp(
             nfn, &coeffs[0, 0], npoint, &points[0, 0],
             norb, &iorbs[0], &output[0, 0, 0])
         return np.asarray(output)
@@ -1333,8 +1334,8 @@ cdef class GOBasis(GBasis):
         # Get the maximum of the absolute value over the rows
         cdef double[:] dmmaxrow = np.abs(dm).max(axis=0)
         # Go!
-        (<gbasis.GOBasis*>self._this).compute_grid1_dm(
-            &dm[0, 0], npoint, &points[0, 0], grid_fn._this, &output[0, 0], epsilon,
+        self._this.compute_grid1_dm(
+            &dm[0, 0], npoint, &points[0, 0], grid_fn._baseptr, &output[0, 0], epsilon,
             &dmmaxrow[0])
 
     def compute_grid_density_dm(self, double[:, ::1] dm not None,
@@ -1551,7 +1552,7 @@ cdef class GOBasis(GBasis):
         npoint = points.shape[0]
         output = _prepare_array(output, (npoint,), 'output')
         # compute
-        (<gbasis.GOBasis*>self._this).compute_grid2_dm(
+        self._this.compute_grid2_dm(
             &dm[0, 0], npoint, &points[0, 0], &output[0])
         return np.asarray(output)
 
@@ -1627,8 +1628,8 @@ cdef class GOBasis(GBasis):
         pot_stride = (pots.strides[0]/8)
         if pots.shape[1] > 1:
             pot_stride *= (pots.strides[1]/8)
-        (<gbasis.GOBasis*>self._this).compute_grid1_fock(
-            npoint, &points[0, 0], &weights[0], pot_stride, &pots[0, 0], grid_fn._this,
+        self._this.compute_grid1_fock(
+            npoint, &points[0, 0], &weights[0], pot_stride, &pots[0, 0], grid_fn._baseptr,
             &fock[0, 0])
         return fock
 
@@ -1721,7 +1722,7 @@ cdef class GOBasis(GBasis):
     def compute_grid_kinetic_fock(self, double[:, ::1] points not None,
                                   double[::1] weights not None, double[:] pots not None,
                                   double[:, ::1] fock=None) :
-        """Compute a Fock operator from a kientic-energy-density potential.
+        """Compute a Fock operator from a kinetic-energy-density potential.
 
         **Warning:** the results are added to the Fock operator!
 
@@ -1841,7 +1842,7 @@ def _select_2index(GOBasis gobasis, long index0, long index2):
     try:
         gb4int = new ints.GB4ElectronRepulsionIntegralLibInt(
                             gobasis.max_shell_type)
-        gb4w = new gbw.GB4IntegralWrapper((<gbasis.GOBasis* > gobasis._this),
+        gb4w = new gbw.GB4IntegralWrapper(gobasis._this,
                             <ints.GB4Integral*> gb4int)
         gb4w.select_2index(index0, index2, &pbegin0, &pend0, &pbegin2, &pend2)
     finally:
@@ -1862,7 +1863,7 @@ def _compute_diagonal(GOBasis gobasis, double[:, ::1] diagonal not None):
     try:
         gb4int = new ints.GB4ElectronRepulsionIntegralLibInt(
                             gobasis.max_shell_type)
-        gb4w = new gbw.GB4IntegralWrapper((<gbasis.GOBasis* > gobasis._this),
+        gb4w = new gbw.GB4IntegralWrapper(gobasis._this,
                             <ints.GB4Integral*> gb4int)
         gb4w.compute_diagonal(&output[0, 0])
 
@@ -1888,7 +1889,7 @@ def _get_2index_slice(GOBasis gobasis, long index0, long index2,
     try:
         gb4int = new ints.GB4ElectronRepulsionIntegralLibInt(
                             gobasis.max_shell_type)
-        gb4w = new gbw.GB4IntegralWrapper((<gbasis.GOBasis* > gobasis._this),
+        gb4w = new gbw.GB4IntegralWrapper(gobasis._this,
                             <ints.GB4Integral*> gb4int)
         gb4w.select_2index(index0, index2, &pbegin0, &pend0, &pbegin2, &pend2)
         gb4w.compute()
@@ -1913,39 +1914,39 @@ def _get_2index_slice(GOBasis gobasis, long index0, long index2,
 
 cdef class _GB2Integral:
     """Wrapper for ints.GB2Integral, for testing only"""
-    cdef ints.GB2Integral* _this
+    cdef ints.GB2Integral* _baseptr
 
     def __dealloc__(self):
-        del self._this
+        del self._baseptr
 
     @property
     def nwork(self):
-        return self._this.get_nwork()
+        return self._baseptr.get_nwork()
 
     @property
     def max_shell_type(self):
-        return self._this.get_max_shell_type()
+        return self._baseptr.get_max_shell_type()
 
     @property
     def max_nbasis(self):
-        return self._this.get_max_nbasis()
+        return self._baseptr.get_max_nbasis()
 
     def reset(self, long shell_type0, long shell_type1,
               double[::1] r0 not None,
               double[::1] r1 not None):
         assert r0.shape[0] == 3
         assert r1.shape[0] == 3
-        self._this.reset(shell_type0, shell_type1, &r0[0], &r1[0])
+        self._baseptr.reset(shell_type0, shell_type1, &r0[0], &r1[0])
 
     def add(self, double coeff, double alpha0, double alpha1,
             double[::1] scales0 not None,
             double[::1] scales1 not None):
-        assert scales0.shape[0] == _get_shell_nbasis(abs(self._this.get_shell_type0()))
-        assert scales1.shape[0] == _get_shell_nbasis(abs(self._this.get_shell_type1()))
-        self._this.add(coeff, alpha0, alpha1, &scales0[0], &scales1[0])
+        assert scales0.shape[0] == _get_shell_nbasis(abs(self._baseptr.get_shell_type0()))
+        assert scales1.shape[0] == _get_shell_nbasis(abs(self._baseptr.get_shell_type1()))
+        self._baseptr.add(coeff, alpha0, alpha1, &scales0[0], &scales1[0])
 
     def cart_to_pure(self):
-        self._this.cart_to_pure()
+        self._baseptr.cart_to_pure()
 
     def get_work(self, shape0, shape1):
         """This returns a **copy** of the c++ work array.
@@ -1962,22 +1963,26 @@ cdef class _GB2Integral:
         assert shape1 <= self.max_nbasis
         shape[0] = shape0
         shape[1] = shape1
-        tmp = np.PyArray_SimpleNewFromData(2, shape, np.NPY_DOUBLE, <void*> self._this.get_work())
+        tmp = np.PyArray_SimpleNewFromData(2, shape, np.NPY_DOUBLE, <void*> self._baseptr.get_work())
         return tmp.copy()
 
 
 cdef class _GB2OverlapIntegral(_GB2Integral):
     """Wrapper for ints.GB2OverlapIntegral, for testing only"""
+    cdef ints.GB2OverlapIntegral* _this
 
     def __cinit__(self, long max_nbasis):
-        self._this = <ints.GB2Integral*>(new ints.GB2OverlapIntegral(max_nbasis))
+        self._this = new ints.GB2OverlapIntegral(max_nbasis)
+        self._baseptr = <ints.GB2Integral*> self._this
 
 
 cdef class _GB2KineticIntegral(_GB2Integral):
     """Wrapper for ints.GB2KineticIntegral, for testing only"""
+    cdef ints.GB2KineticIntegral* _this
 
     def __cinit__(self, long max_nbasis):
-        self._this = <ints.GB2Integral*>(new ints.GB2KineticIntegral(max_nbasis))
+        self._this = new ints.GB2KineticIntegral(max_nbasis)
+        self._baseptr = <ints.GB2Integral*> self._this
 
 
 cdef class _GB2NuclearAttractionIntegral(_GB2Integral):
@@ -1985,6 +1990,7 @@ cdef class _GB2NuclearAttractionIntegral(_GB2Integral):
     # make an additional reference to these arguments to avoid deallocation
     cdef double[::1] _charges
     cdef double[:, ::1] _centers
+    cdef ints.GB2NuclearAttractionIntegral* _this
 
     def __cinit__(self, long max_nbasis,
                   double[::1] charges not None,
@@ -1993,9 +1999,10 @@ cdef class _GB2NuclearAttractionIntegral(_GB2Integral):
         assert centers.shape[0] == ncharge
         self._charges = charges
         self._centers = centers
-        self._this = <ints.GB2Integral*>(new ints.GB2NuclearAttractionIntegral(
+        self._this = new ints.GB2NuclearAttractionIntegral(
            max_nbasis, &charges[0], &centers[0, 0], ncharge
-        ))
+        )
+        self._baseptr = <ints.GB2Integral*> self._this
 
 
 cdef class _GB2ErfAttractionIntegral(_GB2Integral):
@@ -2003,6 +2010,7 @@ cdef class _GB2ErfAttractionIntegral(_GB2Integral):
     # make an additional reference to these arguments to avoid deallocation
     cdef double[::1] _charges
     cdef double[:, ::1] _centers
+    cdef ints.GB2ErfAttractionIntegral* _this
 
     def __cinit__(self, long max_nbasis,
                   double[::1] charges not None,
@@ -2011,13 +2019,14 @@ cdef class _GB2ErfAttractionIntegral(_GB2Integral):
         assert centers.shape[0] == ncharge
         self._charges = charges
         self._centers = centers
-        self._this = <ints.GB2Integral*>(new ints.GB2ErfAttractionIntegral(
+        self._this = new ints.GB2ErfAttractionIntegral(
             max_nbasis, &charges[0], &centers[0, 0], ncharge, mu
-        ))
+        )
+        self._baseptr = <ints.GB2Integral*> self._this
 
     @property
     def mu(self):
-        return (<ints.GB2ErfAttractionIntegral*>self._this).get_mu()
+        return self._this.get_mu()
 
 
 cdef class _GB2GaussAttractionIntegral(_GB2Integral):
@@ -2025,6 +2034,7 @@ cdef class _GB2GaussAttractionIntegral(_GB2Integral):
     # make an additional reference to these arguments to avoid deallocation
     cdef double[::1] _charges
     cdef double[:, ::1] _centers
+    cdef ints.GB2GaussAttractionIntegral* _this
 
     def __cinit__(self, long max_nbasis,
                   double[::1] charges not None,
@@ -2034,17 +2044,18 @@ cdef class _GB2GaussAttractionIntegral(_GB2Integral):
         assert centers.shape[0] == ncharge
         self._charges = charges
         self._centers = centers
-        self._this = <ints.GB2Integral*>(new ints.GB2GaussAttractionIntegral(
+        self._this = new ints.GB2GaussAttractionIntegral(
             max_nbasis, &charges[0], &centers[0, 0], ncharge, c, alpha
-        ))
+        )
+        self._baseptr = <ints.GB2Integral*> self._this
 
     @property
     def c(self):
-        return (<ints.GB2GaussAttractionIntegral*>self._this).get_c()
+        return self._this.get_c()
 
     @property
     def alpha(self):
-        return (<ints.GB2GaussAttractionIntegral*>self._this).get_alpha()
+        return self._this.get_alpha()
 
 
 ints.libint2_static_init()
@@ -2055,22 +2066,22 @@ atexit.register(libint2_static_cleanup)
 
 cdef class _GB4Integral:
     """Wrapper for ints.GB4Integral. For testing only."""
-    cdef ints.GB4Integral* _this
+    cdef ints.GB4Integral* _baseptr
 
     def __dealloc__(self):
-        del self._this
+        del self._baseptr
 
     @property
     def nwork(self):
-        return self._this.get_nwork()
+        return self._baseptr.get_nwork()
 
     @property
     def max_shell_type(self):
-        return self._this.get_max_shell_type()
+        return self._baseptr.get_max_shell_type()
 
     @property
     def max_nbasis(self):
-        return self._this.get_max_nbasis()
+        return self._baseptr.get_max_nbasis()
 
     def reset(self, long shell_type0, long shell_type1, long shell_type2, long shell_type3,
               double[::1] r0 not None, double[::1] r1 not None,
@@ -2079,22 +2090,22 @@ cdef class _GB4Integral:
         assert r1.shape[0] == 3
         assert r2.shape[0] == 3
         assert r3.shape[0] == 3
-        self._this.reset(shell_type0, shell_type1, shell_type2, shell_type3,
+        self._baseptr.reset(shell_type0, shell_type1, shell_type2, shell_type3,
                          &r0[0], &r1[0], &r2[0], &r3[0])
 
     def add(self, double coeff, double alpha0, double alpha1, double alpha2, double alpha3,
             double[::1] scales0 not None, double[::1] scales1 not None,
             double[::1] scales2 not None, double[::1] scales3 not None):
-        assert scales0.shape[0] == _get_shell_nbasis(abs(self._this.get_shell_type0()))
-        assert scales1.shape[0] == _get_shell_nbasis(abs(self._this.get_shell_type1()))
-        assert scales2.shape[0] == _get_shell_nbasis(abs(self._this.get_shell_type2()))
-        assert scales3.shape[0] == _get_shell_nbasis(abs(self._this.get_shell_type3()))
-        self._this.add(coeff, alpha0, alpha1, alpha2, alpha3,
+        assert scales0.shape[0] == _get_shell_nbasis(abs(self._baseptr.get_shell_type0()))
+        assert scales1.shape[0] == _get_shell_nbasis(abs(self._baseptr.get_shell_type1()))
+        assert scales2.shape[0] == _get_shell_nbasis(abs(self._baseptr.get_shell_type2()))
+        assert scales3.shape[0] == _get_shell_nbasis(abs(self._baseptr.get_shell_type3()))
+        self._baseptr.add(coeff, alpha0, alpha1, alpha2, alpha3,
                        &scales0[0], &scales1[0],
                        &scales2[0], &scales3[0])
 
     def cart_to_pure(self):
-        self._this.cart_to_pure()
+        self._baseptr.cart_to_pure()
 
     def get_work(self, shape0, shape1, shape2, shape3):
         """This returns a **copy** of the c++ work array.
@@ -2117,66 +2128,78 @@ cdef class _GB4Integral:
         shape[1] = shape1
         shape[2] = shape2
         shape[3] = shape3
-        tmp = np.PyArray_SimpleNewFromData(4, shape, np.NPY_DOUBLE, <void*> self._this.get_work())
+        tmp = np.PyArray_SimpleNewFromData(4, shape, np.NPY_DOUBLE, <void*> self._baseptr.get_work())
         return tmp.copy()
 
 
 cdef class _GB4ElectronRepulsionIntegralLibInt(_GB4Integral):
     """Wrapper for ints.GB4ElectronRepulsionIntegralLibInt, for testing only"""
+    cdef ints.GB4ElectronRepulsionIntegralLibInt* _this
 
     def __cinit__(self, long max_nbasis):
-        self._this = <ints.GB4Integral*>(new ints.GB4ElectronRepulsionIntegralLibInt(max_nbasis))
+        self._this = new ints.GB4ElectronRepulsionIntegralLibInt(max_nbasis)
+        self._baseptr = <ints.GB4Integral*> self._this
 
 
 cdef class _GB4ErfIntegralLibInt(_GB4Integral):
     """Wrapper for ints.GB4ElectronRepulsionIntegralLibInt, for testing only"""
+    cdef ints.GB4ErfIntegralLibInt* _this
 
     def __cinit__(self, long max_nbasis, double mu):
-        self._this = <ints.GB4Integral*>(new ints.GB4ErfIntegralLibInt(max_nbasis, mu))
+        self._this = new ints.GB4ErfIntegralLibInt(max_nbasis, mu)
+        self._baseptr = <ints.GB4Integral*> self._this
 
     @property
     def mu(self):
-        return (<ints.GB4ErfIntegralLibInt*>self._this).get_mu()
+        return self._this.get_mu()
 
 
 cdef class _GB4GaussIntegralLibInt(_GB4Integral):
     """Wrapper for ints.GB4GaussIntegralLibInt, for testing only"""
+    cdef ints.GB4GaussIntegralLibInt* _this
 
     def __cinit__(self, long max_nbasis, double c, double alpha):
-        self._this = <ints.GB4Integral*>(new ints.GB4GaussIntegralLibInt(max_nbasis, c, alpha))
+
+        self._this = new ints.GB4GaussIntegralLibInt(max_nbasis, c, alpha)
+        self._baseptr = <ints.GB4Integral*> self._this
 
     @property
     def c(self):
-        return (<ints.GB4GaussIntegralLibInt*>self._this).get_c()
+        return self._this.get_c()
 
     @property
     def alpha(self):
-        return (<ints.GB4GaussIntegralLibInt*>self._this).get_alpha()
+        return self._this.get_alpha()
 
 
 cdef class _GB4RAlphaIntegralLibInt(_GB4Integral):
     """Wrapper for ints.GB4RAlphaIntegralLibInt, for testing only"""
+    cdef ints.GB4RAlphaIntegralLibInt* _this
 
     def __cinit__(self, long max_nbasis, double alpha):
-        self._this = <ints.GB4Integral*>(new ints.GB4RAlphaIntegralLibInt(max_nbasis, alpha))
+        self._this = new ints.GB4RAlphaIntegralLibInt(max_nbasis, alpha)
+        self._baseptr = <ints.GB4Integral*> self._this
 
     @property
     def alpha(self):
-        return (<ints.GB4RAlphaIntegralLibInt*>self._this).get_alpha()
+        return self._this.get_alpha()
 
 cdef class _GB4DeltaIntegralLibInt(_GB4Integral):
     """Wrapper for ints.GB4DeltaIntegralLibInt, for testing only"""
+    cdef ints.GB4DeltaIntegralLibInt* _this
 
     def __cinit__(self, long max_nbasis):
-        self._this = <ints.GB4Integral*>(new ints.GB4DeltaIntegralLibInt(max_nbasis))
+        self._this = new ints.GB4DeltaIntegralLibInt(max_nbasis)
+        self._baseptr = <ints.GB4Integral*> self._this
 
 
 cdef class _GB4IntraDensIntegralLibInt(_GB4Integral):
     """Wrapper for ints.GB4IntraDensIntegralLibInt, for testing only"""
+    cdef ints.GB4IntraDensIntegralLibInt* _this
 
-    def __cinit__(self, long max_nbasis, np.ndarray[double, ndim=2] point not None):
-        assert point.flags['C_CONTIGUOUS']
-        self._this = <ints.GB4Integral*>(new ints.GB4IntraDensIntegralLibInt(max_nbasis, &point[0, 0]))
+    def __cinit__(self, long max_nbasis, double[:, ::1] point not None):
+        self._this = new ints.GB4IntraDensIntegralLibInt(max_nbasis, &point[0, 0])
+        self._baseptr = <ints.GB4Integral*> self._this
 
 
 
@@ -2187,47 +2210,47 @@ cdef class _GB4IntraDensIntegralLibInt(_GB4Integral):
 
 cdef class _GB1DMGridFn:
     """Wrapper for fns.GB1DMGridFn, for testing only"""
-    cdef fns.GB1DMGridFn* _this
+    cdef fns.GB1DMGridFn* _baseptr
 
     def __dealloc__(self):
-        del self._this
+        del self._baseptr
 
     @property
     def nwork(self):
-        return self._this.get_nwork()
+        return self._baseptr.get_nwork()
 
     @property
     def max_shell_type(self):
-        return self._this.get_max_shell_type()
+        return self._baseptr.get_max_shell_type()
 
     @property
     def max_nbasis(self):
-        return self._this.get_max_nbasis()
+        return self._baseptr.get_max_nbasis()
 
     @property
     def shell_type0(self):
-        return self._this.get_shell_type0()
+        return self._baseptr.get_shell_type0()
 
     @property
     def dim_work(self):
-        return self._this.get_dim_work()
+        return self._baseptr.get_dim_work()
 
     @property
     def dim_output(self):
-        return self._this.get_dim_output()
+        return self._baseptr.get_dim_output()
 
     def reset(self, long shell_type0, double[::1] r0 not None, double[::1] point not None):
         assert r0.shape[0] == 3
         assert point.shape[0] == 3
-        self._this.reset(shell_type0, &r0[0], &point[0])
+        self._baseptr.reset(shell_type0, &r0[0], &point[0])
 
     def add(self, double coeff, double alpha0,
             double[::1] scales0 not None):
-        assert scales0.shape[0] == _get_shell_nbasis(abs(self._this.get_shell_type0()))
-        self._this.add(coeff, alpha0, &scales0[0])
+        assert scales0.shape[0] == _get_shell_nbasis(abs(self._baseptr.get_shell_type0()))
+        self._baseptr.add(coeff, alpha0, &scales0[0])
 
     def cart_to_pure(self):
-        self._this.cart_to_pure()
+        self._baseptr.cart_to_pure()
 
     def get_work(self, shape0):
         """This returns a **copy** of the c++ work array.
@@ -2242,41 +2265,53 @@ cdef class _GB1DMGridFn:
         assert shape0 <= self.max_nbasis
         shape[0] = shape0
         if self.dim_work == 1:
-            tmp = np.PyArray_SimpleNewFromData(1, shape, np.NPY_DOUBLE, <void*> self._this.get_work())
+            tmp = np.PyArray_SimpleNewFromData(1, shape, np.NPY_DOUBLE, <void*> self._baseptr.get_work())
         else:
             shape[1] = self.dim_work
-            tmp = np.PyArray_SimpleNewFromData(2, shape, np.NPY_DOUBLE, <void*> self._this.get_work())
+            tmp = np.PyArray_SimpleNewFromData(2, shape, np.NPY_DOUBLE, <void*> self._baseptr.get_work())
         return tmp.copy()
 
 
 cdef class _GB1DMGridDensityFn(_GB1DMGridFn):
+    cdef fns.GB1DMGridDensityFn* _this
     def __cinit__(self, long max_nbasis):
-        self._this = <fns.GB1DMGridFn*>(new fns.GB1DMGridDensityFn(max_nbasis))
+        self._this = new fns.GB1DMGridDensityFn(max_nbasis)
+        self._baseptr = <fns.GB1DMGridFn*> self._this
 
 
 cdef class _GB1DMGridGradientFn(_GB1DMGridFn):
+    cdef fns.GB1DMGridGradientFn* _this
     def __cinit__(self, long max_nbasis):
-        self._this = <fns.GB1DMGridFn*>(new fns.GB1DMGridGradientFn(max_nbasis))
+        self._this = new fns.GB1DMGridGradientFn(max_nbasis)
+        self._baseptr = <fns.GB1DMGridFn*> self._this
 
 
 cdef class _GB1DMGridGGAFn(_GB1DMGridFn):
+    cdef fns.GB1DMGridGGAFn* _this
     def __cinit__(self, long max_nbasis):
-        self._this = <fns.GB1DMGridFn*>(new fns.GB1DMGridGGAFn(max_nbasis))
+        self._this = new fns.GB1DMGridGGAFn(max_nbasis)
+        self._baseptr = <fns.GB1DMGridFn*> self._this
 
 
 cdef class _GB1DMGridKineticFn(_GB1DMGridFn):
+    cdef fns.GB1DMGridKineticFn* _this
     def __cinit__(self, long max_nbasis):
-        self._this = <fns.GB1DMGridFn*>(new fns.GB1DMGridKineticFn(max_nbasis))
+        self._this = new fns.GB1DMGridKineticFn(max_nbasis)
+        self._baseptr = <fns.GB1DMGridFn*> self._this
 
 
 cdef class _GB1DMGridHessianFn(_GB1DMGridFn):
+    cdef fns.GB1DMGridHessianFn* _this
     def __cinit__(self, long max_nbasis):
-        self._this = <fns.GB1DMGridFn*>(new fns.GB1DMGridHessianFn(max_nbasis))
+        self._this = new fns.GB1DMGridHessianFn(max_nbasis)
+        self._baseptr = <fns.GB1DMGridFn*> self._this
 
 
 cdef class _GB1DMGridMGGAFn(_GB1DMGridFn):
+    cdef fns.GB1DMGridMGGAFn* _this
     def __cinit__(self, long max_nbasis):
-        self._this = <fns.GB1DMGridFn*>(new fns.GB1DMGridMGGAFn(max_nbasis))
+        self._this = new fns.GB1DMGridMGGAFn(max_nbasis)
+        self._baseptr = <fns.GB1DMGridFn*> self._this
 
 
 #
@@ -2290,7 +2325,7 @@ cdef class _IterGB1:
     cdef GBasis _gbasis
 
     def __cinit__(self, GBasis gbasis not None):
-        self._this = new iter_gb.IterGB1(gbasis._this)
+        self._this = new iter_gb.IterGB1(gbasis._baseptr)
         self._gbasis = gbasis
 
     def __dealloc__(self):
@@ -2341,7 +2376,7 @@ cdef class _IterGB2:
     cdef GBasis _gbasis
 
     def __cinit__(self, GBasis gbasis not None):
-        self._this = new iter_gb.IterGB2(gbasis._this)
+        self._this = new iter_gb.IterGB2(gbasis._baseptr)
         self._gbasis = gbasis
 
     def __dealloc__(self):
@@ -2395,7 +2430,7 @@ cdef class _IterGB4:
     cdef GBasis _gbasis
 
     def __cinit__(self, GBasis gbasis not None):
-        self._this = new iter_gb.IterGB4(gbasis._this)
+        self._this = new iter_gb.IterGB4(gbasis._baseptr)
         self._gbasis = gbasis
 
     def __dealloc__(self):
