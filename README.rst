@@ -32,7 +32,7 @@ Installation (from Conda)
 To install GBasis:
 
 ```
-$ conda -c theochem install gbasis
+$ conda install -c theochem gbasis
 ```
 
 Installation (from source)
