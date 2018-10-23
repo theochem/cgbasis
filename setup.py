@@ -44,7 +44,17 @@ setup(
         extra_compile_args=get_cxxflags(),
         language="c++",
         ),
+        Extension(
+        "gbasis.test.cext",
+        sources=["gbasis/test/cext.pyx"] + glob.glob("gbasis/*.cpp"),
+        depends=glob.glob("gbasis/*.h") + glob.glob("gbasis/*.pxd"),
+        include_dirs=[np.get_include(), "gbasis/"],
+        libraries=["int2"],
+        extra_compile_args=get_cxxflags(),
+        language="c++",
+        ),
     ],
+
     include_package_data=True,
     classifiers=[
         "Environment :: Console",
