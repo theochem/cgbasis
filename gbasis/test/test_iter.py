@@ -23,10 +23,8 @@
 import numpy as np
 from nose.tools import assert_raises
 
-from .. import (GOBasis, _IterGB1, _IterGB2, _IterGB4, )
-
-from gbasis.cext import _get_shell_nbasis
-from gbasis.test.cext import _IterPow1, _IterPow2, _iter_pow1_inc
+from gbasis.cext import GOBasis, _get_shell_nbasis
+from gbasis.test.cext import _IterPow1, _IterPow2, _iter_pow1_inc, _IterGB1, _IterGB2, _IterGB4
 
 def test_iter_pow1_inc_l0():
     indexes = np.zeros(3, int)
