@@ -37,15 +37,17 @@ from numpy_wrapper cimport PyArray_ENABLEFLAGS
 
 cimport common
 cimport gbasis
-cimport ints
-cimport fns
-
 
 cimport cholesky
 cimport gbw
 cimport nucpot
 
-import atexit
+from gbasis.cext_fns cimport _GB1DMGridFn, _GB1DMGridDensityFn, _GB1DMGridGradientFn, \
+    _GB1DMGridGGAFn, _GB1DMGridKineticFn, _GB1DMGridHessianFn, _GB1DMGridMGGAFn
+
+from gbasis.cext_ints cimport _GB4Integral, _GB4ElectronRepulsionIntegralLibInt, \
+    _GB4ErfIntegralLibInt, _GB4GaussIntegralLibInt, _GB4RAlphaIntegralLibInt
+
 
 __all__ = [
     # common
@@ -53,19 +55,6 @@ __all__ = [
     # gbasis
     '_gob_cart_normalization', '_gob_pure_normalization',
     'GOBasis',
-    # ints
-    '_GB4Integral',
-    '_GB4ElectronRepulsionIntegralLibInt',
-    '_GB4ErfIntegralLibInt', '_GB4GaussIntegralLibInt',
-    '_GB4RAlphaIntegralLibInt',
-    '_GB4DeltaIntegralLibInt',
-    '_GB4IntraDensIntegralLibInt',
-
-    # fns
-    '_GB1DMGridDensityFn', '_GB1DMGridGradientFn', '_GB1DMGridGGAFn',
-    '_GB1DMGridKineticFn', '_GB1DMGridHessianFn', '_GB1DMGridMGGAFn',
-
-
 ]
 
 
@@ -1722,276 +1711,6 @@ cdef class GOBasis(GBasis):
         fock = self._compute_grid1_fock(
             points, weights, pots, _GB1DMGridMGGAFn(self.max_shell_type), fock)
         return np.asarray(fock)
-
-
-
-
-
-#
-# ints wrappers (for testing and use in Cholesky iterators only)
-#
-
-ints.libint2_static_init()
-def libint2_static_cleanup():
-    ints.libint2_static_cleanup()
-atexit.register(libint2_static_cleanup)
-
-
-cdef class _GB4Integral:
-    """Wrapper for ints.GB4Integral. For testing only."""
-    cdef ints.GB4Integral* _baseptr
-
-    def __dealloc__(self):
-        del self._baseptr
-
-    @property
-    def nwork(self):
-        return self._baseptr.get_nwork()
-
-    @property
-    def max_shell_type(self):
-        return self._baseptr.get_max_shell_type()
-
-    @property
-    def max_nbasis(self):
-        return self._baseptr.get_max_nbasis()
-
-    def reset(self, long shell_type0, long shell_type1, long shell_type2, long shell_type3,
-              double[::1] r0 not None, double[::1] r1 not None,
-              double[::1] r2 not None, double[::1] r3 not None):
-        assert r0.shape[0] == 3
-        assert r1.shape[0] == 3
-        assert r2.shape[0] == 3
-        assert r3.shape[0] == 3
-        self._baseptr.reset(shell_type0, shell_type1, shell_type2, shell_type3,
-                         &r0[0], &r1[0], &r2[0], &r3[0])
-
-    def add(self, double coeff, double alpha0, double alpha1, double alpha2, double alpha3,
-            double[::1] scales0 not None, double[::1] scales1 not None,
-            double[::1] scales2 not None, double[::1] scales3 not None):
-        assert scales0.shape[0] == _get_shell_nbasis(abs(self._baseptr.get_shell_type0()))
-        assert scales1.shape[0] == _get_shell_nbasis(abs(self._baseptr.get_shell_type1()))
-        assert scales2.shape[0] == _get_shell_nbasis(abs(self._baseptr.get_shell_type2()))
-        assert scales3.shape[0] == _get_shell_nbasis(abs(self._baseptr.get_shell_type3()))
-        self._baseptr.add(coeff, alpha0, alpha1, alpha2, alpha3,
-                       &scales0[0], &scales1[0],
-                       &scales2[0], &scales3[0])
-
-    def cart_to_pure(self):
-        self._baseptr.cart_to_pure()
-
-    def get_work(self, shape0, shape1, shape2, shape3):
-        """This returns a **copy** of the c++ work array.
-
-           Returning a numpy array with a buffer created in c++ is dangerous.
-           If the c++ array becomes deallocated, the numpy array may still
-           point to the deallocated memory. For that reason, a copy is returned.
-           Speed is not an issue as this class is only used for testing.
-        """
-        cdef np.npy_intp shape[4]
-        assert shape0 > 0
-        assert shape1 > 0
-        assert shape2 > 0
-        assert shape3 > 0
-        assert shape0 <= self.max_nbasis
-        assert shape1 <= self.max_nbasis
-        assert shape2 <= self.max_nbasis
-        assert shape3 <= self.max_nbasis
-        shape[0] = shape0
-        shape[1] = shape1
-        shape[2] = shape2
-        shape[3] = shape3
-        tmp = np.PyArray_SimpleNewFromData(4, shape, np.NPY_DOUBLE, <void*> self._baseptr.get_work())
-        return tmp.copy()
-
-
-cdef class _GB4ElectronRepulsionIntegralLibInt(_GB4Integral):
-    """Wrapper for ints.GB4ElectronRepulsionIntegralLibInt, for testing only"""
-    cdef ints.GB4ElectronRepulsionIntegralLibInt* _this
-
-    def __cinit__(self, long max_nbasis):
-        self._this = new ints.GB4ElectronRepulsionIntegralLibInt(max_nbasis)
-        self._baseptr = <ints.GB4Integral*> self._this
-
-
-cdef class _GB4ErfIntegralLibInt(_GB4Integral):
-    """Wrapper for ints.GB4ElectronRepulsionIntegralLibInt, for testing only"""
-    cdef ints.GB4ErfIntegralLibInt* _this
-
-    def __cinit__(self, long max_nbasis, double mu):
-        self._this = new ints.GB4ErfIntegralLibInt(max_nbasis, mu)
-        self._baseptr = <ints.GB4Integral*> self._this
-
-    @property
-    def mu(self):
-        return self._this.get_mu()
-
-
-cdef class _GB4GaussIntegralLibInt(_GB4Integral):
-    """Wrapper for ints.GB4GaussIntegralLibInt, for testing only"""
-    cdef ints.GB4GaussIntegralLibInt* _this
-
-    def __cinit__(self, long max_nbasis, double c, double alpha):
-
-        self._this = new ints.GB4GaussIntegralLibInt(max_nbasis, c, alpha)
-        self._baseptr = <ints.GB4Integral*> self._this
-
-    @property
-    def c(self):
-        return self._this.get_c()
-
-    @property
-    def alpha(self):
-        return self._this.get_alpha()
-
-
-cdef class _GB4RAlphaIntegralLibInt(_GB4Integral):
-    """Wrapper for ints.GB4RAlphaIntegralLibInt, for testing only"""
-    cdef ints.GB4RAlphaIntegralLibInt* _this
-
-    def __cinit__(self, long max_nbasis, double alpha):
-        self._this = new ints.GB4RAlphaIntegralLibInt(max_nbasis, alpha)
-        self._baseptr = <ints.GB4Integral*> self._this
-
-    @property
-    def alpha(self):
-        return self._this.get_alpha()
-
-cdef class _GB4DeltaIntegralLibInt(_GB4Integral):
-    """Wrapper for ints.GB4DeltaIntegralLibInt, for testing only"""
-    cdef ints.GB4DeltaIntegralLibInt* _this
-
-    def __cinit__(self, long max_nbasis):
-        self._this = new ints.GB4DeltaIntegralLibInt(max_nbasis)
-        self._baseptr = <ints.GB4Integral*> self._this
-
-
-cdef class _GB4IntraDensIntegralLibInt(_GB4Integral):
-    """Wrapper for ints.GB4IntraDensIntegralLibInt, for testing only"""
-    cdef ints.GB4IntraDensIntegralLibInt* _this
-
-    def __cinit__(self, long max_nbasis, double[:, ::1] point not None):
-        self._this = new ints.GB4IntraDensIntegralLibInt(max_nbasis, &point[0, 0])
-        self._baseptr = <ints.GB4Integral*> self._this
-
-
-
-#
-# fns wrappers (for testing and use in this module)
-#
-
-
-cdef class _GB1DMGridFn:
-    """Wrapper for fns.GB1DMGridFn, for testing only"""
-    cdef fns.GB1DMGridFn* _baseptr
-
-    def __dealloc__(self):
-        del self._baseptr
-
-    @property
-    def nwork(self):
-        return self._baseptr.get_nwork()
-
-    @property
-    def max_shell_type(self):
-        return self._baseptr.get_max_shell_type()
-
-    @property
-    def max_nbasis(self):
-        return self._baseptr.get_max_nbasis()
-
-    @property
-    def shell_type0(self):
-        return self._baseptr.get_shell_type0()
-
-    @property
-    def dim_work(self):
-        return self._baseptr.get_dim_work()
-
-    @property
-    def dim_output(self):
-        return self._baseptr.get_dim_output()
-
-    def reset(self, long shell_type0, double[::1] r0 not None, double[::1] point not None):
-        assert r0.shape[0] == 3
-        assert point.shape[0] == 3
-        self._baseptr.reset(shell_type0, &r0[0], &point[0])
-
-    def add(self, double coeff, double alpha0,
-            double[::1] scales0 not None):
-        assert scales0.shape[0] == _get_shell_nbasis(abs(self._baseptr.get_shell_type0()))
-        self._baseptr.add(coeff, alpha0, &scales0[0])
-
-    def cart_to_pure(self):
-        self._baseptr.cart_to_pure()
-
-    def get_work(self, shape0):
-        """This returns a **copy** of the c++ work array.
-
-           Returning a numpy array with a buffer created in c++ is dangerous.
-           If the c++ array becomes deallocated, the numpy array may still
-           point to the deallocated memory. For that reason, a copy is returned.
-           Speed is not an issue as this class is only used for testing.
-        """
-        cdef np.npy_intp shape[2]
-        assert shape0 > 0
-        assert shape0 <= self.max_nbasis
-        shape[0] = shape0
-        if self.dim_work == 1:
-            tmp = np.PyArray_SimpleNewFromData(1, shape, np.NPY_DOUBLE, <void*> self._baseptr.get_work())
-        else:
-            shape[1] = self.dim_work
-            tmp = np.PyArray_SimpleNewFromData(2, shape, np.NPY_DOUBLE, <void*> self._baseptr.get_work())
-        return tmp.copy()
-
-
-cdef class _GB1DMGridDensityFn(_GB1DMGridFn):
-    cdef fns.GB1DMGridDensityFn* _this
-    def __cinit__(self, long max_nbasis):
-        self._this = new fns.GB1DMGridDensityFn(max_nbasis)
-        self._baseptr = <fns.GB1DMGridFn*> self._this
-
-
-cdef class _GB1DMGridGradientFn(_GB1DMGridFn):
-    cdef fns.GB1DMGridGradientFn* _this
-    def __cinit__(self, long max_nbasis):
-        self._this = new fns.GB1DMGridGradientFn(max_nbasis)
-        self._baseptr = <fns.GB1DMGridFn*> self._this
-
-
-cdef class _GB1DMGridGGAFn(_GB1DMGridFn):
-    cdef fns.GB1DMGridGGAFn* _this
-    def __cinit__(self, long max_nbasis):
-        self._this = new fns.GB1DMGridGGAFn(max_nbasis)
-        self._baseptr = <fns.GB1DMGridFn*> self._this
-
-
-cdef class _GB1DMGridKineticFn(_GB1DMGridFn):
-    cdef fns.GB1DMGridKineticFn* _this
-    def __cinit__(self, long max_nbasis):
-        self._this = new fns.GB1DMGridKineticFn(max_nbasis)
-        self._baseptr = <fns.GB1DMGridFn*> self._this
-
-
-cdef class _GB1DMGridHessianFn(_GB1DMGridFn):
-    cdef fns.GB1DMGridHessianFn* _this
-    def __cinit__(self, long max_nbasis):
-        self._this = new fns.GB1DMGridHessianFn(max_nbasis)
-        self._baseptr = <fns.GB1DMGridFn*> self._this
-
-
-cdef class _GB1DMGridMGGAFn(_GB1DMGridFn):
-    cdef fns.GB1DMGridMGGAFn* _this
-    def __cinit__(self, long max_nbasis):
-        self._this = new fns.GB1DMGridMGGAFn(max_nbasis)
-        self._baseptr = <fns.GB1DMGridFn*> self._this
-
-
-
-
-
-
-
 
 #
 # nucpot.cpp

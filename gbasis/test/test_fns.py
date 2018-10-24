@@ -27,8 +27,8 @@ from nose.tools import assert_raises
 from .lightgrid import generate_molecular_grid, integrate
 from .common import (load_obasis, load_dm, load_mdata, load_orbsa_coeffs, load_orbsb_coeffs,
                      load_orbsa_occs, load_orbsb_occs, load_orbsa_dms, load_orbsb_dms, check_delta)
-from .. import (GOBasis, GOBasisAtom, GOBasisContraction, _GB1DMGridGradientFn, _GB1DMGridDensityFn,
-                get_gobasis)
+from .. import (GOBasis, GOBasisAtom, GOBasisContraction, get_gobasis)
+from gbasis.cext_fns import _GB1DMGridGradientFn, _GB1DMGridDensityFn
 
 
 def check_functional_deriv(fn, comp, dm_method, fock_method):
