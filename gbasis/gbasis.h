@@ -54,10 +54,15 @@ class GBasis {
   const double *con_coeffs;
   const long ncenter, nshell, nprim_total;
 
+  double r0[3];
+  double r1[3];
+  double r2[3];
+  double r3[3];
+
   GBasis(const double *centers, const long *shell_map, const long *nprims,
          const long *shell_types, const double *alphas, const double *con_coeffs,
          const long ncenter, const long nshell, const long nprim_total);
-  GBasis(const GBasis& other) = delete;
+  GBasis(const GBasis &other) = delete;
 
   virtual ~GBasis();
 
@@ -65,9 +70,11 @@ class GBasis {
 
   void init_scales();
 
+  void shift_center(const double *r, double *shift, double *r_total);
+
   void compute_two_index(double *output, GB2Integral *integral);
 
-  void compute_four_index(double *output, GB4Integral *integral);
+  void compute_four_index(double *output, GB4Integral *integral, double *shift = nullptr);
 
   void compute_grid_point1(double *output, double *point, GB1GridFn *grid_fn);
 
@@ -225,7 +232,7 @@ class GOBasis : public GBasis {
       @param output
           The output array with the integrals.
    */
-  void compute_delta_repulsion(double* output);
+  void compute_delta_repulsion(double *output, double *shift = nullptr);
 
   /** @brief
           Computes the Intracule core integrals.
@@ -236,7 +243,7 @@ class GOBasis : public GBasis {
       @param point
           The intracular coordinate.
    */
-  void compute_intra_density(double* output, double* point);
+  void compute_intra_density(double *output, double *point);
 
   /** @brief
           Computes the (multipole) moment integrals.

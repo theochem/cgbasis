@@ -145,6 +145,12 @@ void GBasis::init_scales() {
   }
 }
 
+void GBasis::shift_center(const double *r, double *shift, double *r_total) {
+  r_total[0] = r[0] + shift[0];
+  r_total[1] = r[1] + shift[1];
+  r_total[2] = r[2] + shift[2];
+}
+
 void GBasis::compute_two_index(double *output, GB2Integral *integral) {
   IterGB2 iter(this);
   iter.update_shell();
@@ -159,12 +165,24 @@ void GBasis::compute_two_index(double *output, GB2Integral *integral) {
   } while (iter.inc_shell());
 }
 
-void GBasis::compute_four_index(double *output, GB4Integral *integral) {
+void GBasis::compute_four_index(double *output, GB4Integral *integral, double *shift) {
   IterGB4 iter(this);
   iter.update_shell();
   do {
-    integral->reset(iter.shell_type0, iter.shell_type1, iter.shell_type2, iter.shell_type3,
-                    iter.r0, iter.r1, iter.r2, iter.r3);
+    if (shift) {
+      shift_center(iter.r0, shift, r0);
+      shift_center(iter.r1, shift + 3, r1);
+      shift_center(iter.r2, shift + 6, r2);
+      shift_center(iter.r3, shift + 9, r3);
+
+      integral->reset(iter.shell_type0, iter.shell_type1, iter.shell_type2, iter.shell_type3,
+                      r0, r1, r2, r3);
+
+    } else {
+      integral->reset(iter.shell_type0, iter.shell_type1, iter.shell_type2, iter.shell_type3,
+                      iter.r0, iter.r1, iter.r2, iter.r3);
+    }
+
     iter.update_prim();
     do {
       integral->add(iter.con_coeff, iter.alpha0, iter.alpha1, iter.alpha2, iter.alpha3,
@@ -273,14 +291,14 @@ void GOBasis::compute_ralpha_repulsion(double *output, double alpha) {
   compute_four_index(output, &integral);
 }
 
-void GOBasis::compute_delta_repulsion(double* output) {
+void GOBasis::compute_delta_repulsion(double *output, double *shift) {
   GB4DeltaIntegralLibInt integral = GB4DeltaIntegralLibInt(get_max_shell_type());
-  compute_four_index(output, &integral);
+  compute_four_index(output, &integral, shift);
 }
 
-void GOBasis::compute_intra_density(double* output, double* point) {
-    GB4IntraDensIntegralLibInt integral = GB4IntraDensIntegralLibInt(get_max_shell_type(), point);
-    compute_four_index(output, &integral);
+void GOBasis::compute_intra_density(double *output, double *point) {
+  GB4IntraDensIntegralLibInt integral = GB4IntraDensIntegralLibInt(get_max_shell_type(), point);
+  compute_four_index(output, &integral);
 }
 
 void GOBasis::compute_grid1_exp(long nfn, double *coeffs, long npoint, double *points,

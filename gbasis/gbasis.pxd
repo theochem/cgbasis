@@ -44,11 +44,14 @@ cdef extern from "gbasis.h":
         long* get_shell_lookup()
         long* get_basis_offsets()
 
+        # Shifting Gaussian centers
+        void shift_center(const double *r, double *shift, double *r_total)
+
         # low-level compute routines
         void compute_grid_point1(double* output, double* point, fns.GB1DMGridFn* grid_fn)
         double compute_grid_point2(double* dm, double* point, fns.GB2DMGridFn* grid_fn)
 
-    cdef cppclass GOBasis:
+    cdef cppclass GOBasis(GBasis):
         GOBasis(double* centers, long* shell_map, long* nprims,
                 long* shell_types, double* alphas, double* con_coeffs,
                 long ncenter, long nshell, long nprim_total) except +
@@ -63,6 +66,7 @@ cdef extern from "gbasis.h":
         void compute_erf_repulsion(double* output, double mu)
         void compute_gauss_repulsion(double* output, double c, double alpha)
         void compute_ralpha_repulsion(double* output, double alpha)
+        void compute_delta_repulsion(double* output, double* shift)
         void compute_delta_repulsion(double* output)
         void compute_intra_density(double* output, double* point)
 

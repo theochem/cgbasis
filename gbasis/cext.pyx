@@ -948,7 +948,8 @@ cdef class GOBasis(GBasis):
         self._this.compute_ralpha_repulsion(&output[0, 0, 0, 0], alpha)
         return np.asarray(output)
 
-    def compute_delta_repulsion(self, double[:, :, :, ::1] output=None) -> np.ndarray:
+    def compute_delta_repulsion(self, double[:, :, :, ::1] output=None,
+                                      double[:, ::1] shift=None) -> np.ndarray:
         r"""Compute electron-electron repulsion integrals.
 
         .. math::
@@ -956,6 +957,9 @@ cdef class GOBasis(GBasis):
 
         Parameters
         ----------
+        shift
+            A (4, 3) array of cartesian coordinates to shift each Gaussian center. Each row
+            corresponds to a Gaussian center in physicist's notation.
         output
             A Four-index object, optional.
 
@@ -968,6 +972,8 @@ cdef class GOBasis(GBasis):
         self.biblio.append(('valeev2014',
                     'the efficient implementation of four-center electron repulsion integrals'))
         output = _prepare_array(output, (self.nbasis, self.nbasis, self.nbasis, self.nbasis), 'output')
+        if shift is not None:
+            self._this.compute_delta_repulsion(&output[0, 0, 0, 0], &shift[0,0])
         self._this.compute_delta_repulsion(&output[0, 0, 0, 0])
         return np.asarray(output)
 
