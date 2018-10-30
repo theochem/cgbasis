@@ -49,13 +49,13 @@ def test_shell_nbasis():
 
 def test_gobasis_consistency():
     centers = np.random.uniform(-1, 1, (2, 3))
-    shell_map = np.array([0, 0, 0, 1, 1, 1, 1])
-    nprims = np.array([2, 3, 3, 5, 5, 5, 7])
+    shell_center = np.array([0, 0, 0, 1, 1, 1, 1])
+    shell_nprims = np.array([2, 3, 3, 5, 5, 5, 7])
     shell_types = np.array([2, 1, 0, -2, 3, 0, 1])
-    alphas = np.random.uniform(0, 1, nprims.sum())
-    con_coeffs = np.random.uniform(-1, 1, nprims.sum())
+    alphas = np.random.uniform(0, 1, shell_nprims.sum())
+    con_coeffs = np.random.uniform(-1, 1, shell_nprims.sum())
 
-    gb = GOBasis(centers, shell_map, nprims, shell_types, alphas, con_coeffs)
+    gb = GOBasis(centers, shell_center, shell_nprims, shell_types, alphas, con_coeffs)
     assert gb.nbasis == 29
     assert gb.max_shell_type == 3
     scales = gb.get_scales()
@@ -66,56 +66,56 @@ def test_gobasis_consistency():
                                          4, 4, 4, 5, 6, 6, 6])).all()
 
     shell_types = np.array([1, 1, 0, -2, -2, 0, 1])
-    gb = GOBasis(centers, shell_map, nprims, shell_types, alphas, con_coeffs)
+    gb = GOBasis(centers, shell_center, shell_nprims, shell_types, alphas, con_coeffs)
     assert gb.nbasis == 21
     assert gb.max_shell_type == 2
 
-    # The center indexes in the shell_map are out of range.
-    shell_map[0] = 2
+    # The center indexes in the shell_center are out of range.
+    shell_center[0] = 2
     with assert_raises(ValueError):
-        GOBasis(centers, shell_map, nprims, shell_types, alphas, con_coeffs)
-    shell_map[0] = 0
+        GOBasis(centers, shell_center, shell_nprims, shell_types, alphas, con_coeffs)
+    shell_center[0] = 0
 
-    # The size of the array shell_types does not match the sum of nprims.
+    # The size of the array shell_types does not match the sum of shell_nprims.
     shell_types = np.array([1, 1])
     with assert_raises(TypeError):
-        GOBasis(centers, shell_map, nprims, shell_types, alphas, con_coeffs)
+        GOBasis(centers, shell_center, shell_nprims, shell_types, alphas, con_coeffs)
     shell_types = np.array([1, 1, 0, -2, -2, 0, 1])
 
-    # The elements of nprims should be at least 1.
-    nprims[1] = 0
+    # The elements of shell_nprims should be at least 1.
+    shell_nprims[1] = 0
     with assert_raises(ValueError):
-        GOBasis(centers, shell_map, nprims, shell_types, alphas, con_coeffs)
-    nprims[1] = 3
+        GOBasis(centers, shell_center, shell_nprims, shell_types, alphas, con_coeffs)
+    shell_nprims[1] = 3
 
-    # The size of the array alphas does not match the sum of nprims.
+    # The size of the array alphas does not match the sum of shell_nprims.
     alphas = np.random.uniform(-1, 1, 2)
     with assert_raises(TypeError):
-        GOBasis(centers, shell_map, nprims, shell_types, alphas, con_coeffs)
-    alphas = np.random.uniform(-1, 1, nprims.sum())
+        GOBasis(centers, shell_center, shell_nprims, shell_types, alphas, con_coeffs)
+    alphas = np.random.uniform(-1, 1, shell_nprims.sum())
 
     # Encountered the nonexistent shell_type -1.
     shell_types[1] = -1
     with assert_raises(ValueError):
-        GOBasis(centers, shell_map, nprims, shell_types, alphas, con_coeffs)
+        GOBasis(centers, shell_center, shell_nprims, shell_types, alphas, con_coeffs)
     shell_types[1] = 1
 
-    # The size of con_coeffs does not match nprims.
+    # The size of con_coeffs does not match shell_nprims.
     con_coeffs = np.random.uniform(-1, 1, 3)
     with assert_raises(TypeError):
-        GOBasis(centers, shell_map, nprims, shell_types, alphas, con_coeffs)
-    con_coeffs = np.random.uniform(-1, 1, nprims.sum())
+        GOBasis(centers, shell_center, shell_nprims, shell_types, alphas, con_coeffs)
+    con_coeffs = np.random.uniform(-1, 1, shell_nprims.sum())
 
     # Exceeding the maximym shell type (above):
     shell_types[0] = _get_max_shell_type() + 1
     with assert_raises(ValueError):
-        GOBasis(centers, shell_map, nprims, shell_types, alphas, con_coeffs)
+        GOBasis(centers, shell_center, shell_nprims, shell_types, alphas, con_coeffs)
     shell_types[0] = 2
 
     # Exceeding the maximym shell type (below):
     shell_types[0] = -_get_max_shell_type() - 1
     with assert_raises(ValueError):
-        GOBasis(centers, shell_map, nprims, shell_types, alphas, con_coeffs)
+        GOBasis(centers, shell_center, shell_nprims, shell_types, alphas, con_coeffs)
     shell_types[0] = 2
 
 
@@ -144,7 +144,7 @@ def test_grid_lih_321g_hf_density_some_points():
     grid_fn = _GB1DMGridDensityFn(obasis.max_shell_type)
     obasis._compute_grid_point1(output, point, grid_fn)
     # first basis function is contraction of three s-type gaussians
-    assert obasis.nprims[0] == 3
+    assert obasis.shell_nprims[0] == 3
     scales = obasis.get_scales()
     total = 0.0
     for i in range(3):
@@ -154,7 +154,7 @@ def test_grid_lih_321g_hf_density_some_points():
         # check scale
         assert abs(scales[i] - nrml) < 1e-10
         # check that we are on the first atom
-        assert obasis.shell_map[i] == 0
+        assert obasis.shell_center[i] == 0
         dsq = np.linalg.norm(point - mol['coordinates'][0]) ** 2
         gauss = nrml * np.exp(-alpha * dsq)
         total += coeff * gauss
@@ -465,13 +465,13 @@ def test_concatenate2():
 def test_abstract():
     with assert_raises(NotImplementedError):
         centers = np.zeros((1, 3), float)
-        shell_map = np.zeros(2, int)
-        nprims = np.array([1, 2])
+        shell_center = np.zeros(2, int)
+        shell_nprims = np.array([1, 2])
         shell_types = np.array([0, 1])
         alphas = np.array([1.0, 1.1, 1.2])
         con_coeffs = np.array([0.1, 0.2, 0.3])
         from ..cext import GBasis
-        GBasis(centers, shell_map, nprims, shell_types, alphas, con_coeffs)
+        GBasis(centers, shell_center, shell_nprims, shell_types, alphas, con_coeffs)
 
 
 def test_gobasis_desc_element_map():
@@ -481,14 +481,14 @@ def test_gobasis_desc_element_map():
     obasis = gobd.apply_to(coordinates, numbers)
     assert obasis.centers.shape == (3, 3)
     # H
-    assert obasis.shell_map[0] == 0
-    assert obasis.nprims[0] == 3
+    assert obasis.shell_center[0] == 0
+    assert obasis.shell_nprims[0] == 3
     # He
-    assert (obasis.shell_map[1:11] == 1).all()
-    assert (obasis.nprims[1:11] == [4, 1, 1, 1, 1, 1, 1, 1, 1, 1]).all()
+    assert (obasis.shell_center[1:11] == 1).all()
+    assert (obasis.shell_nprims[1:11] == [4, 1, 1, 1, 1, 1, 1, 1, 1, 1]).all()
     # Li
-    assert (obasis.shell_map[11:] == 2).all()
-    assert (obasis.nprims[11:] == [3, 2, 2, 1, 1]).all()
+    assert (obasis.shell_center[11:] == 2).all()
+    assert (obasis.shell_nprims[11:] == [3, 2, 2, 1, 1]).all()
 
 
 def test_gobasis_desc_index_map():
@@ -498,14 +498,14 @@ def test_gobasis_desc_index_map():
     obasis = gobd.apply_to(coordinates, numbers)
     assert obasis.centers.shape == (3, 3)
     # H
-    assert (obasis.shell_map[:2] == 0).all()
-    assert (obasis.nprims[:2] == [2, 1]).all()
+    assert (obasis.shell_center[:2] == 0).all()
+    assert (obasis.shell_nprims[:2] == [2, 1]).all()
     # He
-    assert (obasis.shell_map[2:3] == 1).all()
-    assert (obasis.nprims[2:3] == 3).all()
+    assert (obasis.shell_center[2:3] == 1).all()
+    assert (obasis.shell_nprims[2:3] == 3).all()
     # Li
-    assert (obasis.shell_map[3:] == 2).all()
-    assert (obasis.nprims[3:] == [3, 1, 1, 1, 1, 1, 1, 1, 1, 1]).all()
+    assert (obasis.shell_center[3:] == 2).all()
+    assert (obasis.shell_nprims[3:] == [3, 1, 1, 1, 1, 1, 1, 1, 1, 1]).all()
 
 
 def test_gobasis_output_args_grid_orbitals_exp():
@@ -561,8 +561,8 @@ def test_subset_simple():
     assert sub_obasis.ncenter == 1
     assert sub_obasis.nshell == 2
     assert (sub_obasis.centers[0] == obasis.centers[0]).all()
-    assert (sub_obasis.shell_map == obasis.shell_map[:2]).all()
-    assert (sub_obasis.nprims == obasis.nprims[:2]).all()
+    assert (sub_obasis.shell_center == obasis.shell_center[:2]).all()
+    assert (sub_obasis.shell_nprims == obasis.shell_nprims[:2]).all()
     assert (sub_obasis.shell_types == obasis.shell_types[:2]).all()
     assert sub_obasis.nprim_total == 3
     assert (sub_obasis.alphas == obasis.alphas[:3]).all()
@@ -578,8 +578,8 @@ def test_subset_simple_reverse():
     assert sub_obasis.ncenter == 1
     assert sub_obasis.nshell == 2
     assert (sub_obasis.centers[0] == obasis.centers[0]).all()
-    assert (sub_obasis.shell_map == obasis.shell_map[1::-1]).all()
-    assert (sub_obasis.nprims == obasis.nprims[1::-1]).all()
+    assert (sub_obasis.shell_center == obasis.shell_center[1::-1]).all()
+    assert (sub_obasis.shell_nprims == obasis.shell_nprims[1::-1]).all()
     assert (sub_obasis.shell_types == obasis.shell_types[1::-1]).all()
     assert sub_obasis.nprim_total == 3
     assert (sub_obasis.alphas[:1] == obasis.alphas[2:3]).all()
@@ -598,8 +598,8 @@ def test_subset():
     assert sub_obasis.nshell == 4
     assert (sub_obasis.centers[0] == obasis.centers[1]).all()
     assert (sub_obasis.centers[1] == obasis.centers[2]).all()
-    assert (sub_obasis.shell_map == obasis.shell_map[[7, 3, 4, 8]] - 1).all()
-    assert (sub_obasis.nprims == obasis.nprims[[7, 3, 4, 8]]).all()
+    assert (sub_obasis.shell_center == obasis.shell_center[[7, 3, 4, 8]] - 1).all()
+    assert (sub_obasis.shell_nprims == obasis.shell_nprims[[7, 3, 4, 8]]).all()
     assert (sub_obasis.shell_types == obasis.shell_types[[7, 3, 4, 8]]).all()
     assert sub_obasis.nprim_total == 7
     for b0, e0, b1, e1 in (12, 14, 0, 2), (6, 8, 2, 4), (8, 10, 4, 6), (14, 15, 6, 7):

@@ -29,8 +29,8 @@ cdef extern from "gbasis.h":
     cdef cppclass GBasis:
         # Arrays that fully describe the basis set.
         double* centers
-        long* shell_map
-        long* nprims
+        long* shell_center
+        long* shell_nprims
         long* shell_types
         double* alphas
         double* con_coeffs
@@ -52,7 +52,7 @@ cdef extern from "gbasis.h":
         double compute_grid_point2(double* dm, double* point, fns.GB2DMGridFn* grid_fn)
 
     cdef cppclass GOBasis(GBasis):
-        GOBasis(double* centers, long* shell_map, long* nprims,
+        GOBasis(double* centers, long* shell_center, long* shell_nprims,
                 long* shell_types, double* alphas, double* con_coeffs,
                 long ncenter, long nshell, long nprim_total) except +
 

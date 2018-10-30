@@ -47,8 +47,8 @@ class GBasis {
  public:
   // Arrays that fully describe the basis set.
   const double *centers;
-  const long *shell_map;
-  const long *nprims;
+  const long *shell_center;
+  const long *shell_nprims;
   const long *shell_types;
   const double *alphas;
   const double *con_coeffs;
@@ -59,7 +59,7 @@ class GBasis {
   double r2[3];
   double r3[3];
 
-  GBasis(const double *centers, const long *shell_map, const long *nprims,
+  GBasis(const double *centers, const long *shell_center, const long *shell_nprims,
          const long *shell_types, const double *alphas, const double *con_coeffs,
          const long ncenter, const long nshell, const long nprim_total);
   GBasis(const GBasis &other) = delete;
@@ -98,7 +98,7 @@ class GBasis {
 class GOBasis : public GBasis {
  public:
   // double compute_normalization(double alpha, long nx, long ny, long nz);
-  GOBasis(const double *centers, const long *shell_map, const long *nprims,
+  GOBasis(const double *centers, const long *shell_center, const long *shell_nprims,
           const long *shell_types, const double *alphas, const double *con_coeffs,
           const long ncenter, const long nshell, const long nprim_total);
 

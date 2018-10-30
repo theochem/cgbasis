@@ -44,16 +44,16 @@ void GB4IntegralWrapper::compute_shell(long ishell1, long ishell3) {
   // quadruple of shells. (index0 and index2 are fixed.)
   gb4int->reset(gobasis->shell_types[ishell0], gobasis->shell_types[ishell1],
                 gobasis->shell_types[ishell2], gobasis->shell_types[ishell3],
-                gobasis->centers + gobasis->shell_map[ishell0] * 3,
-                gobasis->centers + gobasis->shell_map[ishell1] * 3,
-                gobasis->centers + gobasis->shell_map[ishell2] * 3,
-                gobasis->centers + gobasis->shell_map[ishell3] * 3);
+                gobasis->centers + gobasis->shell_center[ishell0] * 3,
+                gobasis->centers + gobasis->shell_center[ishell1] * 3,
+                gobasis->centers + gobasis->shell_center[ishell2] * 3,
+                gobasis->centers + gobasis->shell_center[ishell3] * 3);
 
   // Quadruple loop over all primitives for these four shells.
-  for (long iprim0 = 0; iprim0 < gobasis->nprims[ishell0]; iprim0++) {
-    for (long iprim1 = 0; iprim1 < gobasis->nprims[ishell1]; iprim1++) {
-      for (long iprim2 = 0; iprim2 < gobasis->nprims[ishell2]; iprim2++) {
-        for (long iprim3 = 0; iprim3 < gobasis->nprims[ishell3]; iprim3++) {
+  for (long iprim0 = 0; iprim0 < gobasis->shell_nprims[ishell0]; iprim0++) {
+    for (long iprim1 = 0; iprim1 < gobasis->shell_nprims[ishell1]; iprim1++) {
+      for (long iprim2 = 0; iprim2 < gobasis->shell_nprims[ishell2]; iprim2++) {
+        for (long iprim3 = 0; iprim3 < gobasis->shell_nprims[ishell3]; iprim3++) {
           gb4int->add(gobasis->con_coeffs[gobasis->get_prim_offsets()[ishell0] + iprim0] *
                           gobasis->con_coeffs[gobasis->get_prim_offsets()[ishell1] + iprim1] *
                           gobasis->con_coeffs[gobasis->get_prim_offsets()[ishell2] + iprim2] *

@@ -49,11 +49,11 @@ int IterGB1::inc_shell() {
 
 void IterGB1::update_shell() {
   // Update fields that depend on shell and related counters.
-  nprim0 = gbasis->nprims[ishell0];
+  nprim0 = gbasis->shell_nprims[ishell0];
   // Update indexes in output array
   ibasis0 = basis_offsets[ishell0];
   // update centers
-  r0 = gbasis->centers + 3 * gbasis->shell_map[ishell0];
+  r0 = gbasis->centers + 3 * gbasis->shell_center[ishell0];
   // update shell types
   shell_type0 = gbasis->shell_types[ishell0];
   // reset contraction counters
@@ -127,14 +127,14 @@ int IterGB2::inc_shell() {
 
 void IterGB2::update_shell() {
   // Update fields that depend on shell and related counters.
-  nprim0 = gbasis->nprims[ishell0];
-  nprim1 = gbasis->nprims[ishell1];
+  nprim0 = gbasis->shell_nprims[ishell0];
+  nprim1 = gbasis->shell_nprims[ishell1];
   // Update indexes in output array
   ibasis0 = basis_offsets[ishell0];
   ibasis1 = basis_offsets[ishell1];
   // update centers
-  r0 = gbasis->centers + 3 * gbasis->shell_map[ishell0];
-  r1 = gbasis->centers + 3 * gbasis->shell_map[ishell1];
+  r0 = gbasis->centers + 3 * gbasis->shell_center[ishell0];
+  r1 = gbasis->centers + 3 * gbasis->shell_center[ishell1];
   // update shell types
   shell_type0 = gbasis->shell_types[ishell0];
   shell_type1 = gbasis->shell_types[ishell1];
@@ -303,20 +303,20 @@ int IterGB4::inc_shell() {
 
 void IterGB4::update_shell() {
   // Update fields that depend on shell and related counters.
-  nprim0 = gbasis->nprims[ishell0];
-  nprim1 = gbasis->nprims[ishell1];
-  nprim2 = gbasis->nprims[ishell2];
-  nprim3 = gbasis->nprims[ishell3];
+  nprim0 = gbasis->shell_nprims[ishell0];
+  nprim1 = gbasis->shell_nprims[ishell1];
+  nprim2 = gbasis->shell_nprims[ishell2];
+  nprim3 = gbasis->shell_nprims[ishell3];
   // Update indexes in output array
   ibasis0 = basis_offsets[ishell0];
   ibasis1 = basis_offsets[ishell1];
   ibasis2 = basis_offsets[ishell2];
   ibasis3 = basis_offsets[ishell3];
   // update centers
-  r0 = gbasis->centers + 3 * gbasis->shell_map[ishell0];
-  r1 = gbasis->centers + 3 * gbasis->shell_map[ishell1];
-  r2 = gbasis->centers + 3 * gbasis->shell_map[ishell2];
-  r3 = gbasis->centers + 3 * gbasis->shell_map[ishell3];
+  r0 = gbasis->centers + 3 * gbasis->shell_center[ishell0];
+  r1 = gbasis->centers + 3 * gbasis->shell_center[ishell1];
+  r2 = gbasis->centers + 3 * gbasis->shell_center[ishell2];
+  r3 = gbasis->centers + 3 * gbasis->shell_center[ishell3];
   // update shell types
   shell_type0 = gbasis->shell_types[ishell0];
   shell_type1 = gbasis->shell_types[ishell1];

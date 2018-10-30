@@ -208,7 +208,7 @@ cdef class GBasis:
         calculation.
     """
 
-    def __cinit__(self, centers: Iterable, shell_map: Iterable, nprims: Iterable,
+    def __cinit__(self, centers: Iterable, shell_center: Iterable, shell_nprims: Iterable,
                   shell_types: Iterable, alphas: Iterable, con_coeffs: Iterable):
         """
         A C++ wrapper class for interfacing with all the gaussian integral and numerical integral
@@ -219,10 +219,10 @@ cdef class GBasis:
         centers
             A numpy array with centers for the basis functions.
             shape = (ncenter, 3)
-        shell_map
+        shell_center
             An array with the center index for each shell.
             shape = (nshell,)
-        nprims
+        shell_nprims
             The number of primitives in each shell.
             shape = (nshell,)
         shell_types
@@ -231,13 +231,13 @@ cdef class GBasis:
             shape = (nshell,)
         alphas
             The exponents of the primitives in one shell.
-            shape = (sum(nprims),)
+            shape = (sum(shell_nprims),)
         con_coeffs
             The contraction coefficients of the primitives for each
             contraction in a contiguous array. The coefficients are ordered
             according to the shells. Within each shell, the coefficients are
             grouped per exponent.
-            shape = (sum(nprims),)
+            shape = (sum(shell_nprims),)
 
 
         Copies are made of the arguments and stored internally, and are not meant
@@ -251,8 +251,8 @@ cdef class GBasis:
         """
         # Make private copies of the input arrays.
         self._centers = np.array(centers, dtype=float)
-        self._shell_map = np.array(shell_map, dtype=int)
-        self._nprims = np.array(nprims, dtype=int)
+        self._shell_center = np.array(shell_center, dtype=int)
+        self._shell_nprims = np.array(shell_nprims, dtype=int)
         self._shell_types = np.array(shell_types, dtype=int)
         self._alphas = np.array(alphas, dtype=float)
         self._con_coeffs = np.array(con_coeffs, dtype=float)
@@ -265,8 +265,8 @@ cdef class GBasis:
         # is deliberately taking risks. A strict read-only buffer would be
         # ideal but is not possible. One can always pass a pointer to a
         # C library and start messing things up.
-        self._shell_map.flags.writeable = False
-        self._nprims.flags.writeable = False
+        self._shell_center.flags.writeable = False
+        self._shell_nprims.flags.writeable = False
         self._shell_types.flags.writeable = False
         self._alphas.flags.writeable = False
         self._con_coeffs.flags.writeable = False
@@ -274,10 +274,10 @@ cdef class GBasis:
         # Check array dimensions
         if self._centers.ndim != 2:
             raise TypeError('centers must be a 2D array')
-        if self._shell_map.ndim != 1:
-            raise TypeError('shell_map must be a 1D array')
-        if self._nprims.ndim != 1:
-            raise TypeError('nprims must be a 1D array')
+        if self._shell_center.ndim != 1:
+            raise TypeError('shell_center must be a 1D array')
+        if self._shell_nprims.ndim != 1:
+            raise TypeError('shell_nprims must be a 1D array')
         if self._shell_types.ndim != 1:
             raise TypeError('shell_types must be a 1D array')
         if self._alphas.ndim != 1:
@@ -288,28 +288,28 @@ cdef class GBasis:
         # Essential array checks
         if self._centers.shape[1] != 3:
             raise TypeError('centers must have three columns.')
-        if self._nprims.shape[0] != self._shell_map.shape[0]:
-            raise TypeError('nprims and shell_map must have the same length.')
-        if self._shell_types.shape[0] != self._shell_map.shape[0]:
-            raise TypeError('shell_types and shell_map must have the same length.')
+        if self._shell_nprims.shape[0] != self._shell_center.shape[0]:
+            raise TypeError('shell_nprims and shell_center must have the same length.')
+        if self._shell_types.shape[0] != self._shell_center.shape[0]:
+            raise TypeError('shell_types and shell_center must have the same length.')
         if self._alphas.shape[0] != self._con_coeffs.shape[0]:
             raise TypeError('alphas and con_coeffs must have the same length.')
 
         # Consistency checks
-        if self._shell_map.min() < 0:
-            raise ValueError('shell_map can not contain negative values.')
-        if self._shell_map.max() >= self.centers.shape[0]:
-            raise ValueError('shell_map can not contain values larger than the number of centers.')
-        if self._nprims.min() < 1:
-            raise ValueError('nprims elements must be strictly positive.')
+        if self._shell_center.min() < 0:
+            raise ValueError('shell_center can not contain negative values.')
+        if self._shell_center.max() >= self.centers.shape[0]:
+            raise ValueError('shell_center can not contain values larger than the number of centers.')
+        if self._shell_nprims.min() < 1:
+            raise ValueError('shell_nprims elements must be strictly positive.')
         if (self._shell_types == -1).any():
             raise ValueError('The shell_type -1 is not supported.')
-        cdef long nprim_total = self._nprims.sum()
+        cdef long nprim_total = self._shell_nprims.sum()
         if self._alphas.shape[0] != nprim_total:
             raise TypeError('The length of alphas must equal the total number of primitives.')
 
 
-    def __init__(self, centers: Iterable, shell_map: Iterable, nprims: Iterable,
+    def __init__(self, centers: Iterable, shell_center: Iterable, shell_nprims: Iterable,
                   shell_types: Iterable, alphas: Iterable, con_coeffs: Iterable):
         """
         A C++ wrapper class for interfacing with all the gaussian integral and numerical integral
@@ -320,10 +320,10 @@ cdef class GBasis:
         centers
             A numpy array with centers for the basis functions.
             shape = (ncenter, 3)
-        shell_map
+        shell_center
             An array with the center index for each shell.
             shape = (nshell,)
-        nprims
+        shell_nprims
             The number of primitives in each shell.
             shape = (nshell,)
         shell_types
@@ -332,13 +332,13 @@ cdef class GBasis:
             shape = (nshell,)
         alphas
             The exponents of the primitives in one shell.
-            shape = (sum(nprims),)
+            shape = (sum(shell_nprims),)
         con_coeffs
             The contraction coefficients of the primitives for each
             contraction in a contiguous array. The coefficients are ordered
             according to the shells. Within each shell, the coefficients are
             grouped per exponent.
-            shape = (sum(nprims),)
+            shape = (sum(shell_nprims),)
 
 
         Copies are made of the arguments and stored internally, and are not meant
@@ -381,17 +381,17 @@ cdef class GBasis:
 
         # do the concatenation of each array properly
         centers = np.concatenate([gb.centers for gb in gbs])
-        shell_map = []
+        shell_center = []
         offset = 0
         for gb in gbs:
-            shell_map.append(gb.shell_map + offset)
+            shell_center.append(gb.shell_center + offset)
             offset += gb.ncenter
-        shell_map = np.concatenate(shell_map)
-        nprims = np.concatenate([gb.nprims for gb in gbs])
+        shell_center = np.concatenate(shell_center)
+        shell_nprims = np.concatenate([gb.shell_nprims for gb in gbs])
         shell_types = np.concatenate([gb.shell_types for gb in gbs])
         alphas = np.concatenate([gb.alphas for gb in gbs])
         con_coeffs = np.concatenate([gb.con_coeffs for gb in gbs])
-        return cls(centers, shell_map, nprims, shell_types, alphas, con_coeffs)
+        return cls(centers, shell_center, shell_nprims, shell_types, alphas, con_coeffs)
 
     @property
     def biblio(self):
@@ -406,14 +406,14 @@ cdef class GBasis:
         return self._centers
 
     @property
-    def shell_map(self):
+    def shell_center(self):
         """The index in ``centers`` for each shell"""
-        return self._shell_map.view()
+        return self._shell_center.view()
 
     @property
-    def nprims(self):
+    def shell_nprims(self):
         """The number of primitives in each shell."""
-        return self._nprims.view()
+        return self._shell_nprims.view()
 
     @property
     def shell_types(self):
@@ -446,12 +446,12 @@ cdef class GBasis:
     @property
     def nshell(self):
         """The number of shells"""
-        return self.shell_map.shape[0]
+        return self.shell_center.shape[0]
 
     @property
     def nprim_total(self):
         """The total number of primitives"""
-        return self.nprims.sum()
+        return self.shell_nprims.sum()
 
     # Other properties
 
@@ -497,10 +497,10 @@ cdef class GBasis:
         }
         descs = ['']*self.ncenter
         for i in range(self.nshell):
-            icenter = self.shell_map[i]
+            icenter = self.shell_center[i]
             s = descs[icenter]
             name = shell_type_names[self.shell_types[i]]
-            s += ' %s%i' % (name, self.nprims[i])
+            s += ' %s%i' % (name, self.shell_nprims[i])
             descs[icenter] = s
         deflist = []
         # for i in range(self.ncenter):
@@ -545,16 +545,16 @@ cdef class GBasis:
                 raise ValueError('ishell out of range: %i < 0' % ishell)
             if ishell >= self.nshell:
                 raise ValueError('ishell out of range: %i >= %s' % (ishell, self.nshell))
-            icenters.add(self.shell_map[ishell])
+            icenters.add(self.shell_center[ishell])
         icenters = sorted(icenters) # fix the order
         new_centers = self.centers[icenters]
-        # construct the new shell_map, nprims, shell_types
-        new_shell_map = np.zeros(len(ishells), int)
+        # construct the new shell_center, shell_nprims, shell_types
+        new_shell_center = np.zeros(len(ishells), int)
         new_nprims = np.zeros(len(ishells), int)
         new_shell_types = np.zeros(len(ishells), int)
         for new_ishell, ishell in enumerate(ishells):
-            new_shell_map[new_ishell] = icenters.index(self.shell_map[ishell])
-            new_nprims[new_ishell] = self.nprims[ishell]
+            new_shell_center[new_ishell] = icenters.index(self.shell_center[ishell])
+            new_nprims[new_ishell] = self.shell_nprims[ishell]
             new_shell_types[new_ishell] = self.shell_types[ishell]
         # construct the new alphas and con_coeffs
         new_nprim_total = new_nprims.sum()
@@ -563,7 +563,7 @@ cdef class GBasis:
         new_iprim = 0
         for new_ishell, ishell in enumerate(ishells):
             nprim = new_nprims[new_ishell]
-            old_iprim = self.nprims[:ishell].sum()
+            old_iprim = self.shell_nprims[:ishell].sum()
             new_alphas[new_iprim:new_iprim+nprim] = self.alphas[old_iprim:old_iprim+nprim]
             new_con_coeffs[new_iprim:new_iprim+nprim] = self.con_coeffs[old_iprim:old_iprim+nprim]
             new_iprim += nprim
@@ -575,7 +575,7 @@ cdef class GBasis:
             ibasis_list.extend(range(ibasis_old, ibasis_old+nbasis))
         ibasis_list = np.array(ibasis_list)
         # create the basis set object
-        basis = self.__class__(new_centers, new_shell_map, new_nprims,
+        basis = self.__class__(new_centers, new_shell_center, new_nprims,
                                new_shell_types, new_alphas, new_con_coeffs)
         # return stuff
         return basis, ibasis_list
@@ -618,7 +618,7 @@ cdef class GBasis:
             # find the shells on these centers
             ishells = []
             for ishell in range(self.nshell):
-                if self.shell_map[ishell] in icenters:
+                if self.shell_center[ishell] in icenters:
                     ishells.append(ishell)
             # construct a sub basis
             sub_basis, ibasis_list = self.get_subset(ishells)
@@ -627,10 +627,10 @@ cdef class GBasis:
 
 
 cdef class GOBasis(GBasis):
-    def __cinit__(self, centers, shell_map, nprims, shell_types, alphas, con_coeffs):
+    def __cinit__(self, centers, shell_center, shell_nprims, shell_types, alphas, con_coeffs):
         self._this = new gbasis.GOBasis(
-            <double*>self._centers.data, <long*>self._shell_map.data,
-            <long*>self._nprims.data, <long*>self._shell_types.data,
+            <double*>self._centers.data, <long*>self._shell_center.data,
+            <long*>self._shell_nprims.data, <long*>self._shell_types.data,
             <double*>self._alphas.data, <double*>self._con_coeffs.data,
             self._centers.shape[0], self._shell_types.shape[0], self._alphas.shape[0])
         self._baseptr = <gbasis.GBasis*> self._this

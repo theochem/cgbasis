@@ -134,8 +134,8 @@ class GOBasisDesc:
         """
         natom, coordinates, numbers = typecheck_geo(coordinates, numbers, need_pseudo_numbers=False)
 
-        shell_map = []
-        nprims = []
+        shell_center = []
+        shell_nprims = []
         shell_types = []
         alphas = []
         con_coeffs = []
@@ -218,10 +218,10 @@ class GOBasisDesc:
             n = numbers[i]
             basis_x = get_basis(i, n)
             basis_atom = translate_basis(basis_x, n)
-            basis_atom.extend(i, shell_map, nprims, shell_types, alphas, con_coeffs, self.pure)
+            basis_atom.extend(i, shell_center, shell_nprims, shell_types, alphas, con_coeffs, self.pure)
 
         # Return the Gaussian basis object.
-        return GOBasis(coordinates, shell_map, nprims, shell_types, alphas, con_coeffs)
+        return GOBasis(coordinates, shell_center, shell_nprims, shell_types, alphas, con_coeffs)
 
 
 class GOBasisFamily:
@@ -392,7 +392,7 @@ class GOBasisAtom:
         """
         self.bcs = bcs
 
-    def extend(self, i: int, shell_map: List[int], nprims: List[int], shell_types: List[int],
+    def extend(self, i: int, shell_center: List[int], shell_nprims: List[int], shell_types: List[int],
                alphas: List[float], con_coeffs: List[float], pure=True):
         """
         Add basis functions to an atom. This can take an existing set of parameters for GOBasis and
@@ -402,9 +402,9 @@ class GOBasisAtom:
         ----------
         i
             The index of the center of this atom.
-        shell_map
+        shell_center
             The index of the centres of each shell. This instance's centre will be appended to it.
-        nprims
+        shell_nprims
             The number of primitives in each shell. This instance's centre will be appended to it.
         shell_types
             The angular momentum of the shell. 0 = S, 1 = P, 2 = D (cartesian), -2 = D (pure)
@@ -421,8 +421,8 @@ class GOBasisAtom:
         for bc in self.bcs:
             if bc.is_generalized():
                 raise ValueError('Generalized contractions are not supported (yet).')
-            shell_map.append(i)
-            nprims.append(len(bc.alphas))
+            shell_center.append(i)
+            shell_nprims.append(len(bc.alphas))
             if pure and bc.shell_type >= 2:
                 shell_types.append(-bc.shell_type)
             else:
@@ -497,12 +497,12 @@ class GOBasisContraction:
         # code below (ab)uses the GOBasis machinery to get that result.
         # 1) Construct a GOBasis object with only this contraction.
         centers = np.array([[0.0, 0.0, 0.0]])
-        shell_map = np.array([0])
-        nprims = np.array([len(self.alphas)])
+        shell_center = np.array([0])
+        shell_nprims = np.array([len(self.alphas)])
         shell_types = np.array([self.shell_type])
         alphas = self.alphas
         con_coeffs = self.con_coeffs
-        gobasis = GOBasis(centers, shell_map, nprims, shell_types, alphas, con_coeffs)
+        gobasis = GOBasis(centers, shell_center, shell_nprims, shell_types, alphas, con_coeffs)
         # 2) Get the first diagonal element of the overlap matrix
         olpdiag = gobasis.compute_overlap()[0, 0]
         # 3) Normalize the contraction

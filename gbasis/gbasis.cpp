@@ -57,11 +57,11 @@ const double gob_pure_normalization(const double alpha, const long l) {
     changed once the constructor is called.
 */
 
-GBasis::GBasis(const double *centers, const long *shell_map, const long *nprims,
+GBasis::GBasis(const double *centers, const long *shell_center, const long *shell_nprims,
                const long *shell_types, const double *alphas, const double *con_coeffs,
                const long ncenter, const long nshell, const long nprim_total) :
     nbasis(0), nscales(0), max_shell_type(0),
-    centers(centers), shell_map(shell_map), nprims(nprims),
+    centers(centers), shell_center(shell_center), shell_nprims(shell_nprims),
     shell_types(shell_types), alphas(alphas), con_coeffs(con_coeffs),
     ncenter(ncenter), nshell(nshell), nprim_total(nprim_total) {
   long shell_nbasis;
@@ -93,7 +93,7 @@ GBasis::GBasis(const double *centers, const long *shell_map, const long *nprims,
   prim_offsets = new long[nshell];
   prim_offsets[0] = 0;
   for (long ishell = 1; ishell < nshell; ishell++) {
-    prim_offsets[ishell] = prim_offsets[ishell - 1] + nprims[ishell - 1];
+    prim_offsets[ishell] = prim_offsets[ishell - 1] + shell_nprims[ishell - 1];
   }
 
   // shell_lookup: the index of the contracted shell of Gaussians for every
@@ -110,7 +110,7 @@ GBasis::GBasis(const double *centers, const long *shell_map, const long *nprims,
   // nscales
   for (long ishell = 0; ishell < nshell; ishell++) {
     shell_nbasis = get_shell_nbasis(abs(shell_types[ishell]));
-    nscales += shell_nbasis * nprims[ishell];
+    nscales += shell_nbasis * shell_nprims[ishell];
   }
 
   // scales
@@ -130,7 +130,7 @@ void GBasis::init_scales() {
   long n[3], counter = 0, oprim = 0;
   double alpha;
   for (long ishell = 0; ishell < nshell; ishell++) {
-    for (long iprim = 0; iprim < nprims[ishell]; iprim++) {
+    for (long iprim = 0; iprim < shell_nprims[ishell]; iprim++) {
       scales_offsets[oprim + iprim] = counter;
       alpha = alphas[oprim + iprim];
       n[0] = abs(shell_types[ishell]);
@@ -141,7 +141,7 @@ void GBasis::init_scales() {
         counter += 1;
       } while (iter_pow1_inc(n));
     }
-    oprim += nprims[ishell];
+    oprim += shell_nprims[ishell];
   }
 }
 
@@ -223,10 +223,10 @@ double GBasis::compute_grid_point2(double *dm, double *point, GB2DMGridFn *grid_
   return result;
 }
 
-GOBasis::GOBasis(const double *centers, const long *shell_map, const long *nprims,
+GOBasis::GOBasis(const double *centers, const long *shell_center, const long *shell_nprims,
                  const long *shell_types, const double *alphas, const double *con_coeffs,
                  const long ncenter, const long nshell, const long nprim_total) :
-    GBasis(centers, shell_map, nprims, shell_types, alphas, con_coeffs,
+    GBasis(centers, shell_center, shell_nprims, shell_types, alphas, con_coeffs,
            ncenter, nshell, nprim_total) {
   init_scales();
 }

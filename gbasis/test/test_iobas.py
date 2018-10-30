@@ -65,8 +65,8 @@ def test_go_basis_desc_neon_sto3g():
                    GOBasisFamily('STO-3G', filename=to_bset_path('sto-3g.gbs'))]
     for gobasis in gobasis_set:
         obasis = get_gobasis(np.array([[0.0, 0.0, 0.0]]), np.array([2]), gobasis)
-        assert (obasis.shell_map == np.array([0])).all()
-        assert (obasis.nprims == np.array([3])).all()
+        assert (obasis.shell_center == np.array([0])).all()
+        assert (obasis.shell_nprims == np.array([3])).all()
         assert (obasis.shell_types == np.array([0])).all()
         np.testing.assert_equal(obasis.alphas, [6.36242139, 1.15892300, 0.31364979])
         # Limited precision due to normalization of contractions after loading them from file.
@@ -78,8 +78,8 @@ def test_go_basis_desc_hydrogen_321g():
                    GOBasisFamily('3-21G', filename=to_bset_path('3-21g.gbs'))]
     for gobasis in gobasis_set:
         obasis = get_gobasis(np.array([[0.0, 0.0, 0.0]]), np.array([1]), gobasis)
-        assert (obasis.shell_map == np.array([0, 0])).all()
-        assert (obasis.nprims == np.array([2, 1])).all()
+        assert (obasis.shell_center == np.array([0, 0])).all()
+        assert (obasis.shell_nprims == np.array([2, 1])).all()
         assert (obasis.shell_types == np.array([0, 0])).all()
         np.testing.assert_equal(obasis.alphas, [5.4471780, 0.8245470, 0.1831920])
         # Limited precision due to normalization of contractions after loading them from file.
@@ -97,8 +97,8 @@ def test_go_basis_desc_lithium_321g():
                    GOBasisFamily('3-21G', filename=to_bset_path('3-21g.gbs'))]
     for gobasis in gobasis_set:
         obasis = get_gobasis(np.array([[0.0, 0.0, 0.0]]), np.array([3]), gobasis)
-        assert (obasis.shell_map == np.array([0, 0, 0, 0, 0])).all()
-        assert (obasis.nprims == np.array([3, 2, 2, 1, 1])).all()
+        assert (obasis.shell_center == np.array([0, 0, 0, 0, 0])).all()
+        assert (obasis.shell_nprims == np.array([3, 2, 2, 1, 1])).all()
         assert (obasis.shell_types == np.array([0, 0, 1, 0, 1])).all()
         np.testing.assert_equal(obasis.alphas, [
             36.8382000, 5.4817200, 1.1132700,
@@ -120,8 +120,8 @@ def test_go_basis_desc_water_sto3g():
                    GOBasisFamily('STO-3G', filename=to_bset_path('sto-3g.gbs'))]
     for gobasis in gobasis_set:
         obasis = get_gobasis(mol['coordinates'], mol['numbers'], gobasis)
-        assert (obasis.shell_map == np.array([0, 1, 1, 1, 2])).all()
-        assert (obasis.nprims == np.array([3, 3, 3, 3, 3])).all()
+        assert (obasis.shell_center == np.array([0, 1, 1, 1, 2])).all()
+        assert (obasis.shell_nprims == np.array([3, 3, 3, 3, 3])).all()
         assert (obasis.shell_types == np.array([0, 0, 0, 1, 0])).all()
         expected_alphas = [
             3.42525091, 0.62391373, 0.16885540,

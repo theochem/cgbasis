@@ -150,12 +150,12 @@ def test_iter_pow2_raise():
 def get_itergb1():
     # This is a rather random basis specification for two centers.
     centers = np.random.uniform(-1, 1, (2, 3))
-    shell_map = np.array([0, 0, 0, 1, 1, 1, 1])
-    nprims = np.array([2, 3, 3, 5, 5, 5, 7])
+    shell_center = np.array([0, 0, 0, 1, 1, 1, 1])
+    shell_nprims = np.array([2, 3, 3, 5, 5, 5, 7])
     shell_types = np.array([2, 1, 0, -2, 3, 0, 1])
-    alphas = np.random.uniform(0.5, 2, nprims.sum())
-    con_coeffs = np.random.uniform(-1, 1, nprims.sum())
-    gobasis = GOBasis(centers, shell_map, nprims, shell_types, alphas, con_coeffs)
+    alphas = np.random.uniform(0.5, 2, shell_nprims.sum())
+    con_coeffs = np.random.uniform(-1, 1, shell_nprims.sum())
+    gobasis = GOBasis(centers, shell_center, shell_nprims, shell_types, alphas, con_coeffs)
     return _IterGB1(gobasis), gobasis
 
 
@@ -267,12 +267,12 @@ def test_itergb1_store():
 def get_itergb2():
     # This is a rather random basis specification for two centers.
     centers = np.random.uniform(-1, 1, (2, 3))
-    shell_map = np.array([0, 0, 0, 1, 1, 1, 1])
-    nprims = np.array([2, 3, 3, 5, 5, 5, 7])
+    shell_center = np.array([0, 0, 0, 1, 1, 1, 1])
+    shell_nprims = np.array([2, 3, 3, 5, 5, 5, 7])
     shell_types = np.array([2, 1, 0, -2, 3, 0, 1])
-    alphas = np.random.uniform(0.5, 2, nprims.sum())
-    con_coeffs = np.random.uniform(-1, 1, nprims.sum())
-    gobasis = GOBasis(centers, shell_map, nprims, shell_types, alphas, con_coeffs)
+    alphas = np.random.uniform(0.5, 2, shell_nprims.sum())
+    con_coeffs = np.random.uniform(-1, 1, shell_nprims.sum())
+    gobasis = GOBasis(centers, shell_center, shell_nprims, shell_types, alphas, con_coeffs)
     return _IterGB2(gobasis), gobasis
 
 
@@ -499,12 +499,12 @@ def test_itergb4_idea():
 def get_itergb4():
     # This is a rather random basis specification for two centers.
     centers = np.random.uniform(-1, 1, (2, 3))
-    shell_map = np.array([0, 0, 1, 1, 1])
-    nprims = np.array([2, 3, 5, 2, 7])
+    shell_center = np.array([0, 0, 1, 1, 1])
+    shell_nprims = np.array([2, 3, 5, 2, 7])
     shell_types = np.array([2, 1, -2, 3, 0])
-    alphas = np.random.uniform(0.5, 2, nprims.sum())
-    con_coeffs = np.random.uniform(-1, 1, nprims.sum())
-    gobasis = GOBasis(centers, shell_map, nprims, shell_types, alphas, con_coeffs)
+    alphas = np.random.uniform(0.5, 2, shell_nprims.sum())
+    con_coeffs = np.random.uniform(-1, 1, shell_nprims.sum())
+    gobasis = GOBasis(centers, shell_center, shell_nprims, shell_types, alphas, con_coeffs)
     return _IterGB4(gobasis), gobasis
 
 
@@ -554,13 +554,13 @@ def test_itergb4_inc_shell():
     oprims = np.zeros(gobasis.nshell, int)
     basis_offsets = np.zeros(gobasis.nshell, int)
     for i in range(1, gobasis.nshell):
-        oprims[i] = oprims[i - 1] + gobasis.nprims[i - 1]
+        oprims[i] = oprims[i - 1] + gobasis.shell_nprims[i - 1]
         basis_offsets[i] = basis_offsets[i - 1] + _get_shell_nbasis(gobasis.shell_types[i - 1])
 
     def check_fields(is0, is1, is2, is3):
         assert i4.private_fields == (
             is0, is1, is2, is3,
-            gobasis.nprims[is0], gobasis.nprims[is1], gobasis.nprims[is2], gobasis.nprims[is3],
+            gobasis.shell_nprims[is0], gobasis.shell_nprims[is1], gobasis.shell_nprims[is2], gobasis.shell_nprims[is3],
             oprims[is0], oprims[is1], oprims[is2], oprims[is3],
             0, 0, 0, 0
         )
@@ -571,14 +571,14 @@ def test_itergb4_inc_shell():
             gobasis.shell_types[is0], gobasis.shell_types[is1], gobasis.shell_types[is2], gobasis.shell_types[is3],
             gobasis.alphas[oprims[is0]], gobasis.alphas[oprims[is1]], gobasis.alphas[oprims[is2]],
             gobasis.alphas[oprims[is3]],
-            gobasis.centers[gobasis.shell_map[is0], 0], gobasis.centers[gobasis.shell_map[is0], 1],
-            gobasis.centers[gobasis.shell_map[is0], 2],
-            gobasis.centers[gobasis.shell_map[is1], 0], gobasis.centers[gobasis.shell_map[is1], 1],
-            gobasis.centers[gobasis.shell_map[is1], 2],
-            gobasis.centers[gobasis.shell_map[is2], 0], gobasis.centers[gobasis.shell_map[is2], 1],
-            gobasis.centers[gobasis.shell_map[is2], 2],
-            gobasis.centers[gobasis.shell_map[is3], 0], gobasis.centers[gobasis.shell_map[is3], 1],
-            gobasis.centers[gobasis.shell_map[is3], 2],
+            gobasis.centers[gobasis.shell_center[is0], 0], gobasis.centers[gobasis.shell_center[is0], 1],
+            gobasis.centers[gobasis.shell_center[is0], 2],
+            gobasis.centers[gobasis.shell_center[is1], 0], gobasis.centers[gobasis.shell_center[is1], 1],
+            gobasis.centers[gobasis.shell_center[is1], 2],
+            gobasis.centers[gobasis.shell_center[is2], 0], gobasis.centers[gobasis.shell_center[is2], 1],
+            gobasis.centers[gobasis.shell_center[is2], 2],
+            gobasis.centers[gobasis.shell_center[is3], 0], gobasis.centers[gobasis.shell_center[is3], 1],
+            gobasis.centers[gobasis.shell_center[is3], 2],
             basis_offsets[is0], basis_offsets[is1], basis_offsets[is2], basis_offsets[is3]
         ])
         assert abs(f1 - f2).max() < 1e-10
@@ -649,13 +649,13 @@ def test_itergb4_inc_prim():
     oprims = np.zeros(gobasis.nshell, int)
     basis_offsets = np.zeros(gobasis.nshell, int)
     for i in range(1, gobasis.nshell):
-        oprims[i] = oprims[i - 1] + gobasis.nprims[i - 1]
+        oprims[i] = oprims[i - 1] + gobasis.shell_nprims[i - 1]
         basis_offsets[i] = basis_offsets[i - 1] + _get_shell_nbasis(gobasis.shell_types[i - 1])
 
     def check_fields(is0, is1, is2, is3, ip0, ip1, ip2, ip3):
         assert i4.private_fields == (
             is0, is1, is2, is3,
-            gobasis.nprims[is0], gobasis.nprims[is1], gobasis.nprims[is2], gobasis.nprims[is3],
+            gobasis.shell_nprims[is0], gobasis.shell_nprims[is1], gobasis.shell_nprims[is2], gobasis.shell_nprims[is3],
             oprims[is0], oprims[is1], oprims[is2], oprims[is3],
             ip0, ip1, ip2, ip3
         )
@@ -666,14 +666,14 @@ def test_itergb4_inc_prim():
             gobasis.shell_types[is0], gobasis.shell_types[is1], gobasis.shell_types[is2], gobasis.shell_types[is3],
             gobasis.alphas[oprims[is0] + ip0], gobasis.alphas[oprims[is1] + ip1], gobasis.alphas[oprims[is2] + ip2],
             gobasis.alphas[oprims[is3] + ip3],
-            gobasis.centers[gobasis.shell_map[is0], 0], gobasis.centers[gobasis.shell_map[is0], 1],
-            gobasis.centers[gobasis.shell_map[is0], 2],
-            gobasis.centers[gobasis.shell_map[is1], 0], gobasis.centers[gobasis.shell_map[is1], 1],
-            gobasis.centers[gobasis.shell_map[is1], 2],
-            gobasis.centers[gobasis.shell_map[is2], 0], gobasis.centers[gobasis.shell_map[is2], 1],
-            gobasis.centers[gobasis.shell_map[is2], 2],
-            gobasis.centers[gobasis.shell_map[is3], 0], gobasis.centers[gobasis.shell_map[is3], 1],
-            gobasis.centers[gobasis.shell_map[is3], 2],
+            gobasis.centers[gobasis.shell_center[is0], 0], gobasis.centers[gobasis.shell_center[is0], 1],
+            gobasis.centers[gobasis.shell_center[is0], 2],
+            gobasis.centers[gobasis.shell_center[is1], 0], gobasis.centers[gobasis.shell_center[is1], 1],
+            gobasis.centers[gobasis.shell_center[is1], 2],
+            gobasis.centers[gobasis.shell_center[is2], 0], gobasis.centers[gobasis.shell_center[is2], 1],
+            gobasis.centers[gobasis.shell_center[is2], 2],
+            gobasis.centers[gobasis.shell_center[is3], 0], gobasis.centers[gobasis.shell_center[is3], 1],
+            gobasis.centers[gobasis.shell_center[is3], 2],
             basis_offsets[is0], basis_offsets[is1], basis_offsets[is2], basis_offsets[is3]
         ])
         assert abs(f1 - f2).max() < 1e-10
