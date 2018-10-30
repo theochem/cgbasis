@@ -1673,7 +1673,7 @@ def get_gauss_repulsion(alphas0, alphas1, alphas2, alphas3, r0, r1, r2, r3,
     nbasis3 = _get_shell_nbasis(shell_type3)
     # Clear the working memory
     gb4i.reset(shell_type0, shell_type1, shell_type2, shell_type3, r0, r1, r2, r3)
-    # Add a few cobtributions:
+    # Add a few contributions:
     for alpha0, alpha1, alpha2, alpha3 in zip(alphas0, alphas1, alphas2, alphas3):
         gb4i.add(1.0, alpha0, alpha1, alpha2, alpha3, scales0, scales1, scales2, scales3)
     return gb4i.get_work(nbasis0, nbasis1, nbasis2, nbasis3)
@@ -1713,7 +1713,7 @@ def check_delta_repulsion(alphas0, alphas1, alphas2, alphas3, r0, r1, r2, r3, sc
     assert result0.shape == (nbasis0, nbasis1, nbasis2, nbasis3)
     # Clear the working memory
     gb4i.reset(shell_type0, shell_type1, shell_type2, shell_type3, r0, r1, r2, r3)
-    # Add a few cobtributions:
+    # Add a few contributions:
     for alpha0, alpha1, alpha2, alpha3 in zip(alphas0, alphas1, alphas2, alphas3):
         gb4i.add(1.0, alpha0, alpha1, alpha2, alpha3, scales0, scales1, scales2, scales3)
     result1 = gb4i.get_work(nbasis0, nbasis1, nbasis2, nbasis3)
@@ -1852,7 +1852,7 @@ def check_intracule_integrals(alphas0, alphas1, alphas2, alphas3, r0, r1, r2, r3
     assert result0.shape == (nbasis0, nbasis1, nbasis2, nbasis3)
     # Clear the working memory
     gb4i.reset(shell_type0, shell_type1, shell_type2, shell_type3, r0, r1, r2, r3)
-    # Add a few cobtributions:
+    # Add a few contributions:
     for alpha0, alpha1, alpha2, alpha3 in zip(alphas0, alphas1, alphas2, alphas3):
         gb4i.add(1.0, alpha0, alpha1, alpha2, alpha3, scales0, scales1, scales2, scales3)
     result1 = gb4i.get_work(nbasis0, nbasis1, nbasis2, nbasis3)
@@ -1942,14 +1942,16 @@ def test_delta_repulsion_int0():
 
 
 def test_delta_repulsion_int1():
-    coords = np.array([[0., 0., 1.], [0., 1., 0.], [0., 1., 1.], [0., 0., 0.]])
-    numbers = np.ones([4], dtype=int)
+    coords = np.array([[0., 0., 1.]])
+    numbers = np.ones([1], dtype=int)
     basis = "sto-3g"
     gobasis_ref = get_gobasis(coords, numbers, basis)
 
-    coords1 = np.array([[0, 0, 2], [0, 2, 0], [0, 2, 2], [1, 1, 1]], dtype=float)
-    shift = np.array([[0, 0, -1], [0, -1, 0], [0, -1, -1], [-1, -1, -1, ]], dtype=float)
+    coords1 = np.array([[0, 0, 2]], dtype=float)
+    shift = np.array([[0, 0, -1], [0, 0, -1], [0, 0, -1], [0, 0, -1, ]], dtype=float)
     gobasis = get_gobasis(coords1, numbers, basis)
+
+    print(gobasis.compute_delta_repulsion(shift=shift))
 
     assert np.allclose(gobasis.compute_delta_repulsion(shift=shift),
                        gobasis_ref.compute_delta_repulsion())
