@@ -974,7 +974,8 @@ cdef class GOBasis(GBasis):
         output = _prepare_array(output, (self.nbasis, self.nbasis, self.nbasis, self.nbasis), 'output')
         if shift is not None:
             self._this.compute_delta_repulsion(&output[0, 0, 0, 0], &shift[0,0])
-        self._this.compute_delta_repulsion(&output[0, 0, 0, 0])
+        else:
+            self._this.compute_delta_repulsion(&output[0, 0, 0, 0])
         return np.asarray(output)
 
     def compute_intra_density(self, double[:, :, :, ::1] output=None,
