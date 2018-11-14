@@ -23,6 +23,7 @@
 #cython: embedsignature=True
 
 """C++ extensions"""
+import warnings
 from typing import Iterable, Tuple, Type, List, Union
 
 cimport numpy as np
@@ -354,6 +355,8 @@ cdef class GBasis:
             raise NotImplementedError('GBasis is an abstract base class')
         self._log_init()
         self._biblio = []
+        warnings.warn("GOBasis is being split into 4 classes. GBasis1, GBasis2, GBasisGrid, "
+                      "GBasisSparse", DeprecationWarning)
 
     def __dealloc__(self):
         del self._baseptr
