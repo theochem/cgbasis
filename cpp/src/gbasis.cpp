@@ -29,7 +29,9 @@
 #include <stdexcept>
 #include <cstring>
 #include "gbasis.h"
-#include "iter_gb.h"
+#include "grids/iter_gb1.h"
+#include "ones/iter_gb2.h"
+#include "twos/iter_gb4.h"
 
 using std::abs;
 

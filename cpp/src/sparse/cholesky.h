@@ -27,7 +27,7 @@
 #define GBASIS_CHOLESKY_H_
 
 #include <vector>
-#include "gbw.h"
+#include "../twos/gbw.h"
 
 /**
     @brief

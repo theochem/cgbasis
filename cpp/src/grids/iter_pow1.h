@@ -23,8 +23,8 @@
  * @brief Iterators over Cartesian polynomials in one shell
  */
 
-#ifndef GBASIS_ITER_POW_H
-#define GBASIS_ITER_POW_H
+#ifndef GBASIS_ITER_POW1_H
+#define GBASIS_ITER_POW1_H
 
 ///Increment to next basis function, within the same angular momentum.
 int iter_pow1_inc(long *n);
@@ -42,22 +42,6 @@ class IterPow1 {
   long n0[3];
   /// basis counter
   long ibasis0;
-};
-
-class IterPow2 {
- private:
-  /// shell types
-  long shell_type0, shell_type1;
- public:
-  /// reinitialize on a new shell
-  void reset(long shell_type0, long shell_type1);
-  /// increment to next basis function, first within the shell, then to the next shell.
-  int inc();
-  /// 3D cartesian shell type
-  long n0[3];
-  long n1[3];
-  /// basis counters and offsets.
-  long offset, ibasis0, ibasis1;
 };
 
 #endif

@@ -117,9 +117,10 @@
 #ifndef GBASIS_FNS_H_
 #define GBASIS_FNS_H_
 
-#include "calc.h"
-#include "common.h"
-#include "iter_pow.h"
+#include "../calc.h"
+#include "../common.h"
+#include "iter_pow1.h"
+#include "../ones/iter_pow2.h"
 
 /** @brief
       Base class for grid calculators that require only a single loop over all basis

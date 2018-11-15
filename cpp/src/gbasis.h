@@ -26,8 +26,9 @@
 #ifndef GBASIS_GBASIS_H_
 #define GBASIS_GBASIS_H_
 
-#include "ints.h"
-#include "fns.h"
+#include "ones/ints2.h"
+#include "twos/ints4.h"
+#include "grids/fns.h"
 
 const double gob_cart_normalization(const double alpha, const long *n);
 
