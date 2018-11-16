@@ -20,7 +20,7 @@
 # --
 
 
-cdef extern from "ints.h":
+cdef extern from "ones/ints2.h":
     cdef cppclass GB2Integral:
         long get_nwork()
         long get_max_shell_type()
@@ -53,44 +53,3 @@ cdef extern from "ints.h":
 
     cdef cppclass GB2MomentIntegral:
         GB2MomentIntegral(long max_shell_type, long* xyz, double* center) except +
-
-    cdef cppclass GB4Integral:
-        long get_nwork()
-        long get_max_shell_type()
-        long get_max_nbasis()
-        void reset(long shell_type0, long shell_type1, long shell_type2, long shell_type3, double* r0, double* r1, double* r2, double* r3) except +
-        void add(double coeff, double alpha0, double alpha1, double alpha2, double alpha3, double* scales0, double* scales1, double* scales2, double* scales3)
-        void cart_to_pure() except +
-
-        long get_shell_type0()
-        long get_shell_type1()
-        long get_shell_type2()
-        long get_shell_type3()
-        double* get_work()
-
-    cdef cppclass GB4ElectronRepulsionIntegralLibInt:
-        GB4ElectronRepulsionIntegralLibInt(long max_shell_type) except +
-
-    cdef cppclass GB4ErfIntegralLibInt:
-        GB4ErfIntegralLibInt(long max_shell_type, double mu) except +
-        double get_mu()
-
-    cdef cppclass GB4GaussIntegralLibInt:
-        GB4GaussIntegralLibInt(long max_shell_type, double c, double alpha) except +
-        double get_c()
-        double get_alpha()
-
-    cdef cppclass GB4RAlphaIntegralLibInt:
-        GB4RAlphaIntegralLibInt(long max_shell_type, double alpha) except +
-        double get_alpha()
-
-    cdef cppclass GB4DeltaIntegralLibInt:
-        GB4DeltaIntegralLibInt(long max_shell_type) except +
-
-    cdef cppclass GB4IntraDensIntegralLibInt:
-        GB4IntraDensIntegralLibInt(long max_shell_type, double* point) except +
-
-
-cdef extern from "libint2.h":
-    void libint2_static_init()
-    void libint2_static_cleanup()

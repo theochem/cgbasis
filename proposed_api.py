@@ -21,12 +21,12 @@
 # - - iter_pow_grid.[h/cpp]
 # - sparse/
 # - - cholesky.[h/cpp]
-# python-gbasis/
+# python/
 # - test/
-# - - (all test pxds)
+# - - (all test ext)
 # - - (all test pys)
-# - pxds/
-# - - (all non-test pxds, ie gbasis.pxd)
+# - ext/
+# - - (all non-test ext, ie c_gbasis.pxd)
 # - periodic.py
 # - utils.py
 # - gobasis.py

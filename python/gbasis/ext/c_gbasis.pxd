@@ -20,7 +20,7 @@
 # --
 
 
-cimport fns
+from gbasis.ext.grids cimport c_fns
 
 cdef extern from "gbasis.h":
     double gob_cart_normalization(double alpha, long* n)
@@ -48,8 +48,8 @@ cdef extern from "gbasis.h":
         void shift_center(const double *r, double *shift, double *r_total)
 
         # low-level compute routines
-        void compute_grid_point1(double* output, double* point, fns.GB1DMGridFn* grid_fn)
-        double compute_grid_point2(double* dm, double* point, fns.GB2DMGridFn* grid_fn)
+        void compute_grid_point1(double* output, double* point, c_fns.GB1DMGridFn* grid_fn)
+        double compute_grid_point2(double* dm, double* point, c_fns.GB2DMGridFn* grid_fn)
 
     cdef cppclass GOBasis(GBasis):
         GOBasis(double* centers, long* shell_map, long* nprims,
@@ -62,6 +62,7 @@ cdef extern from "gbasis.h":
         void compute_erf_attraction(double* charges, double* centers, long ncharge, double* output, double mu)
         void compute_gauss_attraction(double* charges, double* centers, long ncharge, double* output, double c, double alpha)
         void compute_multipole_moment(long* xyz, double* center, double* output)
+
         void compute_electron_repulsion(double* output)
         void compute_erf_repulsion(double* output, double mu)
         void compute_gauss_repulsion(double* output, double c, double alpha)
@@ -72,6 +73,6 @@ cdef extern from "gbasis.h":
 
         void compute_grid1_exp(long nfn, double* coeffs, long npoint, double* points, long norb, long* iorbs, double* output)
         void compute_grid1_grad_exp(long nfn, double* coeffs, long npoint, double* points, long norb, long* iorbs, double* output)
-        void compute_grid1_dm(double* dm, long npoint, double* points, fns.GB1DMGridFn* grid_fn, double* output, double epsilon, double* dmmaxrow)
+        void compute_grid1_dm(double* dm, long npoint, double* points, c_fns.GB1DMGridFn* grid_fn, double* output, double epsilon, double* dmmaxrow)
         void compute_grid2_dm(double* dm, long npoint, double* points, double* output)
-        void compute_grid1_fock(long npoint, double* points, double* weights, long pot_stride, double* pots, fns.GB1DMGridFn* grid_fn, double* output)
+        void compute_grid1_fock(long npoint, double* points, double* weights, long pot_stride, double* pots, c_fns.GB1DMGridFn* grid_fn, double* output)

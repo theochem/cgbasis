@@ -19,6 +19,26 @@
 #
 # --
 
-cdef extern from "nucpot.h":
-    void compute_grid_nucpot(double* coordinates, double* charges, long natom,
-                             double* points, double* output, long npoint)
+
+from gbasis.pxds cimport gbasis
+
+cdef extern from "grids/iter_gb1.h":
+    cdef cppclass IterGB1:
+        IterGB1(gbasis.GBasis* gbasis)
+
+        bint inc_shell()
+        void update_shell()
+        bint inc_prim()
+        void update_prim()
+        void store(double* work, double* output, long dim)
+
+        # 'public' iterator fields
+        long shell_type0
+        double con_coeff, alpha0
+        double* r0
+        double* scales0
+        long ibasis0
+
+        # 'private' iterator fields
+        long ishell0
+        long nprim0, iprim0, oprim0

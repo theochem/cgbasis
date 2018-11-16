@@ -5,13 +5,13 @@ import numpy as np # Must include this line after cimport numpy
 
 cimport libc.string
 
-from gbasis cimport iter_pow
-from gbasis cimport iter_gb
-from gbasis cimport ints
-from gbasis cimport gbw
-from gbasis cimport common
-from gbasis cimport boys
-from gbasis cimport cartpure
+from gbasis.pxds cimport iter_pow
+from gbasis.pxds cimport iter_gb
+from gbasis.pxds cimport ints
+from gbasis.pxds cimport gbw
+from gbasis.pxds cimport common
+from gbasis.pxds cimport boys
+from gbasis.pxds cimport cartpure
 from gbasis.cext cimport GBasis, GOBasis, _get_shell_nbasis
 
 __all__ = [

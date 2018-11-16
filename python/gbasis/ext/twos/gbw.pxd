@@ -18,8 +18,16 @@
 # along with this program; if not, see <http://www.gnu.org/licenses/>
 #
 # --
+from .. cimport c_gbasis
+cimport c_ints4
 
-
-cdef extern from "boys.h":
-    double boys_function(long m, double t) except +
-    void boys_function_array(long mmax, double t, double *output) except +
+cdef extern from "twos/gbw.h":
+    cdef cppclass GB4IntegralWrapper:
+        GB4IntegralWrapper(c_gbasis.GOBasis* gobasis, c_ints4.GB4Integral* gb4int)
+        long get_nbasis()
+        void select_2index(long index0, long index2,
+                            long* pbegin0, long* pend0,
+                            long* pbegin2, long* pend2)
+        void compute()
+        void compute_diagonal(double* diagonal)
+        double* get_2index_slice(long index0, long index2)

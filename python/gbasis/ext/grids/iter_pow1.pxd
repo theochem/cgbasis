@@ -18,16 +18,13 @@
 # along with this program; if not, see <http://www.gnu.org/licenses/>
 #
 # --
-cimport gbasis
-cimport ints
 
-cdef extern from "gbw.h":
-    cdef cppclass GB4IntegralWrapper:
-        GB4IntegralWrapper(gbasis.GOBasis* gobasis, ints.GB4Integral* gb4int)
-        long get_nbasis()
-        void select_2index(long index0, long index2,
-                            long* pbegin0, long* pend0,
-                            long* pbegin2, long* pend2)
-        void compute()
-        void compute_diagonal(double* diagonal)
-        double* get_2index_slice(long index0, long index2)
+
+cdef extern from "grids/iter_pow1.h":
+    bint iter_pow1_inc(long* n)
+
+    cdef cppclass IterPow1:
+        void reset(long shell_type0)
+        bint inc()
+        long n0[3]
+        long ibasis0

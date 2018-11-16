@@ -1,0 +1,33 @@
+package:
+  version: "{{ PROJECT_VERSION }}"
+  name: 'gbasis'
+
+source:
+  path: ../
+
+build:
+  number: 0
+
+requirements:
+  host:
+    - python ={{ MYCONDAPY }}
+    - libint =2.0.3 
+    - cython >=0.24.1
+    - numpy
+    - setuptools
+    - nose
+  run:
+    - python >=3
+    - numpy
+    - scipy
+    - nose
+test:
+  requires:
+    - nose
+  commands:
+    - nosetests -v --detailed-errors gbasis
+    - conda inspect linkages gbasis
+
+about:
+  home: https://github.com/theochem/gbasis
+  license: GPL3
