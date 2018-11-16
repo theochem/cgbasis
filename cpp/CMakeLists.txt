@@ -3,7 +3,7 @@
 cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
 
 # Specify the project, its version and the used language
-project(GBasis
+project(gbasis
         LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -35,11 +35,12 @@ include(src/twos/CMakeLists.txt)
 include(src/grids/CMakeLists.txt)
 include(src/sparse/CMakeLists.txt)
 
-
-# Add the public headers to the target
-set_target_properties(${LIBRARY_NAME} PROPERTIES
-        PUBLIC_HEADER "${INCLUDES_LIST}"
-        )
+# Install the headers
+install(DIRECTORY "${CMAKE_SOURCE_DIR}/src/" # source directory
+        DESTINATION "include" # target directory
+        FILES_MATCHING # install only matched files
+        PATTERN "*.h" # select header files
+)
 
 
 # Make the install target for this library
