@@ -339,12 +339,12 @@ class GB1ExpGridOrbGradientFn : public GB1ExpGridFn {
                                       long nbasis, double *output);
 
  protected:
-  long *iorbs;     // !< Array of indices of orbitals to be evaluated on grid.
-  long norb;       // !< The number of elements in iorbs.
   double poly_work[MAX_NCART_CUMUL_D];  // !< Work array with Cartesian polynomials.
   long offset;     // !< Offset for the polynomials for the density
   long offset_l1;  // !< Lower offset for the polynomials for the gradient.
   long offset_h1;  // !< Higher offset for the polynomials for the gradient.
+  long *iorbs;     // !< Array of indices of orbitals to be evaluated on grid.
+  long norb;       // !< The number of elements in iorbs.
 };
 
 /** @brief
