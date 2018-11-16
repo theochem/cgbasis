@@ -25,9 +25,6 @@ include(${CMAKE_SOURCE_DIR}/cmake/FindPackages.cmake)
 # Make a library target
 add_library(${LIBRARY_NAME} ${LIBRARY_TYPE})
 
-target_include_directories(${LIBRARY_NAME} PRIVATE ${MKL_INCLUDE_DIRS})
-target_link_libraries(${LIBRARY_NAME} PRIVATE ${MKL_LIBRARIES})
-
 target_include_directories(${LIBRARY_NAME} PRIVATE ${Libint2_INCLUDE_DIRS})
 target_link_libraries(${LIBRARY_NAME} PRIVATE ${Libint2_LIBRARIES})
 
@@ -37,6 +34,12 @@ include(src/ones/CMakeLists.txt)
 include(src/twos/CMakeLists.txt)
 include(src/grids/CMakeLists.txt)
 include(src/sparse/CMakeLists.txt)
+
+
+# Add the public headers to the target
+set_target_properties(${LIBRARY_NAME} PROPERTIES
+        PUBLIC_HEADER "${INCLUDES_LIST}"
+        )
 
 
 # Make the install target for this library

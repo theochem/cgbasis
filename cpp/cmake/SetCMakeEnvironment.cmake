@@ -16,20 +16,3 @@ set(EXPORT_TYPE LIBRARY)
 
 # Find the source folder
 set(PROJECT_SOURCE_FOLDER ${CMAKE_SOURCE_DIR}/src)
-
-# Find the source files
-set(PROJECT_SOURCE_FILES
-        ${PROJECT_SOURCE_FOLDER}/io.cpp
-        ${PROJECT_SOURCE_FOLDER}/linalg.cpp
-        ${PROJECT_SOURCE_FOLDER}/miscellaneous.cpp)
-
-# Find the header folder
-set(PROJECT_INCLUDE_FOLDER ${CMAKE_SOURCE_DIR}/include)
-
-# Find the header files (not including version.hpp.in)
-set(PROJECT_INCLUDE_FILES
-        ${PROJECT_INCLUDE_FOLDER}/cpputil.hpp
-        ${PROJECT_INCLUDE_FOLDER}/io.hpp
-        ${PROJECT_INCLUDE_FOLDER}/linalg.hpp
-        ${PROJECT_INCLUDE_FOLDER}/miscellaneous.hpp
-        ${PROJECT_INCLUDE_FOLDER}/version.hpp)

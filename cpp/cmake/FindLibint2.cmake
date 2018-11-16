@@ -30,5 +30,4 @@ else()
 	    PATHS ${Libint2_LIBRARIES} ${LIBINT_PREFIX}/lib)
 
     message(STATUS "Libint2 was found at ${LIBINT_PREFIX}")
-    message(STATUS "Settings Libint2_INCLUDE_DIRS to ${Libint2_INCLUDE_DIRS}")
 endif()
