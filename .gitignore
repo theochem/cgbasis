@@ -118,5 +118,5 @@ tools/libs/matplotlibrc
 tools/libs/cached
 
 # Ignore (in-place) build results
-cext.cpp
-cext.so
+python/gbasis/cext*.cpp
+python/gbasis/cext*.so

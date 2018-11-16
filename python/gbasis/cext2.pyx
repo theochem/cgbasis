@@ -20,7 +20,7 @@
 # --
 
 #!python
-#cython: embedsignature=True
+#cython: embedsignature=True, language_level=3
 
 """C++ extensions"""
 
@@ -30,7 +30,7 @@ import numpy as np
 np.import_array()
 
 from cext_common cimport GBasis, _check_shape, _prepare_array
-from ext cimport c_gbasis
+from gbasis.ext cimport c_gbasis
 
 __all__ = [
     'GOBasis2',

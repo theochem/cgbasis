@@ -20,14 +20,14 @@
 # --
 
 #!python
-#cython: embedsignature=True
+#cython: embedsignature=True, language_level=3
 
 """C++ extensions"""
 cimport numpy as np
 import numpy as np
 
 from cext_common cimport _check_shape, _prepare_array, GBasis
-from ext cimport c_gbasis
+from gbasis.ext cimport c_gbasis
 
 __all__ = [
     'GOBasis1',

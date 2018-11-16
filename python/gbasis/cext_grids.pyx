@@ -20,7 +20,7 @@
 # --
 
 #!python
-#cython: embedsignature=True
+#cython: embedsignature=True, language_level=3
 
 """C++ extensions"""
 cimport numpy as np
@@ -30,9 +30,9 @@ np.import_array()
 
 from cext_common cimport GBasis, _check_shape, _prepare_array, _get_shell_nbasis
 
-from ext cimport c_gbasis
-from ext.grids cimport c_fns
-from ext.grids cimport c_nucpot
+from gbasis.ext cimport c_gbasis
+from gbasis.ext.grids cimport c_fns
+from gbasis.ext.grids cimport c_nucpot
 
 __all__ = [
     # common
@@ -480,9 +480,9 @@ cdef class GOBasisGrid(GBasis):
             raise TypeError('stride[0] of the pots argument must be a multiple of 8.')
         if pots.strides[1] % 8 != 0:
             raise TypeError('stride[1] of the pots argument must be a multiple of 8.')
-        pot_stride = (pots.strides[0]/8)
+        pot_stride = (pots.strides[0]//8)
         if pots.shape[1] > 1:
-            pot_stride *= (pots.strides[1]/8)
+            pot_stride *= (pots.strides[1]//8)
         self._this.compute_grid1_fock(
             npoint, &points[0, 0], &weights[0], pot_stride, &pots[0, 0], grid_fn._baseptr,
             &fock[0, 0])

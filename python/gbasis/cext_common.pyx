@@ -1,4 +1,4 @@
-# cython: language_level=3
+# cython: embedsignature=True, language_level=3
 
 from typing import Iterable, Tuple, Type, List, Union
 

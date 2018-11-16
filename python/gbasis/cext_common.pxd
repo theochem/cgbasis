@@ -1,7 +1,9 @@
+#cython: language_level=3
+
 from typing import Tuple, Union
 
 cimport numpy as np
-from ext cimport c_gbasis
+from gbasis.ext cimport c_gbasis
 
 # cdef _prepare_array(array: Union[np.ndarray, None], shape: Tuple[int], name: str)
 # cdef _check_shape(array: Union[np.ndarray, memoryview], shape: Tuple[int], name: str)
