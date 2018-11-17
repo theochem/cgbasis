@@ -26,7 +26,7 @@
 cimport numpy as np
 import numpy as np
 
-from cext_common cimport _check_shape, _prepare_array, GBasis
+from gbasis.cext_common cimport _check_shape, _prepare_array, GBasis
 from gbasis.pxds cimport c_gbasis
 
 __all__ = [

@@ -20,7 +20,11 @@
 # --
 """Gaussian basis sets"""
 
-from gbasis.cext import *
+from gbasis.cext_common import *
+from gbasis.cext1 import *
+from gbasis.cext2 import *
+from gbasis.cext_grids import *
+# from gbasis.cext_sparse import *
 from gbasis.gobasis import *
 from gbasis.iobas import *
 from gbasis.bsets import *

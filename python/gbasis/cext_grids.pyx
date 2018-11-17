@@ -28,7 +28,7 @@ import numpy as np
 
 np.import_array()
 
-from cext_common cimport GBasis, _check_shape, _prepare_array, _get_shell_nbasis
+from gbasis.cext_common cimport GBasis, _check_shape, _prepare_array, _get_shell_nbasis
 
 from gbasis.pxds cimport c_gbasis
 from gbasis.pxds.grids cimport c_fns

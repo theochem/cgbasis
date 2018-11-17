@@ -29,7 +29,7 @@ import numpy as np
 
 np.import_array()
 
-from cext_common cimport GBasis, _check_shape, _prepare_array
+from gbasis.cext_common cimport GBasis, _check_shape, _prepare_array
 from gbasis.pxds cimport c_gbasis
 
 __all__ = [

@@ -7,8 +7,8 @@ import numpy as np
 
 np.import_array()
 
-cimport c_common
-cimport c_gbasis
+from gbasis.pxds cimport c_common
+from gbasis.pxds cimport c_gbasis
 
 
 cdef _check_shape(array, shape, name):
