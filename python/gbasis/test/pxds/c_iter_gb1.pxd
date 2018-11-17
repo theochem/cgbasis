@@ -20,18 +20,25 @@
 # --
 
 
-cdef extern from "iter_pow.h":
-    bint iter_pow1_inc(long* n)
+from gbasis.pxds cimport c_gbasis
 
-    cdef cppclass IterPow1:
-        void reset(long shell_type0)
-        bint inc()
-        long n0[3]
+cdef extern from "grids/iter_gb1.h":
+    cdef cppclass IterGB1:
+        IterGB1(c_gbasis.GBasis* gbasis)
+
+        bint inc_shell()
+        void update_shell()
+        bint inc_prim()
+        void update_prim()
+        void store(double* work, double* output, long dim)
+
+        # 'public' iterator fields
+        long shell_type0
+        double con_coeff, alpha0
+        double* r0
+        double* scales0
         long ibasis0
 
-    cdef cppclass IterPow2:
-        void reset(long shell_type0, long shell_type1)
-        bint inc()
-        long n0[3]
-        long n1[3]
-        long offset, ibasis0, ibasis1
+        # 'private' iterator fields
+        long ishell0
+        long nprim0, iprim0, oprim0

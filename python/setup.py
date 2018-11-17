@@ -56,6 +56,12 @@ ext_modules = [Extension("gbasis.cext_common", ["gbasis/cext_common.pyx"],
                          extra_compile_args=get_cxxflags(),
                          language="c++",
                          ),
+               Extension("gbasis.test.cext", ["gbasis/test/cext.pyx"],
+                         include_dirs=[np.get_include()] + get_include_path(),
+                         libraries=["gbasis"],
+                         extra_compile_args=get_cxxflags(),
+                         language="c++",
+                         ),
                ]
 
 setup(
@@ -70,7 +76,7 @@ setup(
     packages=["gbasis", "gbasis.test", "gbasis.bsets", "gbasis.test.cached"],
     package_data={"gbasis.bsets": ["*"],
                   "gbasis.test.cached": ["*/*"]},
-    ext_modules=cythonize(ext_modules, include_path=["gbasis/ext", "gbasis"]),
+    ext_modules=cythonize(ext_modules, include_path=["gbasis/pxds", "gbasis", "gbasis/test/pxds"]),
     include_package_data=True,
     classifiers=[
         "Environment :: Console",

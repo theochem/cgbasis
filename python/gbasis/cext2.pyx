@@ -30,15 +30,15 @@ import numpy as np
 np.import_array()
 
 from cext_common cimport GBasis, _check_shape, _prepare_array
-from gbasis.ext cimport c_gbasis
+from gbasis.pxds cimport c_gbasis
 
 __all__ = [
     'GOBasis2',
 ]
 
 cdef class GOBasis2(GBasis):
-    cdef public list _biblio
-    cdef c_gbasis.GOBasis* _this
+    # cdef public list _biblio
+    # cdef c_gbasis.GOBasis* _this
 
     def __cinit__(self, centers, shell_map, nprims, shell_types, alphas, con_coeffs):
         self._this = new c_gbasis.GOBasis(

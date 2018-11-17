@@ -119,4 +119,5 @@ tools/libs/cached
 
 # Ignore (in-place) build results
 python/gbasis/cext*.cpp
+python/gbasis/test/cext*.cpp
 python/gbasis/cext*.so

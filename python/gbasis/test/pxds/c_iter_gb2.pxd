@@ -20,11 +20,11 @@
 # --
 
 
-from gbasis.ext cimport c_gbasis
+from gbasis.pxds cimport c_gbasis
 
-cdef extern from "twos/iter_gb4.h":
-    cdef cppclass IterGB4:
-        IterGB4(c_gbasis.GBasis* gbasis)
+cdef extern from "ones/iter_gb2.h":
+    cdef cppclass IterGB2:
+        IterGB2(c_gbasis.GBasis* gbasis)
 
         bint inc_shell()
         void update_shell()
@@ -33,21 +33,14 @@ cdef extern from "twos/iter_gb4.h":
         void store(double* work, double* output)
 
         # 'public' iterator fields
-        long shell_type0, shell_type1, shell_type2, shell_type3
-        long ishell3_max
-        double con_coeff, alpha0, alpha1, alpha2, alpha3
+        long shell_type0, shell_type1
+        double con_coeff, alpha0, alpha1
         double* r0
         double* r1
-        double* r2
-        double* r3
         double* scales0
         double* scales1
-        double* scales2
-        double* scales3
-        long ibasis0, ibasis1, ibasis2, ibasis3
+        long ibasis0, ibasis1
 
         # 'private' iterator fields
-        long ishell0, ishell1, ishell2, ishell3
-        long nprim0, nprim1, nprim2, nprim3
-        long iprim0, iprim1, iprim2, iprim3
-        long oprim0, oprim1, oprim2, oprim3
+        long ishell0, ishell1
+        long nprim0, nprim1, iprim0, iprim1, oprim0, oprim1

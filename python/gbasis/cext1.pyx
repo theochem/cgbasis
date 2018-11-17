@@ -27,7 +27,7 @@ cimport numpy as np
 import numpy as np
 
 from cext_common cimport _check_shape, _prepare_array, GBasis
-from gbasis.ext cimport c_gbasis
+from gbasis.pxds cimport c_gbasis
 
 __all__ = [
     'GOBasis1',
@@ -41,8 +41,8 @@ __all__ = [
 
 
 cdef class GOBasis1(GBasis):
-    cdef public list _biblio
-    cdef c_gbasis.GOBasis* _this
+    # cdef public list _biblio
+    # cdef c_gbasis.GOBasis* _this
 
     def __cinit__(self, centers, shell_map, nprims, shell_types, alphas, con_coeffs):
         self._this = new c_gbasis.GOBasis(

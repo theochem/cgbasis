@@ -30,9 +30,9 @@ np.import_array()
 
 from cext_common cimport GBasis, _check_shape, _prepare_array, _get_shell_nbasis
 
-from gbasis.ext cimport c_gbasis
-from gbasis.ext.grids cimport c_fns
-from gbasis.ext.grids cimport c_nucpot
+from gbasis.pxds cimport c_gbasis
+from gbasis.pxds.grids cimport c_fns
+from gbasis.pxds.grids cimport c_nucpot
 
 __all__ = [
     # common

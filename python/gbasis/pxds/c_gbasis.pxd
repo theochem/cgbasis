@@ -19,8 +19,10 @@
 #
 # --
 
+#cython:language_level=3
 
-from gbasis.ext.grids cimport c_fns
+
+from gbasis.pxds.grids cimport c_fns
 
 cdef extern from "gbasis.h":
     double gob_cart_normalization(double alpha, long* n)

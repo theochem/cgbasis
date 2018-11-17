@@ -18,27 +18,16 @@
 # along with this program; if not, see <http://www.gnu.org/licenses/>
 #
 # --
+from gbasis.pxds cimport c_gbasis
+from gbasis.pxds.twos cimport c_ints4
 
-
-from gbasis.pxds cimport gbasis
-
-cdef extern from "grids/iter_gb1.h":
-    cdef cppclass IterGB1:
-        IterGB1(gbasis.GBasis* gbasis)
-
-        bint inc_shell()
-        void update_shell()
-        bint inc_prim()
-        void update_prim()
-        void store(double* work, double* output, long dim)
-
-        # 'public' iterator fields
-        long shell_type0
-        double con_coeff, alpha0
-        double* r0
-        double* scales0
-        long ibasis0
-
-        # 'private' iterator fields
-        long ishell0
-        long nprim0, iprim0, oprim0
+cdef extern from "twos/gbw.h":
+    cdef cppclass GB4IntegralWrapper:
+        GB4IntegralWrapper(c_gbasis.GOBasis* gobasis, c_ints4.GB4Integral* gb4int)
+        long get_nbasis()
+        void select_2index(long index0, long index2,
+                            long* pbegin0, long* pend0,
+                            long* pbegin2, long* pend2)
+        void compute()
+        void compute_diagonal(double* diagonal)
+        double* get_2index_slice(long index0, long index2)

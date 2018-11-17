@@ -18,16 +18,20 @@
 # along with this program; if not, see <http://www.gnu.org/licenses/>
 #
 # --
-from .. cimport c_gbasis
-cimport c_ints4
 
-cdef extern from "twos/gbw.h":
-    cdef cppclass GB4IntegralWrapper:
-        GB4IntegralWrapper(c_gbasis.GOBasis* gobasis, c_ints4.GB4Integral* gb4int)
-        long get_nbasis()
-        void select_2index(long index0, long index2,
-                            long* pbegin0, long* pend0,
-                            long* pbegin2, long* pend2)
-        void compute()
-        void compute_diagonal(double* diagonal)
-        double* get_2index_slice(long index0, long index2)
+
+cdef extern from "ones/iter_pow2.h":
+    bint iter_pow1_inc(long* n)
+
+    cdef cppclass IterPow1:
+        void reset(long shell_type0)
+        bint inc()
+        long n0[3]
+        long ibasis0
+
+    cdef cppclass IterPow2:
+        void reset(long shell_type0, long shell_type1)
+        bint inc()
+        long n0[3]
+        long n1[3]
+        long offset, ibasis0, ibasis1

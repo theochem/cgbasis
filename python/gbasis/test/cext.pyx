@@ -1,3 +1,5 @@
+#cython: language_level=3
+
 cimport numpy as np
 np.import_array()
 
@@ -5,14 +7,20 @@ import numpy as np # Must include this line after cimport numpy
 
 cimport libc.string
 
-from gbasis.pxds cimport iter_pow
-from gbasis.pxds cimport iter_gb
-from gbasis.pxds cimport ints
-from gbasis.pxds cimport gbw
-from gbasis.pxds cimport common
-from gbasis.pxds cimport boys
-from gbasis.pxds cimport cartpure
-from gbasis.cext cimport GBasis, GOBasis, _get_shell_nbasis
+from gbasis.cext_common cimport GBasis, _get_shell_nbasis
+from gbasis.cext2 cimport GOBasis2
+from gbasis.pxds cimport c_common
+from gbasis.pxds cimport c_cartpure
+
+from gbasis.test.pxds cimport c_iter_pow1
+from gbasis.test.pxds cimport c_iter_pow2
+from gbasis.test.pxds cimport c_iter_gb1
+from gbasis.test.pxds cimport c_iter_gb2
+from gbasis.test.pxds cimport c_iter_gb4
+from gbasis.test.pxds cimport c_ints2
+from gbasis.pxds.twos cimport c_ints4
+from gbasis.test.pxds cimport c_boys
+from gbasis.pxds.sparse cimport gbw
 
 __all__ = [
     # boys
@@ -43,12 +51,12 @@ __all__ = [
 
 
 def _boys_function(long m, double t):
-    return boys.boys_function(m, t)
+    return c_boys.boys_function(m, t)
 
 
 def _boys_function_array(long mmax, double t):
     cdef double[::1] output = np.zeros(mmax+1)
-    boys.boys_function_array(mmax, t, &output[0])
+    c_boys.boys_function_array(mmax, t, &output[0])
     return output
 
 
@@ -60,7 +68,7 @@ def _boys_function_array(long mmax, double t):
 def _cart_to_pure_low(double[::1] work_cart not None,
                      double[::1] work_pure not None,
                      long shell_type, long nant, long npost):
-    cartpure.cart_to_pure_low(
+    c_cartpure.cart_to_pure_low(
         &work_cart[0], &work_pure[0], shell_type, nant,
         npost
     )
@@ -70,54 +78,54 @@ def _cart_to_pure_low(double[::1] work_cart not None,
 #
 
 def _fac(long n):
-    return common.fac(n)
+    return c_common.fac(n)
 
 
 def _fac2(long n):
-    return common.fac2(n)
+    return c_common.fac2(n)
 
 
 def _binom(long n, long m):
-    return common.binom(n, m)
+    return c_common.binom(n, m)
 
 def _get_max_shell_type():
-    return common.get_max_shell_type()
+    return c_common.get_max_shell_type()
 
 
 def _gpt_coeff(long k, long n0, long n1, double pa, double pb):
-    return common.gpt_coeff(k, n0, n1, pa, pb)
+    return c_common.gpt_coeff(k, n0, n1, pa, pb)
 
 
 def _gb_overlap_int1d(long n0, long n1, double pa, double pb, double inv_gamma):
-    return common.gb_overlap_int1d(n0, n1, pa, pb, inv_gamma)
+    return c_common.gb_overlap_int1d(n0, n1, pa, pb, inv_gamma)
 
 
 def _nuclear_attraction_helper(double[::1] work_g not None,
                                 long n0, long n1, double pa, double pb, double cp,
                                 double gamma_inv):
     assert work_g.shape[0] == n0+n1+1
-    common.nuclear_attraction_helper(&work_g[0], n0, n1, pa, pb, cp, gamma_inv)
+    c_common.nuclear_attraction_helper(&work_g[0], n0, n1, pa, pb, cp, gamma_inv)
 
 def _cit(int i, double t, int m):
-        return common.cit(i, t, m)
+        return c_common.cit(i, t, m)
 
 def _jfac(int j, int n):
-    return common.jfac(j, n)
+    return c_common.jfac(j, n)
 
 def _dtaylor(int n, double alpha, double t, double tfactor):
-    return common.dtaylor(n, alpha, t, tfactor)
+    return c_common.dtaylor(n, alpha, t, tfactor)
 
 
 #
 # gbw wrappers
 #
 
-def _select_2index(GOBasis gobasis, long index0, long index2):
+def _select_2index(GOBasis2 gobasis, long index0, long index2):
     """Select 2index 2e ints to compute. For cholesky testing only"""
     assert 0 <= index0 < gobasis.nbasis
     assert 0 <= index2 < gobasis.nbasis
 
-    cdef ints.GB4ElectronRepulsionIntegralLibInt* gb4int = NULL
+    cdef c_ints4.GB4ElectronRepulsionIntegralLibInt* gb4int = NULL
     cdef gbw.GB4IntegralWrapper* gb4w = NULL
 
     cdef long pbegin0
@@ -126,10 +134,10 @@ def _select_2index(GOBasis gobasis, long index0, long index2):
     cdef long pend2
 
     try:
-        gb4int = new ints.GB4ElectronRepulsionIntegralLibInt(
+        gb4int = new c_ints4.GB4ElectronRepulsionIntegralLibInt(
                             gobasis.max_shell_type)
         gb4w = new gbw.GB4IntegralWrapper(gobasis._this,
-                            <ints.GB4Integral*> gb4int)
+                            <c_ints4.GB4Integral*> gb4int)
         gb4w.select_2index(index0, index2, &pbegin0, &pend0, &pbegin2, &pend2)
     finally:
         if gb4int is not NULL:
@@ -139,18 +147,18 @@ def _select_2index(GOBasis gobasis, long index0, long index2):
     return pbegin0, pend0, pbegin2, pend2
 
 
-def _compute_diagonal(GOBasis gobasis, double[:, ::1] diagonal not None):
+def _compute_diagonal(GOBasis2 gobasis, double[:, ::1] diagonal not None):
     """Get the diagonal 2e ints. For cholesky testing only"""
-    cdef ints.GB4ElectronRepulsionIntegralLibInt* gb4int = NULL
+    cdef c_ints4.GB4ElectronRepulsionIntegralLibInt* gb4int = NULL
     cdef gbw.GB4IntegralWrapper* gb4w = NULL
     cdef double[:, ::1] output
     output = diagonal
 
     try:
-        gb4int = new ints.GB4ElectronRepulsionIntegralLibInt(
+        gb4int = new c_ints4.GB4ElectronRepulsionIntegralLibInt(
                             gobasis.max_shell_type)
         gb4w = new gbw.GB4IntegralWrapper(gobasis._this,
-                            <ints.GB4Integral*> gb4int)
+                            <c_ints4.GB4Integral*> gb4int)
         gb4w.compute_diagonal(&output[0, 0])
 
     finally:
@@ -159,10 +167,10 @@ def _compute_diagonal(GOBasis gobasis, double[:, ::1] diagonal not None):
         if gb4w is not NULL:
             del gb4w
 
-def _get_2index_slice(GOBasis gobasis, long index0, long index2,
+def _get_2index_slice(GOBasis2 gobasis, long index0, long index2,
                      double[:, ::1] index_slice not None):
     """Get a 2-index slice. For cholesky testing only."""
-    cdef ints.GB4ElectronRepulsionIntegralLibInt* gb4int = NULL
+    cdef c_ints4.GB4ElectronRepulsionIntegralLibInt* gb4int = NULL
     cdef gbw.GB4IntegralWrapper* gb4w = NULL
     assert index_slice.shape[0] == gobasis.nbasis
     assert index_slice.shape[1] == gobasis.nbasis
@@ -173,10 +181,10 @@ def _get_2index_slice(GOBasis gobasis, long index0, long index2,
     cdef long pend2
     cdef double* output
     try:
-        gb4int = new ints.GB4ElectronRepulsionIntegralLibInt(
+        gb4int = new c_ints4.GB4ElectronRepulsionIntegralLibInt(
                             gobasis.max_shell_type)
         gb4w = new gbw.GB4IntegralWrapper(gobasis._this,
-                            <ints.GB4Integral*> gb4int)
+                            <c_ints4.GB4Integral*> gb4int)
         gb4w.select_2index(index0, index2, &pbegin0, &pend0, &pbegin2, &pend2)
         gb4w.compute()
         output = gb4w.get_2index_slice(index0, index2)
@@ -198,7 +206,7 @@ def _get_2index_slice(GOBasis gobasis, long index0, long index2,
 
 cdef class _GB2Integral:
     """Wrapper for ints.GB2Integral, for testing only"""
-    cdef ints.GB2Integral* _baseptr
+    cdef c_ints2.GB2Integral* _baseptr
 
     def __dealloc__(self):
         del self._baseptr
@@ -253,20 +261,20 @@ cdef class _GB2Integral:
 
 cdef class _GB2OverlapIntegral(_GB2Integral):
     """Wrapper for ints.GB2OverlapIntegral, for testing only"""
-    cdef ints.GB2OverlapIntegral* _this
+    cdef c_ints2.GB2OverlapIntegral* _this
 
     def __cinit__(self, long max_nbasis):
-        self._this = new ints.GB2OverlapIntegral(max_nbasis)
-        self._baseptr = <ints.GB2Integral*> self._this
+        self._this = new c_ints2.GB2OverlapIntegral(max_nbasis)
+        self._baseptr = <c_ints2.GB2Integral*> self._this
 
 
 cdef class _GB2KineticIntegral(_GB2Integral):
     """Wrapper for ints.GB2KineticIntegral, for testing only"""
-    cdef ints.GB2KineticIntegral* _this
+    cdef c_ints2.GB2KineticIntegral* _this
 
     def __cinit__(self, long max_nbasis):
-        self._this = new ints.GB2KineticIntegral(max_nbasis)
-        self._baseptr = <ints.GB2Integral*> self._this
+        self._this = new c_ints2.GB2KineticIntegral(max_nbasis)
+        self._baseptr = <c_ints2.GB2Integral*> self._this
 
 
 cdef class _GB2NuclearAttractionIntegral(_GB2Integral):
@@ -274,7 +282,7 @@ cdef class _GB2NuclearAttractionIntegral(_GB2Integral):
     # make an additional reference to these arguments to avoid deallocation
     cdef double[::1] _charges
     cdef double[:, ::1] _centers
-    cdef ints.GB2NuclearAttractionIntegral* _this
+    cdef c_ints2.GB2NuclearAttractionIntegral* _this
 
     def __cinit__(self, long max_nbasis,
                   double[::1] charges not None,
@@ -283,10 +291,10 @@ cdef class _GB2NuclearAttractionIntegral(_GB2Integral):
         assert centers.shape[0] == ncharge
         self._charges = charges
         self._centers = centers
-        self._this = new ints.GB2NuclearAttractionIntegral(
+        self._this = new c_ints2.GB2NuclearAttractionIntegral(
            max_nbasis, &charges[0], &centers[0, 0], ncharge
         )
-        self._baseptr = <ints.GB2Integral*> self._this
+        self._baseptr = <c_ints2.GB2Integral*> self._this
 
 
 cdef class _GB2ErfAttractionIntegral(_GB2Integral):
@@ -294,7 +302,7 @@ cdef class _GB2ErfAttractionIntegral(_GB2Integral):
     # make an additional reference to these arguments to avoid deallocation
     cdef double[::1] _charges
     cdef double[:, ::1] _centers
-    cdef ints.GB2ErfAttractionIntegral* _this
+    cdef c_ints2.GB2ErfAttractionIntegral* _this
 
     def __cinit__(self, long max_nbasis,
                   double[::1] charges not None,
@@ -303,10 +311,10 @@ cdef class _GB2ErfAttractionIntegral(_GB2Integral):
         assert centers.shape[0] == ncharge
         self._charges = charges
         self._centers = centers
-        self._this = new ints.GB2ErfAttractionIntegral(
+        self._this = new c_ints2.GB2ErfAttractionIntegral(
             max_nbasis, &charges[0], &centers[0, 0], ncharge, mu
         )
-        self._baseptr = <ints.GB2Integral*> self._this
+        self._baseptr = <c_ints2.GB2Integral*> self._this
 
     @property
     def mu(self):
@@ -318,7 +326,7 @@ cdef class _GB2GaussAttractionIntegral(_GB2Integral):
     # make an additional reference to these arguments to avoid deallocation
     cdef double[::1] _charges
     cdef double[:, ::1] _centers
-    cdef ints.GB2GaussAttractionIntegral* _this
+    cdef c_ints2.GB2GaussAttractionIntegral* _this
 
     def __cinit__(self, long max_nbasis,
                   double[::1] charges not None,
@@ -328,10 +336,10 @@ cdef class _GB2GaussAttractionIntegral(_GB2Integral):
         assert centers.shape[0] == ncharge
         self._charges = charges
         self._centers = centers
-        self._this = new ints.GB2GaussAttractionIntegral(
+        self._this = new c_ints2.GB2GaussAttractionIntegral(
             max_nbasis, &charges[0], &centers[0, 0], ncharge, c, alpha
         )
-        self._baseptr = <ints.GB2Integral*> self._this
+        self._baseptr = <c_ints2.GB2Integral*> self._this
 
     @property
     def c(self):
@@ -349,11 +357,11 @@ cdef class _GB2GaussAttractionIntegral(_GB2Integral):
 
 cdef class _IterGB1:
     """Wrapper for the IterGB1 class, for testing only."""
-    cdef iter_gb.IterGB1* _this
+    cdef c_iter_gb1.IterGB1* _this
     cdef GBasis _gbasis
 
     def __cinit__(self, GBasis gbasis not None):
-        self._this = new iter_gb.IterGB1(gbasis._baseptr)
+        self._this = new c_iter_gb1.IterGB1(gbasis._baseptr)
         self._gbasis = gbasis
 
     def __dealloc__(self):
@@ -400,11 +408,11 @@ cdef class _IterGB1:
 
 cdef class _IterGB2:
     """Wrapper for the IterGB2 class, for testing only."""
-    cdef iter_gb.IterGB2* _this
+    cdef c_iter_gb2.IterGB2* _this
     cdef GBasis _gbasis
 
     def __cinit__(self, GBasis gbasis not None):
-        self._this = new iter_gb.IterGB2(gbasis._baseptr)
+        self._this = new c_iter_gb2.IterGB2(gbasis._baseptr)
         self._gbasis = gbasis
 
     def __dealloc__(self):
@@ -454,11 +462,11 @@ cdef class _IterGB2:
 
 cdef class _IterGB4:
     """Wrapper for the IterGB4 class, for testing only."""
-    cdef iter_gb.IterGB4* _this
+    cdef c_iter_gb4.IterGB4* _this
     cdef GBasis _gbasis
 
     def __cinit__(self, GBasis gbasis not None):
-        self._this = new iter_gb.IterGB4(gbasis._baseptr)
+        self._this = new c_iter_gb4.IterGB4(gbasis._baseptr)
         self._gbasis = gbasis
 
     def __dealloc__(self):
@@ -519,15 +527,15 @@ cdef class _IterGB4:
 
 def _iter_pow1_inc(long[::1] n not None):
     assert n.shape[0] == 3
-    return iter_pow.iter_pow1_inc(&n[0])
+    return c_iter_pow1.iter_pow1_inc(&n[0])
 
 
 cdef class _IterPow1:
     """Wrapper for the IterPow1 class, for testing only."""
-    cdef iter_pow.IterPow1* _c_i1p
+    cdef c_iter_pow1.IterPow1* _c_i1p
 
     def __cinit__(self):
-        self._c_i1p = new iter_pow.IterPow1()
+        self._c_i1p = new c_iter_pow1.IterPow1()
 
     def __dealloc__(self):
         del self._c_i1p
@@ -550,10 +558,10 @@ cdef class _IterPow1:
 
 cdef class _IterPow2:
     """Wrapper for the IterPow2 class, for testing only."""
-    cdef iter_pow.IterPow2* _c_i2p
+    cdef c_iter_pow2.IterPow2* _c_i2p
 
     def __cinit__(self):
-        self._c_i2p = new iter_pow.IterPow2()
+        self._c_i2p = new c_iter_pow2.IterPow2()
 
     def __dealloc__(self):
         del self._c_i2p
