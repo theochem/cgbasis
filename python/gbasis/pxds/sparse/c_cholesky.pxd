@@ -20,7 +20,7 @@
 # --
 from libcpp.vector cimport vector
 
-cimport gbw
+from gbasis.pxds.sparse cimport c_gbw
 
-cdef extern from "cholesky.h":
-    long cholesky(gbw.GB4IntegralWrapper* gbw4, vector[double]* vectors, double threshold)
+cdef extern from "sparse/cholesky.h":
+    long cholesky(c_gbw.GB4IntegralWrapper* gbw4, vector[double]* vectors, double threshold)

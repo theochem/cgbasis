@@ -20,7 +20,7 @@ from gbasis.test.pxds cimport c_iter_gb4
 from gbasis.test.pxds cimport c_ints2
 from gbasis.pxds.twos cimport c_ints4
 from gbasis.test.pxds cimport c_boys
-from gbasis.pxds.sparse cimport gbw
+from gbasis.pxds.sparse cimport c_gbw
 
 __all__ = [
     # boys
@@ -126,7 +126,7 @@ def _select_2index(GOBasis2 gobasis, long index0, long index2):
     assert 0 <= index2 < gobasis.nbasis
 
     cdef c_ints4.GB4ElectronRepulsionIntegralLibInt* gb4int = NULL
-    cdef gbw.GB4IntegralWrapper* gb4w = NULL
+    cdef c_gbw.GB4IntegralWrapper* gb4w = NULL
 
     cdef long pbegin0
     cdef long pend0
@@ -136,7 +136,7 @@ def _select_2index(GOBasis2 gobasis, long index0, long index2):
     try:
         gb4int = new c_ints4.GB4ElectronRepulsionIntegralLibInt(
                             gobasis.max_shell_type)
-        gb4w = new gbw.GB4IntegralWrapper(gobasis._this,
+        gb4w = new c_gbw.GB4IntegralWrapper(gobasis._this,
                             <c_ints4.GB4Integral*> gb4int)
         gb4w.select_2index(index0, index2, &pbegin0, &pend0, &pbegin2, &pend2)
     finally:
@@ -150,14 +150,14 @@ def _select_2index(GOBasis2 gobasis, long index0, long index2):
 def _compute_diagonal(GOBasis2 gobasis, double[:, ::1] diagonal not None):
     """Get the diagonal 2e ints. For cholesky testing only"""
     cdef c_ints4.GB4ElectronRepulsionIntegralLibInt* gb4int = NULL
-    cdef gbw.GB4IntegralWrapper* gb4w = NULL
+    cdef c_gbw.GB4IntegralWrapper* gb4w = NULL
     cdef double[:, ::1] output
     output = diagonal
 
     try:
         gb4int = new c_ints4.GB4ElectronRepulsionIntegralLibInt(
                             gobasis.max_shell_type)
-        gb4w = new gbw.GB4IntegralWrapper(gobasis._this,
+        gb4w = new c_gbw.GB4IntegralWrapper(gobasis._this,
                             <c_ints4.GB4Integral*> gb4int)
         gb4w.compute_diagonal(&output[0, 0])
 
@@ -171,7 +171,7 @@ def _get_2index_slice(GOBasis2 gobasis, long index0, long index2,
                      double[:, ::1] index_slice not None):
     """Get a 2-index slice. For cholesky testing only."""
     cdef c_ints4.GB4ElectronRepulsionIntegralLibInt* gb4int = NULL
-    cdef gbw.GB4IntegralWrapper* gb4w = NULL
+    cdef c_gbw.GB4IntegralWrapper* gb4w = NULL
     assert index_slice.shape[0] == gobasis.nbasis
     assert index_slice.shape[1] == gobasis.nbasis
 
@@ -183,7 +183,7 @@ def _get_2index_slice(GOBasis2 gobasis, long index0, long index2,
     try:
         gb4int = new c_ints4.GB4ElectronRepulsionIntegralLibInt(
                             gobasis.max_shell_type)
-        gb4w = new gbw.GB4IntegralWrapper(gobasis._this,
+        gb4w = new c_gbw.GB4IntegralWrapper(gobasis._this,
                             <c_ints4.GB4Integral*> gb4int)
         gb4w.select_2index(index0, index2, &pbegin0, &pend0, &pbegin2, &pend2)
         gb4w.compute()
