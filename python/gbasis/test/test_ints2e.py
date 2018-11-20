@@ -23,12 +23,14 @@
 
 import numpy as np
 
-from gbasis.cext import _get_shell_nbasis
-from .common import (load_obasis, load_json)
-from .. import (_GB4RAlphaIntegralLibInt, _GB4ErfIntegralLibInt, _GB4GaussIntegralLibInt,
-                _GB4ElectronRepulsionIntegralLibInt,
-                _GB4DeltaIntegralLibInt,
-                _GB4IntraDensIntegralLibInt, get_gobasis)
+from gbasis.cext_common import _get_shell_nbasis
+from .common import load_obasis2, load_json
+from gbasis.cext_sparse import (_GB4RAlphaIntegralLibInt, _GB4ErfIntegralLibInt,
+                                _GB4GaussIntegralLibInt,
+                                _GB4ElectronRepulsionIntegralLibInt,
+                                _GB4DeltaIntegralLibInt,
+                                _GB4IntraDensIntegralLibInt)
+from ..gobasis import get_gobasis2
 
 
 def test_gb4_erilibint_class():
@@ -1937,7 +1939,7 @@ def test_intracule_repulsion_0_0_0_0_simple4():
 
 def test_delta_repulsion_int0():
     fn = 'water_ccpvdz_pure_hf_g03_fchk'
-    obasis = load_obasis(fn)
+    obasis = load_obasis2(fn)
     obasis.compute_delta_repulsion(shift=np.zeros([4, 3]))
 
 
@@ -1945,11 +1947,11 @@ def test_delta_repulsion_int1():
     coords = np.array([[0., 0., 1.]])
     numbers = np.ones([1], dtype=int)
     basis = "sto-3g"
-    gobasis_ref = get_gobasis(coords, numbers, basis)
+    gobasis_ref = get_gobasis2(coords, numbers, basis)
 
     coords1 = np.array([[0, 0, 2]], dtype=float)
     shift = np.array([[0, 0, -1], [0, 0, -1], [0, 0, -1], [0, 0, -1, ]], dtype=float)
-    gobasis = get_gobasis(coords1, numbers, basis)
+    gobasis = get_gobasis2(coords1, numbers, basis)
 
     print(gobasis.compute_delta_repulsion(shift=shift))
 

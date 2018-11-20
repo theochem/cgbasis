@@ -189,9 +189,24 @@ def load_orbsb_dms(fn):
     return _compose_fn("orbs_b_dms", fn)
 
 
-def load_obasis(fn):
+def load_obasis1(fn):
     """Loads the cached from molecule, and returns a gobasis object."""
-    return gobasis.GOBasis(*getattr(gdata, fn))
+    return gobasis.GOBasis1(*getattr(gdata, fn))
+
+
+def load_obasis2(fn):
+    """Loads the cached from molecule, and returns a gobasis object."""
+    return gobasis.GOBasis2(*getattr(gdata, fn))
+
+
+def load_obasis_grid(fn):
+    """Loads the cached from molecule, and returns a gobasis object."""
+    return gobasis.GOBasisGrid(*getattr(gdata, fn))
+
+
+def load_obasis_sparse(fn):
+    """Loads the cached from molecule, and returns a gobasis object."""
+    return gobasis.GOBasisSparse(*getattr(gdata, fn))
 
 
 def load_mdata(fn):

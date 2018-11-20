@@ -24,7 +24,7 @@ import numpy as np
 from nose.tools import assert_raises
 
 from .common import tmpdir, load_mdata
-from .. import (GOBasisFamily, GOBasisContraction, go_basis_families, get_gobasis,
+from .. import (GOBasisFamily, GOBasisContraction, go_basis_families, get_gobasis1,
                 str_to_shell_types, dump_basis_atom_map_gbs, fortran_float, shell_type_to_str)
 from .. utils import to_bset_path
 
@@ -64,7 +64,7 @@ def test_go_basis_desc_neon_sto3g():
     gobasis_set = [GOBasisFamily('STO-3G', filename=to_bset_path('sto-3g.nwchem')),
                    GOBasisFamily('STO-3G', filename=to_bset_path('sto-3g.gbs'))]
     for gobasis in gobasis_set:
-        obasis = get_gobasis(np.array([[0.0, 0.0, 0.0]]), np.array([2]), gobasis)
+        obasis = get_gobasis1(np.array([[0.0, 0.0, 0.0]]), np.array([2]), gobasis)
         assert (obasis.shell_map == np.array([0])).all()
         assert (obasis.nprims == np.array([3])).all()
         assert (obasis.shell_types == np.array([0])).all()
@@ -77,7 +77,7 @@ def test_go_basis_desc_hydrogen_321g():
     gobasis_set = [GOBasisFamily('3-21G', filename=to_bset_path('3-21g.nwchem')),
                    GOBasisFamily('3-21G', filename=to_bset_path('3-21g.gbs'))]
     for gobasis in gobasis_set:
-        obasis = get_gobasis(np.array([[0.0, 0.0, 0.0]]), np.array([1]), gobasis)
+        obasis = get_gobasis1(np.array([[0.0, 0.0, 0.0]]), np.array([1]), gobasis)
         assert (obasis.shell_map == np.array([0, 0])).all()
         assert (obasis.nprims == np.array([2, 1])).all()
         assert (obasis.shell_types == np.array([0, 0])).all()
@@ -96,7 +96,7 @@ def test_go_basis_desc_lithium_321g():
     gobasis_set = [GOBasisFamily('3-21G', filename=to_bset_path('3-21g.nwchem')),
                    GOBasisFamily('3-21G', filename=to_bset_path('3-21g.gbs'))]
     for gobasis in gobasis_set:
-        obasis = get_gobasis(np.array([[0.0, 0.0, 0.0]]), np.array([3]), gobasis)
+        obasis = get_gobasis1(np.array([[0.0, 0.0, 0.0]]), np.array([3]), gobasis)
         assert (obasis.shell_map == np.array([0, 0, 0, 0, 0])).all()
         assert (obasis.nprims == np.array([3, 2, 2, 1, 1])).all()
         assert (obasis.shell_types == np.array([0, 0, 1, 0, 1])).all()
@@ -119,7 +119,7 @@ def test_go_basis_desc_water_sto3g():
     gobasis_set = [GOBasisFamily('STO-3G', filename=to_bset_path('sto-3g.nwchem')),
                    GOBasisFamily('STO-3G', filename=to_bset_path('sto-3g.gbs'))]
     for gobasis in gobasis_set:
-        obasis = get_gobasis(mol['coordinates'], mol['numbers'], gobasis)
+        obasis = get_gobasis1(mol['coordinates'], mol['numbers'], gobasis)
         assert (obasis.shell_map == np.array([0, 1, 1, 1, 2])).all()
         assert (obasis.nprims == np.array([3, 3, 3, 3, 3])).all()
         assert (obasis.shell_types == np.array([0, 0, 0, 1, 0])).all()

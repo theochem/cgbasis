@@ -22,14 +22,14 @@
 import numpy as np
 
 from .common import load_mdata
-from gbasis import get_gobasis
+from gbasis import get_gobasis2
 from gbasis.test.cext import _get_2index_slice, _select_2index, _compute_diagonal
 
 
 def get_h2o_er():
     fn = "water_xyz"
     mol = load_mdata(fn)
-    obasis = get_gobasis(mol["coordinates"], mol["numbers"], 'sto-3g')
+    obasis = get_gobasis2(mol["coordinates"], mol["numbers"], 'sto-3g')
     return obasis, obasis.compute_electron_repulsion()
 
 

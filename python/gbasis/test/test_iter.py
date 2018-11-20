@@ -23,7 +23,10 @@
 import numpy as np
 from nose.tools import assert_raises
 
-from gbasis.cext import GOBasis, _get_shell_nbasis
+from gbasis.cext_common import _get_shell_nbasis
+from gbasis.cext1 import GOBasis1
+from gbasis.cext2 import GOBasis2
+from gbasis.cext_grids import GOBasisGrid
 from gbasis.test.cext import _IterPow1, _IterPow2, _iter_pow1_inc, _IterGB1, _IterGB2, _IterGB4
 
 def test_iter_pow1_inc_l0():
@@ -155,7 +158,7 @@ def get_itergb1():
     shell_types = np.array([2, 1, 0, -2, 3, 0, 1])
     alphas = np.random.uniform(0.5, 2, nprims.sum())
     con_coeffs = np.random.uniform(-1, 1, nprims.sum())
-    gobasis = GOBasis(centers, shell_map, nprims, shell_types, alphas, con_coeffs)
+    gobasis = GOBasisGrid(centers, shell_map, nprims, shell_types, alphas, con_coeffs)
     return _IterGB1(gobasis), gobasis
 
 
@@ -272,7 +275,7 @@ def get_itergb2():
     shell_types = np.array([2, 1, 0, -2, 3, 0, 1])
     alphas = np.random.uniform(0.5, 2, nprims.sum())
     con_coeffs = np.random.uniform(-1, 1, nprims.sum())
-    gobasis = GOBasis(centers, shell_map, nprims, shell_types, alphas, con_coeffs)
+    gobasis = GOBasis1(centers, shell_map, nprims, shell_types, alphas, con_coeffs)
     return _IterGB2(gobasis), gobasis
 
 
@@ -504,7 +507,7 @@ def get_itergb4():
     shell_types = np.array([2, 1, -2, 3, 0])
     alphas = np.random.uniform(0.5, 2, nprims.sum())
     con_coeffs = np.random.uniform(-1, 1, nprims.sum())
-    gobasis = GOBasis(centers, shell_map, nprims, shell_types, alphas, con_coeffs)
+    gobasis = GOBasis2(centers, shell_map, nprims, shell_types, alphas, con_coeffs)
     return _IterGB4(gobasis), gobasis
 
 

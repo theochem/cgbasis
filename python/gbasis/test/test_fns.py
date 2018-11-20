@@ -25,10 +25,12 @@ from nose.plugins.attrib import attr
 from nose.tools import assert_raises
 
 from .lightgrid import generate_molecular_grid, integrate
-from .common import (load_obasis, load_dm, load_mdata, load_orbsa_coeffs, load_orbsb_coeffs,
+from .common import (load_obasis_grid, load_obasis1, load_dm, load_mdata, load_orbsa_coeffs,
+                     load_orbsb_coeffs,
                      load_orbsa_occs, load_orbsb_occs, load_orbsa_dms, load_orbsb_dms, check_delta)
-from .. import (GOBasis, GOBasisAtom, GOBasisContraction, _GB1DMGridGradientFn, _GB1DMGridDensityFn,
-                get_gobasis)
+from .. import (GOBasisGrid, GOBasisAtom, GOBasisContraction, _GB1DMGridGradientFn,
+                _GB1DMGridDensityFn,
+                get_gobasis_grid)
 
 
 def check_functional_deriv(fn, comp, dm_method, fock_method):
@@ -45,13 +47,13 @@ def check_functional_deriv(fn, comp, dm_method, fock_method):
     dm_method : function
         Computes from a density matrix the density properties of interest, e.g. density.
         This function takes three arguments: obasis, dm_full and points. (See e.g.
-        ``GOBasis.compute_grid_density_dm``)
+        ``GOBasisGrid.compute_grid_density_dm``)
     fock_method : function
         Computes from a potential on a grid, the fock operator. This function takes five
         arguments: obasis, points, weights, potential and fock. (See e.g.
-        ``GOBasis.compute_grid_density_fock``)
+        ``GOBasisGrid.compute_grid_density_fock``)
     """
-    obasis = load_obasis(fn)
+    obasis = load_obasis_grid(fn)
     dm_full = load_dm(fn)
 
     mol = load_mdata(fn)
@@ -233,7 +235,7 @@ def test_density_epsilon():
     mol = load_mdata(fn)
     points, weights = generate_molecular_grid(mol['numbers'], mol['coordinates'])
     dm_full = load_dm(fn)
-    obasis = load_obasis(fn)
+    obasis = load_obasis_grid(fn)
     rho1 = obasis.compute_grid_density_dm(dm_full, points)
     for epsilon in 1e-10, 1e-5, 1e-3, 1e-1:
         rho2 = obasis.compute_grid_density_dm(dm_full, points, epsilon=epsilon)
@@ -243,8 +245,8 @@ def test_density_epsilon():
 
 
 def test_density_functional_deriv():
-    check_functional_deriv('n2_hfs_sto3g_fchk', 0, GOBasis.compute_grid_density_dm,
-                           GOBasis.compute_grid_density_fock)
+    check_functional_deriv('n2_hfs_sto3g_fchk', 0, GOBasisGrid.compute_grid_density_dm,
+                           GOBasisGrid.compute_grid_density_fock)
 
 
 def check_density_gradient(obasis, dm_full, point, eps):
@@ -252,7 +254,7 @@ def check_density_gradient(obasis, dm_full, point, eps):
 
     Parameters
     ----------
-    obasis : GOBasis
+    obasis : GOBasisGrid
         The basis set to use in the test.
     dm_full : DenseTwoIndex
         The spin-summed density matrix.
@@ -277,7 +279,7 @@ def check_density_gradient(obasis, dm_full, point, eps):
 def test_density_gradient_n2_sto3g():
     fn = 'n2_hfs_sto3g_fchk'
     dm_full = load_dm(fn)
-    obasis = load_obasis(fn)
+    obasis = load_obasis_grid(fn)
 
     points = np.zeros((1, 3), float)
     g = obasis.compute_grid_gradient_dm(dm_full, points)
@@ -293,7 +295,7 @@ def test_density_gradient_n2_sto3g():
 def test_density_gradient_h3_321g():
     fn = 'h3_pbe_321g_fchk'
     dm_full = load_dm(fn)
-    obasis = load_obasis(fn)
+    obasis = load_obasis_grid(fn)
 
     eps = 1e-4
     check_density_gradient(obasis, dm_full, np.array([0.1, 0.3, 0.2]), eps)
@@ -305,7 +307,7 @@ def test_density_gradient_h3_321g():
 def test_density_gradient_co_ccpv5z_cart():
     fn = 'co_ccpv5z_cart_hf_g03_fchk'
     dm_full = load_dm(fn)
-    obasis = load_obasis(fn)
+    obasis = load_obasis_grid(fn)
 
     eps = 1e-4
     check_density_gradient(obasis, dm_full, np.array([0.1, 0.3, 0.2]), eps)
@@ -317,7 +319,7 @@ def test_density_gradient_co_ccpv5z_cart():
 def test_density_gradient_co_ccpv5z_pure():
     fn = 'co_ccpv5z_pure_hf_g03_fchk'
     dm_full = load_dm(fn)
-    obasis = load_obasis(fn)
+    obasis = load_obasis_grid(fn)
 
     eps = 1e-4
     check_density_gradient(obasis, dm_full, np.array([0.1, 0.3, 0.2]), eps)
@@ -331,7 +333,7 @@ def check_dm_gradient(obasis, dm_full, p0, p1):
 
     Parameters
     ----------
-    obasis : GOBasis
+    obasis : GOBasisGrid
         The basis set to use in the test.
     dm_full : DenseTwoIndex
         The spin-summed density matrix.
@@ -357,7 +359,7 @@ def check_dm_gradient(obasis, dm_full, p0, p1):
 def test_dm_gradient_n2_sto3g():
     fn = 'n2_hfs_sto3g_fchk'
     dm_full = load_dm(fn)
-    obasis = load_obasis(fn)
+    obasis = load_obasis_grid(fn)
 
     eps = 1e-4
     check_dm_gradient(obasis, dm_full, np.array([[-0.1, 0.4, 1.2]]),
@@ -371,7 +373,7 @@ def test_dm_gradient_n2_sto3g():
 def test_dm_gradient_h3_321g():
     fn = 'h3_hfs_321g_fchk'
     dm_full = load_dm(fn)
-    obasis = load_obasis(fn)
+    obasis = load_obasis_grid(fn)
 
     eps = 1e-4
     check_dm_gradient(obasis, dm_full, np.array([[-0.1, 0.4, 1.2]]),
@@ -384,8 +386,8 @@ def test_dm_gradient_h3_321g():
 
 def check_gradient_functional_deriv(fn, comp):
     """Test consistency of density gradient on grid with Fock build."""
-    check_functional_deriv(fn, comp, GOBasis.compute_grid_gradient_dm,
-                           GOBasis.compute_grid_gradient_fock)
+    check_functional_deriv(fn, comp, GOBasisGrid.compute_grid_gradient_dm,
+                           GOBasisGrid.compute_grid_gradient_fock)
 
 
 def test_gradient_functional_deriv_0():
@@ -401,7 +403,7 @@ def test_gradient_functional_deriv_2():
 
 
 def check_orbitals(fn):
-    obasis = load_obasis(fn)
+    obasis = load_obasis_grid(fn)
 
     """Test if sum of squared orbitals reproduces the density, and other things."""
     points = np.array([
@@ -477,11 +479,12 @@ def test_orbitals_co_ccpv5z_pure():
 
 def check_dm_kinetic(fn, npoint, eps):
     mol = load_mdata(fn)
-    obasis = load_obasis(fn)
+    obasis_kin = load_obasis1(fn)
+    obasis = load_obasis_grid(fn)
     dm = load_dm(fn)
     points, weights = generate_molecular_grid(mol['numbers'], mol['coordinates'], npoint)
 
-    kin = obasis.compute_kinetic()
+    kin = obasis_kin.compute_kinetic()
     ekin1 = np.einsum('ab,ba', kin, dm)
     kindens = obasis.compute_grid_kinetic_dm(dm, points)
     ekin2 = integrate(weights, kindens)
@@ -517,8 +520,8 @@ def test_dm_kinetic_co_ccpv5z_pure():
 
 @attr('slow')
 def test_kinetic_functional_deriv():
-    check_functional_deriv('n2_hfs_sto3g_fchk', 0, GOBasis.compute_grid_kinetic_dm,
-                           GOBasis.compute_grid_kinetic_fock)
+    check_functional_deriv('n2_hfs_sto3g_fchk', 0, GOBasisGrid.compute_grid_kinetic_dm,
+                           GOBasisGrid.compute_grid_kinetic_fock)
 
 
 def test_concept_gradient():
@@ -570,8 +573,8 @@ def check_gradient_systematic(pure):
         bcs.append(GOBasisContraction(shell_type, np.array([alpha, alpha / 2]),
                                       np.array([0.5, 0.5])))
     goba = GOBasisAtom(bcs)
-    obasis = get_gobasis(np.array([[-0.5, 0.0, 0.0], [0.5, 0.0, 0.0]]), np.array([1, 1]),
-                         goba, pure=pure)
+    obasis = get_gobasis_grid(np.array([[-0.5, 0.0, 0.0], [0.5, 0.0, 0.0]]), np.array([1, 1]),
+                              goba, pure=pure)
 
     # create fake dm
     dm = np.zeros((obasis.nbasis, obasis.nbasis))
@@ -602,7 +605,7 @@ def check_density_hessian(obasis, dm_full, point, eps):
 
     Parameters
     ----------
-    obasis : GOBasis
+    obasis : GOBasisGrid
         The basis set to use in the test.
     dm_full : DenseTwoIndex
         The spin-summed density matrix.
@@ -651,8 +654,8 @@ def check_hessian_systematic(pure):
         bcs.append(GOBasisContraction(shell_type, np.array([alpha, alpha / 2]),
                                       np.array([0.5, 0.5])))
     goba = GOBasisAtom(bcs)
-    obasis = get_gobasis(np.array([[-0.5, 0.0, 0.0], [0.5, 0.0, 0.0]]), np.array([1, 1]),
-                         goba, pure=pure)
+    obasis = get_gobasis_grid(np.array([[-0.5, 0.0, 0.0], [0.5, 0.0, 0.0]]), np.array([1, 1]),
+                              goba, pure=pure)
 
     # create fake dm
     dm = np.zeros((obasis.nbasis, obasis.nbasis))
@@ -680,8 +683,8 @@ def test_hessian_systematic_pure():
 
 def check_hessian_functional_deriv(fn, comp):
     """Test consistency of Density Hessian on grid with Fock build."""
-    check_functional_deriv(fn, comp, GOBasis.compute_grid_hessian_dm,
-                           GOBasis.compute_grid_hessian_fock)
+    check_functional_deriv(fn, comp, GOBasisGrid.compute_grid_hessian_dm,
+                           GOBasisGrid.compute_grid_hessian_fock)
 
 
 def test_hessian_functional_deriv_0():
@@ -718,7 +721,7 @@ def check_gga_evaluation(fn):
     """
     points = np.random.uniform(-5, 5, (1000, 3))
     dm_full = load_dm(fn)
-    obasis = load_obasis(fn)
+    obasis = load_obasis_grid(fn)
 
     for _irep in range(5):
         # combined computation of density and gradient
@@ -754,7 +757,7 @@ def check_gga_fock(fn):
     fn : str
         Filename with wavefunction to use in the test.
     """
-    obasis = load_obasis(fn)
+    obasis = load_obasis_grid(fn)
 
     for _irep in range(5):
         # random integration grid
@@ -785,8 +788,8 @@ def test_gga_fock_co_ccpv5z_pure():
 
 def check_gga_functional_deriv(fn, comp):
     """Test consistency of GGA grid properties and Fock build."""
-    check_functional_deriv(fn, comp, GOBasis.compute_grid_gga_dm,
-                           GOBasis.compute_grid_gga_fock)
+    check_functional_deriv(fn, comp, GOBasisGrid.compute_grid_gga_dm,
+                           GOBasisGrid.compute_grid_gga_fock)
 
 
 def test_gga_functional_deriv_0():
@@ -817,7 +820,7 @@ def check_mgga_evaluation(fn):
     # evaluation.
     points = np.random.uniform(-5, 5, (1000, 3))
     dm_full = load_dm(fn)
-    obasis = load_obasis(fn)
+    obasis = load_obasis_grid(fn)
 
     for _irep in range(5):
         # combined computation of density and gradient
@@ -858,7 +861,7 @@ def check_mgga_fock(fn):
     fn : str
         Filename with wavefunction to use in the test.
     """
-    obasis = load_obasis(fn)
+    obasis = load_obasis_grid(fn)
 
     for _irep in range(5):
         # random integration grid
@@ -895,8 +898,8 @@ def test_mgga_fock_co_ccpv5z_pure():
 
 def check_mgga_functional_deriv(fn, comp):
     """Test consistency of MGGA grid properties and Fock build."""
-    check_functional_deriv(fn, comp, GOBasis.compute_grid_mgga_dm,
-                           GOBasis.compute_grid_mgga_fock)
+    check_functional_deriv(fn, comp, GOBasisGrid.compute_grid_mgga_dm,
+                           GOBasisGrid.compute_grid_mgga_fock)
 
 
 def test_mgga_functional_deriv_0():

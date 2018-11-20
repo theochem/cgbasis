@@ -26,11 +26,12 @@ import numpy as np
 from nose.plugins.attrib import attr
 from nose.tools import assert_raises
 
-from gbasis.cext import (_gob_pure_normalization, _gob_cart_normalization, GOBasis,
-                         _GB1DMGridDensityFn, _get_shell_nbasis,)
+from gbasis.cext_common import _get_shell_nbasis, _gob_cart_normalization, _gob_pure_normalization
+from gbasis.cext_grids import _GB1DMGridDensityFn
+from gbasis.cext1 import GOBasis1  # Testing functions from GBasis. Just use any child class
 from gbasis.test.cext import _get_max_shell_type
-from gbasis.gobasis import GOBasisDesc, get_gobasis, go_basis_families
-from .common import load_obasis, load_mdata, load_dm, load_orbsa_coeffs
+from gbasis.gobasis import GOBasisDesc, get_gobasis1, go_basis_families
+from .common import load_obasis1, load_obasis_grid, load_mdata, load_dm, load_orbsa_coeffs
 from .lightgrid import generate_molecular_grid
 
 angstrom = 1.0e-10 / 0.5291772083e-10
@@ -55,7 +56,7 @@ def test_gobasis_consistency():
     alphas = np.random.uniform(0, 1, nprims.sum())
     con_coeffs = np.random.uniform(-1, 1, nprims.sum())
 
-    gb = GOBasis(centers, shell_map, nprims, shell_types, alphas, con_coeffs)
+    gb = GOBasis1(centers, shell_map, nprims, shell_types, alphas, con_coeffs)
     assert gb.nbasis == 29
     assert gb.max_shell_type == 3
     scales = gb.get_scales()
@@ -66,56 +67,56 @@ def test_gobasis_consistency():
                                          4, 4, 4, 5, 6, 6, 6])).all()
 
     shell_types = np.array([1, 1, 0, -2, -2, 0, 1])
-    gb = GOBasis(centers, shell_map, nprims, shell_types, alphas, con_coeffs)
+    gb = GOBasis1(centers, shell_map, nprims, shell_types, alphas, con_coeffs)
     assert gb.nbasis == 21
     assert gb.max_shell_type == 2
 
     # The center indexes in the shell_map are out of range.
     shell_map[0] = 2
     with assert_raises(ValueError):
-        GOBasis(centers, shell_map, nprims, shell_types, alphas, con_coeffs)
+        GOBasis1(centers, shell_map, nprims, shell_types, alphas, con_coeffs)
     shell_map[0] = 0
 
     # The size of the array shell_types does not match the sum of nprims.
     shell_types = np.array([1, 1])
     with assert_raises(TypeError):
-        GOBasis(centers, shell_map, nprims, shell_types, alphas, con_coeffs)
+        GOBasis1(centers, shell_map, nprims, shell_types, alphas, con_coeffs)
     shell_types = np.array([1, 1, 0, -2, -2, 0, 1])
 
     # The elements of nprims should be at least 1.
     nprims[1] = 0
     with assert_raises(ValueError):
-        GOBasis(centers, shell_map, nprims, shell_types, alphas, con_coeffs)
+        GOBasis1(centers, shell_map, nprims, shell_types, alphas, con_coeffs)
     nprims[1] = 3
 
     # The size of the array alphas does not match the sum of nprims.
     alphas = np.random.uniform(-1, 1, 2)
     with assert_raises(TypeError):
-        GOBasis(centers, shell_map, nprims, shell_types, alphas, con_coeffs)
+        GOBasis1(centers, shell_map, nprims, shell_types, alphas, con_coeffs)
     alphas = np.random.uniform(-1, 1, nprims.sum())
 
     # Encountered the nonexistent shell_type -1.
     shell_types[1] = -1
     with assert_raises(ValueError):
-        GOBasis(centers, shell_map, nprims, shell_types, alphas, con_coeffs)
+        GOBasis1(centers, shell_map, nprims, shell_types, alphas, con_coeffs)
     shell_types[1] = 1
 
     # The size of con_coeffs does not match nprims.
     con_coeffs = np.random.uniform(-1, 1, 3)
     with assert_raises(TypeError):
-        GOBasis(centers, shell_map, nprims, shell_types, alphas, con_coeffs)
+        GOBasis1(centers, shell_map, nprims, shell_types, alphas, con_coeffs)
     con_coeffs = np.random.uniform(-1, 1, nprims.sum())
 
     # Exceeding the maximym shell type (above):
     shell_types[0] = _get_max_shell_type() + 1
     with assert_raises(ValueError):
-        GOBasis(centers, shell_map, nprims, shell_types, alphas, con_coeffs)
+        GOBasis1(centers, shell_map, nprims, shell_types, alphas, con_coeffs)
     shell_types[0] = 2
 
     # Exceeding the maximym shell type (below):
     shell_types[0] = -_get_max_shell_type() - 1
     with assert_raises(ValueError):
-        GOBasis(centers, shell_map, nprims, shell_types, alphas, con_coeffs)
+        GOBasis1(centers, shell_map, nprims, shell_types, alphas, con_coeffs)
     shell_types[0] = 2
 
 
@@ -135,7 +136,7 @@ def test_grid_lih_321g_hf_density_some_points():
     ])
     ref[:, :3] *= angstrom
     fn = 'li_h_3_21G_hf_g09_fchk'
-    obasis = load_obasis(fn)
+    obasis = load_obasis_grid(fn)
     mol = load_mdata(fn)
 
     # check for one point the _compute_grid_point1 method
@@ -172,7 +173,7 @@ def test_grid_lih_321g_hf_density_some_points():
 def check_grid_rho(fn, ref, eps):
     points = ref[:, :3].copy()
     dm_full = load_dm(fn)
-    obasis = load_obasis(fn)
+    obasis = load_obasis_grid(fn)
     rhos = obasis.compute_grid_density_dm(dm_full, points)
     assert abs(rhos - ref[:, 3]).max() < eps
 
@@ -209,7 +210,7 @@ def test_grid_co_ccpv5z_pure_hf_density_some_points():
 
 def check_grid_gradient(fn, ref, eps):
     points = ref[:, :3].copy()
-    obasis = load_obasis(fn)
+    obasis = load_obasis_grid(fn)
     dm_full = load_dm(fn)
     gradients = obasis.compute_grid_gradient_dm(dm_full, points)
     assert abs(gradients - ref[:, 3:]).max() < eps
@@ -293,7 +294,7 @@ def test_grid_lih_321g_hf_orbital_gradient_some_points():
          [-0.001806896115, -0.000903448057, -0.019856823712]]
     ])
     fn = 'li_h_3_21G_hf_g09_fchk'
-    obasis = load_obasis(fn)
+    obasis = load_obasis_grid(fn)
     orb_alpha = load_orbsa_coeffs(fn)
     orbs = np.arange(obasis.nbasis)
     test = np.array(obasis.compute_grid_orb_gradient_exp(orb_alpha, points, orbs))
@@ -334,7 +335,7 @@ def test_grid_co_ccpv5z_pure_hf_gradient_some_points():
 
 def check_grid_esp(fn, ref, eps):
     points = ref[:, :3].copy()
-    obasis = load_obasis(fn)
+    obasis = load_obasis_grid(fn)
     mol = load_mdata(fn)
     dm_full = load_dm(fn)
     esps = obasis.compute_grid_esp_dm(dm_full, mol['coordinates'], mol['pseudo_numbers'], points)
@@ -388,13 +389,14 @@ def test_grid_co_ccpv5z_pure_hf_esp_some_points():
 
 def test_grid_two_index_ne():
     fn = 'li_h_3_21G_hf_g09_fchk'
-    obasis = load_obasis(fn)
+    obasis1 = load_obasis1(fn)
+    obasis = load_obasis_grid(fn)
     mol = load_mdata(fn)
     points, weights = generate_molecular_grid(mol['numbers'], mol['coordinates'], 100000)
     dist0 = np.sqrt(((points - mol['coordinates'][0]) ** 2).sum(axis=1))
     dist1 = np.sqrt(((points - mol['coordinates'][1]) ** 2).sum(axis=1))
     pot = -mol['numbers'][0] / dist0 - mol['numbers'][1] / dist1
-    na_ana = obasis.compute_nuclear_attraction(mol['coordinates'], mol['pseudo_numbers'])
+    na_ana = obasis1.compute_nuclear_attraction(mol['coordinates'], mol['pseudo_numbers'])
     na_grid = obasis.compute_grid_density_fock(points, weights, pot)
     # compare grid-based operator with analytical result
     assert abs(na_grid).max() > 8.0
@@ -426,17 +428,17 @@ def test_gob_normalization():
 def test_cart_pure_switch():
     fn = 'water_xyz'
     mol = load_mdata(fn)
-    obasis = get_gobasis(mol['coordinates'], mol['numbers'], 'aug-cc-pvdz')
+    obasis = get_gobasis1(mol['coordinates'], mol['numbers'], 'aug-cc-pvdz')
     assert obasis.nbasis == 41
-    obasis = get_gobasis(mol['coordinates'], mol['numbers'], 'aug-cc-pvdz', pure=False)
+    obasis = get_gobasis1(mol['coordinates'], mol['numbers'], 'aug-cc-pvdz', pure=False)
     assert obasis.nbasis == 43
 
 
 def test_concatenate1():
     fn = 'water_xyz'
     mol = load_mdata(fn)
-    obtmp = get_gobasis(mol['coordinates'], mol['numbers'], '3-21G')
-    ob = GOBasis.concatenate(obtmp, obtmp)
+    obtmp = get_gobasis1(mol['coordinates'], mol['numbers'], '3-21G')
+    ob = GOBasis1.concatenate(obtmp, obtmp)
     assert ob.ncenter == 3 * 2
     assert ob.nbasis == 13 * 2
     a = ob.compute_overlap()
@@ -448,9 +450,9 @@ def test_concatenate1():
 def test_concatenate2():
     fn = 'water_xyz'
     mol = load_mdata(fn)
-    obasis1 = get_gobasis(mol['coordinates'], mol['numbers'], '3-21G')
-    obasis2 = get_gobasis(mol['coordinates'], mol['numbers'], 'sto-3g')
-    obasis = GOBasis.concatenate(obasis1, obasis2)
+    obasis1 = get_gobasis1(mol['coordinates'], mol['numbers'], '3-21G')
+    obasis2 = get_gobasis1(mol['coordinates'], mol['numbers'], 'sto-3g')
+    obasis = GOBasis1.concatenate(obasis1, obasis2)
     assert obasis.ncenter == 3 * 2
     assert obasis.nbasis == obasis1.nbasis + obasis2.nbasis
 
@@ -470,7 +472,7 @@ def test_abstract():
         shell_types = np.array([0, 1])
         alphas = np.array([1.0, 1.1, 1.2])
         con_coeffs = np.array([0.1, 0.2, 0.3])
-        from ..cext import GBasis
+        from ..cext_common import GBasis
         GBasis(centers, shell_map, nprims, shell_types, alphas, con_coeffs)
 
 
@@ -478,7 +480,7 @@ def test_gobasis_desc_element_map():
     gobd = GOBasisDesc('3-21G', {'H': 'sto-3g', 2: 'cc-pVQZ'})
     coordinates = np.zeros([3, 3])
     numbers = np.array([1, 2, 3])
-    obasis = gobd.apply_to(coordinates, numbers)
+    obasis = gobd.apply_to(coordinates, numbers, GOBasis1)
     assert obasis.centers.shape == (3, 3)
     # H
     assert obasis.shell_map[0] == 0
@@ -495,7 +497,7 @@ def test_gobasis_desc_index_map():
     gobd = GOBasisDesc('3-21G', index_map={1: 'sto-3g', 2: 'cc-pVQZ'})
     coordinates = np.zeros([3, 3])
     numbers = np.array([1, 1, 1])
-    obasis = gobd.apply_to(coordinates, numbers)
+    obasis = gobd.apply_to(coordinates, numbers, GOBasis1)
     assert obasis.centers.shape == (3, 3)
     # H
     assert (obasis.shell_map[:2] == 0).all()
@@ -510,7 +512,7 @@ def test_gobasis_desc_index_map():
 
 def test_gobasis_output_args_grid_orbitals_exp():
     fn = 'water_hfs_321g_fchk'
-    obasis = load_obasis(fn)
+    obasis = load_obasis_grid(fn)
     orb_alpha = load_orbsa_coeffs(fn)
     points = np.random.uniform(-5, 5, (100, 3))
     iorbs = np.array([2, 3])
@@ -522,7 +524,7 @@ def test_gobasis_output_args_grid_orbitals_exp():
 
 def test_gobasis_output_args_grid_density_dm():
     fn = 'water_hfs_321g_fchk'
-    obasis = load_obasis(fn)
+    obasis = load_obasis_grid(fn)
     points = np.random.uniform(-5, 5, (100, 3))
     rhos1 = np.zeros(100, float)
     dm_full = load_dm(fn)
@@ -533,7 +535,7 @@ def test_gobasis_output_args_grid_density_dm():
 
 def test_gobasis_output_args_grid_gradient_dm():
     fn = 'water_hfs_321g_fchk'
-    obasis = load_obasis(fn)
+    obasis = load_obasis_grid(fn)
     points = np.random.uniform(-5, 5, (100, 3))
     gradrhos1 = np.zeros((100, 3), float)
     dm_full = load_dm(fn)
@@ -544,7 +546,7 @@ def test_gobasis_output_args_grid_gradient_dm():
 
 def test_gobasis_output_args_grid_hartree_dm():
     fn = 'water_hfs_321g_fchk'
-    obasis = load_obasis(fn)
+    obasis = load_obasis_grid(fn)
     points = np.random.uniform(-5, 5, (100, 3))
     pots1 = np.zeros(100, float)
     dm_full = load_dm(fn)
@@ -555,7 +557,7 @@ def test_gobasis_output_args_grid_hartree_dm():
 
 def test_subset_simple():
     fn = 'water_hfs_321g_fchk'
-    obasis = load_obasis(fn)
+    obasis = load_obasis1(fn)
     # select a basis set for the first hydrogen atom
     sub_obasis, ibasis_list = obasis.get_subset([0, 1])
     assert sub_obasis.ncenter == 1
@@ -572,7 +574,7 @@ def test_subset_simple():
 
 def test_subset_simple_reverse():
     fn = 'water_hfs_321g_fchk'
-    obasis = load_obasis(fn)
+    obasis = load_obasis1(fn)
     # select a basis set for the first hydrogen atom
     sub_obasis, ibasis_list = obasis.get_subset([1, 0])
     assert sub_obasis.ncenter == 1
@@ -591,7 +593,7 @@ def test_subset_simple_reverse():
 
 def test_subset():
     fn = 'water_hfs_321g_fchk'
-    obasis = load_obasis(fn)
+    obasis = load_obasis1(fn)
     # select a basis set for the first hydrogen atom
     sub_obasis, ibasis_list = obasis.get_subset([7, 3, 4, 8])
     assert sub_obasis.ncenter == 2
@@ -610,7 +612,7 @@ def test_subset():
 
 def test_basis_atoms():
     fn = 'water_hfs_321g_fchk'
-    obasis = load_obasis(fn)
+    obasis = load_obasis1(fn)
     mol = load_mdata(fn)
     basis_atoms = obasis.get_basis_atoms(mol['coordinates'])
     assert len(basis_atoms) == 3
@@ -640,7 +642,7 @@ def check_normalization(number, basis):
     numbers = np.array([number])
 
     # Create a Gaussian basis set
-    obasis = get_gobasis(coordinates, numbers, basis)
+    obasis = get_gobasis1(coordinates, numbers, basis)
 
     # Compute Gaussian integrals
     olp = obasis.compute_overlap()

@@ -24,15 +24,13 @@
 import numpy as np
 from nose.tools import assert_raises
 
-from gbasis.cext import _get_shell_nbasis
+from gbasis.cext_common import _get_shell_nbasis, _gob_cart_normalization
 from gbasis.test.cext import (_iter_pow1_inc, _GB2ErfAttractionIntegral, _GB2KineticIntegral,
                               _GB2GaussAttractionIntegral, _GB2NuclearAttractionIntegral,
                               _GB2OverlapIntegral,
                               _nuclear_attraction_helper, _gpt_coeff,
                               _gb_overlap_int1d, _binom
                               )
-from .. import (_gob_cart_normalization)
-
 
 def test_gpt_coeff():
     def py_gpt_coeff(k, n0, n1, pa, pb):

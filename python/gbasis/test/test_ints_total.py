@@ -1,12 +1,12 @@
 import numpy as np
 
-from .common import (load_obasis, load_mdata, load_dm, load_er, load_quad, load_dipole, load_na,
-                     load_kin, load_olp)
+from .common import (load_obasis1, load_obasis2, load_obasis_grid, load_mdata, load_dm, load_er,
+                     load_quad, load_dipole, load_na, load_kin, load_olp)
 from .lightgrid import generate_molecular_grid, integrate
 
 
 def check_g09_overlap(fn):
-    obasis = load_obasis(fn)
+    obasis = load_obasis1(fn)
     olp1 = obasis.compute_overlap()
     olp2 = load_olp(fn)
     mask = abs(olp1) > 1e-5
@@ -37,7 +37,7 @@ def test_overlap_co_ccpv5z_cart_hf():
 
 
 def check_g09_kinetic(fn):
-    obasis = load_obasis(fn)
+    obasis = load_obasis1(fn)
     kin1 = obasis.compute_kinetic()
     kin2 = load_kin(fn)
     mask = abs(kin1) > 1e-5
@@ -69,7 +69,7 @@ def test_kinetic_co_ccpv5z_cart_hf():
 
 def check_g09_nuclear_attraction(fn):
     mol = load_mdata(fn)
-    obasis = load_obasis(fn)
+    obasis = load_obasis1(fn)
     na1 = obasis.compute_nuclear_attraction(mol['coordinates'], mol['pseudo_numbers'])
     na2 = load_na(fn)
     mask = abs(na1) > 1e-5
@@ -108,7 +108,7 @@ def check_g09_dipole(fn):
     fn : str
         The sanitized FCHK filename with '.' and '-' substituted with '_'.
     """
-    obasis = load_obasis(fn)
+    obasis = load_obasis1(fn)
     mol = load_mdata(fn)
     xyz_array = np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
     center = np.zeros(3)
@@ -153,7 +153,7 @@ def check_g09_quadrupole(fn):
     fn : str
         The sanitized FCHK filename with '.' and '-' substituted with '_'.
     """
-    obasis = load_obasis(fn)
+    obasis = load_obasis1(fn)
     mol = load_mdata(fn)
     # HORTON ordering: xx, xy, xz, yy, yz, zz (alphabetic)
     xyz_array = np.array([[2, 0, 0], [1, 1, 0], [1, 0, 1], [0, 2, 0], [0, 1, 1], [0, 0, 2]])
@@ -189,7 +189,7 @@ def test_quadrupole_monosilicic_acid_hf_lan_g09():
 
 
 def check_g09_electron_repulsion(fn, check_g09_zeros=False):
-    obasis = load_obasis(fn)
+    obasis = load_obasis2(fn)
     er1 = obasis.compute_electron_repulsion()
     er2 = load_er(fn)
     mask = abs(er1) > 1e-6
@@ -215,13 +215,14 @@ def test_electron_repulsion_water_ccpvdz_cart_hf():
 
 
 def check_g09_grid_fn(fn):
-    obasis = load_obasis(fn)
+    obasis = load_obasis_grid(fn)
+    obasis1 = load_obasis1(fn)
     mol = load_mdata(fn)
     points, weights = generate_molecular_grid(mol['numbers'], mol['coordinates'], 10000)
     dm_full = load_dm(fn)
     rhos = obasis.compute_grid_density_dm(dm_full, points)
     pop = integrate(weights, rhos)
-    nel = np.einsum('ab,ba', obasis.compute_overlap(), dm_full)
+    nel = np.einsum('ab,ba', obasis1.compute_overlap(), dm_full)
     np.testing.assert_allclose(pop, nel, atol=1e-2)
 
 

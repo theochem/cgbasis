@@ -24,13 +24,14 @@ from __future__ import print_function
 
 import numpy as np
 
-from . mol_data import water_xyz as mdata
-from .. import get_gobasis
+from .mol_data import water_xyz as mdata
+from ..gobasis import get_gobasis_sparse, get_gobasis2
 
 
 def get_h2o_obasis():
-    obasis = get_gobasis(mdata['coordinates'], mdata['numbers'], 'sto-3g')
-    return obasis
+    obasis = get_gobasis_sparse(mdata['coordinates'], mdata['numbers'], 'sto-3g')
+    obasis_ref = get_gobasis2(mdata['coordinates'], mdata['numbers'], 'sto-3g')
+    return obasis, obasis_ref
 
 
 def pcholesky4(A, thresh=1e-8):
@@ -54,36 +55,36 @@ def pcholesky4(A, thresh=1e-8):
 
 
 def test_cholesky_coulomb():
-    obasis = get_h2o_obasis()
-    ref = obasis.compute_electron_repulsion()
+    obasis, obasis_ref = get_h2o_obasis()
+    ref = obasis_ref.compute_electron_repulsion()
     vecs = obasis.compute_electron_repulsion_cholesky()
     chol = np.einsum('kac,kbd->abcd', vecs, vecs)
     np.testing.assert_allclose(ref, chol, rtol=1e-5, atol=1e-8)
 
 
 def test_cholesky_erf():
-    obasis = get_h2o_obasis()
+    obasis, obasis_ref = get_h2o_obasis()
     mu = 1e4
-    ref = obasis.compute_erf_repulsion(mu)
+    ref = obasis_ref.compute_erf_repulsion(mu)
     vecs = obasis.compute_erf_repulsion_cholesky(mu)
     chol = np.einsum('kac,kbd->abcd', vecs, vecs)
     np.testing.assert_allclose(ref, chol, rtol=1e-5, atol=1e-8)
 
 
 def test_cholesky_gauss():
-    obasis = get_h2o_obasis()
+    obasis, obasis_ref = get_h2o_obasis()
     c = 1.2
     alpha = 0.5
-    ref = obasis.compute_gauss_repulsion(c, alpha)
+    ref = obasis_ref.compute_gauss_repulsion(c, alpha)
     vecs = obasis.compute_gauss_repulsion_cholesky(c, alpha)
     chol = np.einsum('kac,kbd->abcd', vecs, vecs)
     np.testing.assert_allclose(ref, chol, rtol=1e-5, atol=1e-8)
 
 
 def test_cholesky_ralpha():
-    obasis = get_h2o_obasis()
+    obasis, obasis_ref = get_h2o_obasis()
     alpha = -2.0
-    ref = obasis.compute_ralpha_repulsion(alpha)
+    ref = obasis_ref.compute_ralpha_repulsion(alpha)
     vecs = obasis.compute_ralpha_repulsion_cholesky(alpha)
     chol = np.einsum('kac,kbd->abcd', vecs, vecs)
     np.testing.assert_allclose(ref, chol, rtol=1e-5, atol=1e-8)

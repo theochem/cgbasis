@@ -21,23 +21,28 @@
 """Gaussian orbital basis set module."""
 from __future__ import annotations
 
-from typing import Union, Dict, Iterable, List
+from typing import Union, Dict, Iterable, List, Type
 
 import numpy as np
 
-from .cext import GOBasis
+from .cext_common import GBasis
+from .cext1 import GOBasis1
+from .cext2 import GOBasis2
+from .cext_grids import GOBasisGrid
+from .cext_sparse import GOBasisSparse
 from .iobas import load_basis_atom_map_nwchem, load_basis_atom_map_gbs, dump_basis_atom_map_gbs
 from .periodic import sym2num
 from .utils import typecheck_geo, to_bset_path
 
 __all__ = [
-    'get_gobasis', 'GOBasisDesc', 'GOBasisFamily', 'go_basis_families',
+    'get_gobasis1', 'get_gobasis2', 'get_gobasis_grid',
+    'GOBasisDesc', 'GOBasisFamily', 'go_basis_families',
     'GOBasisAtom', 'GOBasisContraction',
 ]
 
 
-def get_gobasis(coordinates: np.ndarray, numbers: np.ndarray, default: Union[str, GOBasisFamily],
-                element_map: Dict = None, index_map: Dict = None, pure: bool = True) -> GOBasis:
+def get_gobasis1(coordinates: np.ndarray, numbers: np.ndarray, default: Union[str, GOBasisFamily],
+                element_map: Dict = None, index_map: Dict = None, pure: bool = True) -> GOBasis1:
     """Return GOBasis for a given molecule. This is the standard way to get integrals.
 
     Parameters
@@ -64,14 +69,121 @@ def get_gobasis(coordinates: np.ndarray, numbers: np.ndarray, default: Union[str
 
     Examples
     --------
-    >>>> gbasis = get_gobasis(np.array([[0,0,0], [0,0,1]]), np.array([1,1]), "sto-3g")
+    >>>> gbasis = get_gobasis1(np.array([[0,0,0], [0,0,1]]), np.array([1,1]), "sto-3g")
 
     >>>> gbasis.compute_overlap()
 
     """
     gobasis_desc = GOBasisDesc(default, element_map, index_map, pure)
-    return gobasis_desc.apply_to(coordinates, numbers)
+    return gobasis_desc.apply_to(coordinates, numbers, GOBasis1)
 
+def get_gobasis2(coordinates: np.ndarray, numbers: np.ndarray, default: Union[str, GOBasisFamily],
+                element_map: Dict = None, index_map: Dict = None, pure: bool = True) -> GOBasis2:
+    """Return GOBasis for a given molecule. This is the standard way to get integrals.
+
+    Parameters
+    ----------
+    coordinates
+        A (N, 3) float numpy array with Cartesian coordinates of the atoms in Bohr.
+    numbers
+        A (N,) numpy vector with the atomic numbers.
+    default
+        The default basis set applied to each atom.
+    element_map
+        A dictionary with element names or numbers as keys, and basis sets
+        as values. These specs override the default basis.
+    index_map
+        A dictionary with atomic indexes (based on the order of the atoms)
+        as keys and basis sets as values.
+    pure
+        By default pure basis functions are used. Set this to false to
+        switch to Cartesian basis functions.
+
+    Returns
+    -------
+        A GOBasis instance which can be used to calculate integrals for the molecule.
+
+    Examples
+    --------
+    >>>> gbasis = get_gobasis2(np.array([[0,0,0], [0,0,1]]), np.array([1,1]), "sto-3g")
+
+    >>>> gbasis.compute_electron_repulsion()
+
+    """
+    gobasis_desc = GOBasisDesc(default, element_map, index_map, pure)
+    return gobasis_desc.apply_to(coordinates, numbers, GOBasis2)
+
+def get_gobasis_grid(coordinates: np.ndarray, numbers: np.ndarray, default: Union[str, GOBasisFamily],
+                element_map: Dict = None, index_map: Dict = None, pure: bool = True) -> GOBasisGrid:
+    """Return GOBasis for a given molecule. This is the standard way to get integrals.
+
+    Parameters
+    ----------
+    coordinates
+        A (N, 3) float numpy array with Cartesian coordinates of the atoms in Bohr.
+    numbers
+        A (N,) numpy vector with the atomic numbers.
+    default
+        The default basis set applied to each atom.
+    element_map
+        A dictionary with element names or numbers as keys, and basis sets
+        as values. These specs override the default basis.
+    index_map
+        A dictionary with atomic indexes (based on the order of the atoms)
+        as keys and basis sets as values.
+    pure
+        By default pure basis functions are used. Set this to false to
+        switch to Cartesian basis functions.
+
+    Returns
+    -------
+        A GOBasis instance which can be used to calculate integrals for the molecule.
+
+    Examples
+    --------
+    >>>> gbasis = get_gobasis_grid(np.array([[0,0,0], [0,0,1]]), np.array([1,1]), "sto-3g")
+
+    >>>> gbasis.compute_grid_density_dm()
+
+    """
+    gobasis_desc = GOBasisDesc(default, element_map, index_map, pure)
+    return gobasis_desc.apply_to(coordinates, numbers, GOBasisGrid)
+
+def get_gobasis_sparse(coordinates: np.ndarray, numbers: np.ndarray, default: Union[str, GOBasisFamily],
+                element_map: Dict = None, index_map: Dict = None, pure: bool = True) -> GOBasisSparse:
+    """Return GOBasis for a given molecule. This is the standard way to get integrals.
+
+    Parameters
+    ----------
+    coordinates
+        A (N, 3) float numpy array with Cartesian coordinates of the atoms in Bohr.
+    numbers
+        A (N,) numpy vector with the atomic numbers.
+    default
+        The default basis set applied to each atom.
+    element_map
+        A dictionary with element names or numbers as keys, and basis sets
+        as values. These specs override the default basis.
+    index_map
+        A dictionary with atomic indexes (based on the order of the atoms)
+        as keys and basis sets as values.
+    pure
+        By default pure basis functions are used. Set this to false to
+        switch to Cartesian basis functions.
+
+    Returns
+    -------
+        A GOBasis instance which can be used to calculate integrals for the molecule.
+
+    Examples
+    --------
+    >>>> gbasis = get_gobasis_sparse(np.array([[0,0,0], [0,0,1]]), np.array([1,1]), "sto-3g")
+
+    >>>> gbasis.compute_electron_repulsion_cholesky()
+
+    """
+    gobasis_desc = GOBasisDesc(default, element_map, index_map, pure)
+    return gobasis_desc.apply_to(coordinates, numbers, GOBasisSparse)
 
 class GOBasisDesc:
     """A user specification of the basis set."""
@@ -113,7 +225,7 @@ class GOBasisDesc:
                 self.element_map[number] = element_map[key]
                 del element_map[key]
 
-    def apply_to(self, coordinates: np.ndarray, numbers: np.ndarray) -> GOBasis:
+    def apply_to(self, coordinates: np.ndarray, numbers: np.ndarray, cls: Type[GBasis]) -> Type[GBasis]:
         """Construct a GOBasis object for the given molecular geometry
 
         Parameters
@@ -123,6 +235,8 @@ class GOBasisDesc:
             atoms in Bohr.
         numbers
             A (N,) numpy vector with the atomic numbers.
+        cls
+            A subclass of GOBasis. Usually either GOBasis1, GOBasis2, or GOBasisGrid
 
         Returns
         -------
@@ -221,7 +335,7 @@ class GOBasisDesc:
             basis_atom.extend(i, shell_map, nprims, shell_types, alphas, con_coeffs, self.pure)
 
         # Return the Gaussian basis object.
-        return GOBasis(coordinates, shell_map, nprims, shell_types, alphas, con_coeffs)
+        return cls(coordinates, shell_map, nprims, shell_types, alphas, con_coeffs)
 
 
 class GOBasisFamily:
@@ -502,7 +616,7 @@ class GOBasisContraction:
         shell_types = np.array([self.shell_type])
         alphas = self.alphas
         con_coeffs = self.con_coeffs
-        gobasis = GOBasis(centers, shell_map, nprims, shell_types, alphas, con_coeffs)
+        gobasis = GOBasis1(centers, shell_map, nprims, shell_types, alphas, con_coeffs)
         # 2) Get the first diagonal element of the overlap matrix
         olpdiag = gobasis.compute_overlap()[0, 0]
         # 3) Normalize the contraction
