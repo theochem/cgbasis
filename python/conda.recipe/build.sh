@@ -1,3 +1,11 @@
-${PYTHON} setup.py build_ext -I ${PREFIX}/include/gbasis:${PREFIX}/include/libint2 -L ${PREFIX}/lib
-#PYTHONPATH=$PYTHONPATH:$PREFIX/lib/python3.7/site-packages python setup.py install --single-version-externally-managed --record=record.txt --prefix="${PREFIX}"
+#!/usr/bin/env bash
+
+if [[ -z "${BUILD_DEBUG}" ]]; then
+    ${PYTHON} setup.py build_ext -I ${PREFIX}/include/gbasis:${PREFIX}/include/libint2 \
+        -L ${PREFIX}/lib
+else
+    ${PYTHON} setup.py build_ext -v --define CYTHON_TRACE_NOGIL \
+        -I ${PREFIX}/include/gbasis:${PREFIX}/include/libint2 -L ${PREFIX}/lib
+fi
+
 ${PYTHON} setup.py install --prefix="${PREFIX}"

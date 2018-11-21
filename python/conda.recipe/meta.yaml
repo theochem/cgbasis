@@ -6,9 +6,15 @@ source:
   path: ../
 
 build:
+  script_env:
+    - BUILD_DEBUG
   number: 0
+  run_exports:
+    - python-gbasis
 
 requirements:
+  build:
+    - {{ compiler('cxx') }}
   host:
     - python ={{ MYCONDAPY }}
     - cython >=0.24.1
@@ -22,12 +28,10 @@ requirements:
     - numpy
     - scipy
     - nose
+
 test:
   requires:
     - nose
-  commands:
-    - nosetests -v --detailed-errors gbasis
-    - conda inspect linkages python-gbasis
 
 about:
   home: https://github.com/theochem/gbasis

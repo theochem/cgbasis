@@ -27,6 +27,8 @@ add_library(${LIBRARY_NAME} ${LIBRARY_TYPE})
 
 target_include_directories(${LIBRARY_NAME} PRIVATE ${Libint2_INCLUDE_DIRS})
 target_link_libraries(${LIBRARY_NAME} PRIVATE ${Libint2_LIBRARIES})
+include(CMakeListsVersion.txt.in)
+set_target_properties(${LIBRARY_NAME} PROPERTIES SOVERSION ${GIT_TAG_SOVERSION})
 
 # Add the sources for the library
 include(src/CMakeLists.txt)

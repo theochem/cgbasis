@@ -6,6 +6,8 @@ source:
   path: ../
 
 build:
+  script_env:
+    - BUILD_DEBUG
   number: 0
   run_exports:
     - cxx-gbasis
