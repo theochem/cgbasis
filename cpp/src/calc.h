@@ -26,19 +26,19 @@
 #ifndef GBASIS_CALC_H_
 #define GBASIS_CALC_H_
 
-/*
+/** @brief
+      Base class for anything that computes stuff by iterating over Gaussian
+      basis functions.
 
-    Base class for anything that computes stuff by iterating over Gaussian
-    basis functions
-
-*/
-
-
+    */
 class GBCalculator {
  protected:
-  long nwork, max_shell_type, max_nbasis;
-  double *work_pure, *work_cart;  /// contiguous work arrays sufficiently large for max_shell_type
-  void swap_work(); /// write work_pure into work_cart
+  long nwork; ///< number of elements in work array
+  long max_shell_type; ///< maximum shell angular momentum
+  long max_nbasis; ///< maximum number of basis functions
+  double *work_pure; /// < contiguous pure work arrays sufficiently large for max_shell_type
+  double *work_cart;  ///< contiguous cartesian work arrays sufficiently large for max_shell_type
+  void swap_work(); ///< write work_pure into work_cart
 
  public:
   /** @brief
@@ -61,13 +61,21 @@ class GBCalculator {
   GBCalculator(const GBCalculator& other) = delete;
 
   virtual ~GBCalculator();
-
+  /** @brief
+    Number of elements in the work array.
+    */
   const long get_nwork() const { return nwork; }
-
+/** @brief
+    Maximum shell angular momentum
+    */
   const long get_max_shell_type() const { return max_shell_type; }
-
+/** @brief
+    Maximum number of basis functions
+    */
   const long get_max_nbasis() const { return max_nbasis; }
-
+/** @brief
+    The cartesian work array
+    */
   const double *get_work() const { return work_cart; }
 };
 
