@@ -111,7 +111,7 @@ install:
 # dependencies on metal.yaml and setup.py, unless setup.py already imports them.
 # Install conda tools for packaging and uploading
 #- conda install -q python=${MYCONDAPY} anaconda-client ${CONDA_DEPENDENCIES}
-- conda install -c conda-forge -q python=${MYCONDAPY} anaconda-client cppcheck
+- conda install -c conda-forge -q python=${MYCONDAPY} anaconda-client cppcheck doxygen
 # Deactivate build env and reactivate it to refresh compilers.
 - source deactivate && source $HOME/miniconda/bin/activate
 # Install more recent stuff with pip
