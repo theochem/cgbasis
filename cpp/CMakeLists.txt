@@ -39,7 +39,7 @@ include(src/sparse/CMakeLists.txt)
 
 # Install the headers
 install(DIRECTORY "${CMAKE_SOURCE_DIR}/src/" # source directory
-	DESTINATION "include/${LIBRARY_NAME}" # target directory
+        DESTINATION "include/${LIBRARY_NAME}" # target directory
         FILES_MATCHING # install only matched files
         PATTERN "*.h" # select header files
 )

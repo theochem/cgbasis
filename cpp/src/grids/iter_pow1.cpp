@@ -67,4 +67,3 @@ int IterPow1::inc() {
   }
   return result;
 }
-

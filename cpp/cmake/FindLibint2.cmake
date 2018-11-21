@@ -25,9 +25,9 @@ else()
     set(Libint2_INCLUDE_DIRS "${Libint2_INCLUDE_DIRS};${LIBINT_PREFIX}")
 
     # Set the LIBRARIES
-    find_library(Libint2_LIBRARIES 
-	    NAMES int2
-	    PATHS ${Libint2_LIBRARIES} ${LIBINT_PREFIX}/lib)
+    find_library(Libint2_LIBRARIES
+            NAMES int2
+            PATHS ${Libint2_LIBRARIES} ${LIBINT_PREFIX}/lib)
 
     message(STATUS "Libint2 was found at ${LIBINT_PREFIX}")
 endif()
