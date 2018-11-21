@@ -1,5 +1,5 @@
 linters:
-  - cppcheck:
+#  - cppcheck:
   - cpplint:
       script: ./cpplint.py
   - doxygen:
