@@ -27,11 +27,6 @@ def get_include_path():
         return []
 
 
-def get_readme():
-    with open('../README.rst') as f:
-        return f.read()
-
-
 ext_modules = [Extension("gbasis.cext_common", ["gbasis/cext_common.pyx"],
                          include_dirs=[np.get_include()] + get_include_path(),
                          libraries=["gbasis"],
@@ -74,7 +69,7 @@ setup(
     name="gbasis",
     version=get_version(),
     description="",
-    long_description=get_readme(),
+    long_description="A Python interface for GBasis(c++).",
     author="Toon Verstraelen",
     author_email="Toon.Verstraelen@UGent.be",
     url="https://github.com/theochem/gbasis",
