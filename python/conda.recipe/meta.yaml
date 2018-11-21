@@ -22,7 +22,7 @@ requirements:
     - numpy
     - setuptools
     - nose
-    - cxx-gbasis >=0.2.1
+    - cxx-gbasis >=0.1.10
   run:
     - python >=3
     - numpy
