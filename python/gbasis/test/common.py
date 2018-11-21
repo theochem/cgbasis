@@ -44,7 +44,7 @@ def tmpdir(name):
 
 
 def check_delta(fun: Callable, fun_deriv: Callable, x: np.ndarray, dxs: List):
-    """Check the difference between two function values using the analytical gradient
+    r"""Check the difference between two function values using the analytical gradient
 
     For every displacement in ``dxs``, the following computation is repeated:
 
