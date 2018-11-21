@@ -1,11 +1,12 @@
 linters:
-- import:
-    packages: ['iodata']
-- namespace:
-    filefilter: ['- */__init__.py', '- */test_*.py', '- *setup.py', '- tools/*',
-                 '+ *.py', '+ *.pyx']
-- pylint:
-- pycodestyle:
-    config: .pycodestylerc
-- pydocstyle:
-- whitespace:
+  - cppcheck:
+  - cpplint:
+      script: ./cpplint.py
+  - doxygen:
+  - header:
+  - header:
+      filefilter: ['+ *.cpp', '+ *.h', '+ *.h.in']
+      comment: '// '
+      shebang:
+      extra: []
+  - whitespace:

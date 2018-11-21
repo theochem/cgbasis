@@ -117,8 +117,8 @@ install:
 # Install more recent stuff with pip
 - pip install --upgrade pylint codecov coverage pycodestyle pydocstyle
 # Get the latest cpplint
-- wget https://raw.githubusercontent.com/google/styleguide/gh-pages/cpplint/cpplint.py &&
-  chmod +x cpplint.py
+- (cd ${CPPDIR}; wget https://raw.githubusercontent.com/google/styleguide/gh-pages/cpplint/cpplint.py &&
+  chmod +x cpplint.py)
 # Show conda info for debugging
 - conda info -a
 

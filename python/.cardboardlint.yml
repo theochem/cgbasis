@@ -1,6 +1,6 @@
 linters:
 - import:
-    packages: ['iodata']
+    packages: ['gbasis']
 - namespace:
     filefilter: ['- */__init__.py', '- */test_*.py', '- *setup.py', '- tools/*',
                  '+ *.py', '+ *.pyx']
