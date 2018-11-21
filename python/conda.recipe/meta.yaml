@@ -16,7 +16,7 @@ requirements:
     - numpy
     - setuptools
     - nose
-    - gbasis >=0.2.1
+    - cxx-gbasis >=0.2.1
   run:
     - python >=3
     - numpy
