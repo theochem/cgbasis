@@ -19,9 +19,9 @@ requirements:
     - cmake
     - make
   host:
-    - libint =2.0.3 
+    - libint =2.0.3
   run:
-    - libint =2.0.3 
+    - libint =2.0.3
 test:
   commands:
     - conda inspect linkages cxx-gbasis
