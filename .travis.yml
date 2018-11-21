@@ -139,10 +139,10 @@ script:
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 - if [[ $TRAVIS_TAG ]]; then
     (cd ${CPPDIR}; conda build -q conda.recipe) &&
-    (cd ${PYDIR}; conda build -q conda.recipe);
+    (cd ${PYDIR}; conda build -c local -q conda.recipe);
   else
     (cd ${CPPDIR}; BUILD_DEBUG=True conda build -q conda.recipe) &&
-    (cd ${PYDIR}; BUILD_DEBUG=True conda build -q conda.recipe) &&
+    (cd ${PYDIR}; BUILD_DEBUG=True conda build -c local -q conda.recipe) &&
     conda install -c local ${CONDA_PKG_NAME_PY} &&
     if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
        cardboardlinter --refspec $TRAVIS_BRANCH -f 'dynamic';
