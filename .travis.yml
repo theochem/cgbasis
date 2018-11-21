@@ -114,6 +114,8 @@ install:
 - conda install -q python=${MYCONDAPY} anaconda-client
 # Deactivate build env and reactivate it to refresh compilers.
 - source deactivate && source $HOME/miniconda/bin/activate
+# Install more recent stuff with pip
+- pip install --upgrade pylint codecov coverage pycodestyle pydocstyle
 # Get the latest cpplint
 - wget https://raw.githubusercontent.com/google/styleguide/gh-pages/cpplint/cpplint.py &&
   chmod +x cpplint.py
