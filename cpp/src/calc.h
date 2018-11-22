@@ -36,7 +36,7 @@ class GBCalculator {
   long nwork; ///< number of elements in work array
   long max_shell_type; ///< maximum shell angular momentum
   long max_nbasis; ///< maximum number of basis functions
-  double *work_pure; /// < contiguous pure work arrays sufficiently large for max_shell_type
+  double *work_pure; ///< contiguous pure work arrays sufficiently large for max_shell_type
   double *work_cart;  ///< contiguous cartesian work arrays sufficiently large for max_shell_type
   void swap_work(); ///< write work_pure into work_cart
 
