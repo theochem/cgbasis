@@ -30,36 +30,117 @@
 #include "twos/ints4.h"
 #include "grids/fns.h"
 
+/**
+ * Normalization constant for cartesian gaussian basis functions
+ * @param alpha Exponent
+ * @param n Cartesian center
+ * @return constant
+ */
 const double gob_cart_normalization(const double alpha, const long *n);
 
+/**
+ * Normalization constant for pure gaussian basis functions
+ * @param alpha exponent
+ * @param l angular momentum
+ * @return constant
+ */
 const double gob_pure_normalization(const double alpha, const long l);
 
+/**
+ * Base class for Gaussian basis integrals
+ */
 class GBasis {
  private:
-  // Auxiliary arrays that contain convenient derived information.
-  long *basis_offsets;
-  long *prim_offsets;
-  long *scales_offsets;
-  long *shell_lookup;
-  double *scales;  // pre-computed normalization constants.
-  long nbasis, nscales;
-  long max_shell_type;
+  /// Auxiliary arrays that contain convenient derived information.
+  long *basis_offsets; ///< offsets of basis functions by center
+  long *prim_offsets; ///< offsets for primitives by center
+  long *scales_offsets; ///< offsets for normalization constants by center
+  long *shell_lookup; ///< shell lookup table
+
+  double *scales;  ///< pre-computed normalization constants.
+  long nbasis; ///< number of basis functions
+  long nscales; ///< number of normalization constants
+  long max_shell_type; ///< maximum angular momentum
 
  public:
   // Arrays that fully describe the basis set.
-  const double *centers;
-  const long *shell_map;
-  const long *nprims;
-  const long *shell_types;
-  const double *alphas;
-  const double *con_coeffs;
-  const long ncenter, nshell, nprim_total;
+  const double *centers; ///< gaussian centers
+  const long *shell_map; ///< the center index for each shell
+  const long *nprims; ///< number of primitives per shell
+  const long *shell_types; ///< shell angular momenta
+  const double *alphas; ///< exponents
+  const double *con_coeffs; ///< contraction coefficients
+  const long ncenter; ///< number of centers
+  const long nshell; ///< number of shells
+  const long nprim_total; ///< total number of primitives
 
-  double r0[3];
-  double r1[3];
-  double r2[3];
-  double r3[3];
+  double r0[3]; ///< center 0
+  double r1[3]; ///< center 1
+  double r2[3]; ///< center 2
+  double r3[3]; ///< center 3
 
+  /**
+   * This class describes basis sets applied to a certain molecular structure.
+   *
+   * The order of the pure shells is based on the order of real spherical.
+   * The functions are sorted from low to high magnetic quantum number,
+   * with cosine-like functions before the sine-like functions. The order
+   * of functions in a Cartesian shell is alphabetic. Some examples:
+   *
+   * shell_type = 0, S:
+   *  0 -> 1
+   * shell_type = 1, P:
+   *  0 -> x
+   *  1 -> y
+   *  2 -> z
+   * shell_type = 2, Cartesian D:
+   *  0 -> xx
+   *  1 -> xy
+   *  2 -> xz
+   *  3 -> yy
+   *  4 -> yz
+   *  5 -> zz
+   * shell_type = 3, Cartesian F:
+   *  0 -> xxx
+   *  1 -> xxy
+   *  2 -> xxz
+   *  3 -> xyy
+   *  4 -> xyz
+   *  5 -> xzz
+   *  6 -> yyy
+   *  7 -> yyz
+   *  8 -> yzz
+   *  9 -> zzz
+   * shell_type = -1, not allowed
+   * shell_type = -2, pure D:
+   *  0 -> zz
+   *  1 -> xz
+   *  2 -> yz
+   *  3 -> xx-yy
+   *  4 -> xy
+   * shell_type = -3, pure F:
+   *  0 -> zzz
+   *  1 -> xzz
+   *  2 -> yzz
+   *  3 -> xxz-yyz
+   *  4 -> xyz
+   *  5 -> xxx-3xyy
+   *  6 -> 3xxy-yyy
+   *
+   * @param centers centers for the basis functions.
+   * @param shell_map the center index for each shell.
+   * @param nprims The number of primitives in each shell.
+   * @param shell_types contraction types for each shell
+   * @param alphas The exponents of the primitives in one shell.
+   * @param con_coeffs
+   *    The contraction coefficients of the primitives for each
+   *     contraction in a contiguous array. The coefficients are ordered
+   *     according to the shells. Within each shell, the coefficients are
+   *     grouped per exponent.
+   * @param ncenter number of centers
+   * @param nshell number of shells
+   * @param nprim_total total number of primitives
+   */
   GBasis(const double *centers, const long *shell_map, const long *nprims,
          const long *shell_types, const double *alphas, const double *con_coeffs,
          const long ncenter, const long nshell, const long nprim_total);
