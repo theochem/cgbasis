@@ -19,7 +19,7 @@
 //--
 
 /**
- * @file iter_pow.h
+ * @file iter_pow1.h
  * @brief Iterators over Cartesian polynomials in one shell
  */
 
@@ -29,6 +29,9 @@
 ///Increment to next basis function, within the same angular momentum.
 int iter_pow1_inc(long *n);
 
+/**
+ * Iterator over 1 cartesian polynomial
+ */
 class IterPow1 {
  private:
   /// shell type

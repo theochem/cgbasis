@@ -19,7 +19,7 @@
 //--
 
 /**
- * @file ints.h
+ * @file ints2.h
  * @brief Evaluation of integrals of Gaussian basis functions
  *
     The implementation of the two-index operators in this module are based on
@@ -47,8 +47,10 @@
 
 class GB2Integral : public GBCalculator {
  protected:
-  long shell_type0, shell_type1; /// shell types
-  const double *r0, *r1; /// Gaussian centres
+  long shell_type0; ///< shell type 0
+  long shell_type1; ///< shell type 1
+  const double *r0; ///< gaussian center 0
+  const double *r1; /// Gaussian center 1
   IterPow2 i2p; /// Cartesian basis function iterator
  public:
   /**

@@ -19,7 +19,7 @@
 //--
 
 /**
- * @file iter_gb.h
+ * @file iter_gb1.h
  * @brief Iterators over Gaussian basis functions
  */
 
@@ -41,24 +41,36 @@ class IterGB1 {
   //! Increments the shell index
   int inc_shell();
 
+  //! Update internal shell counter and resets center
   void update_shell();
 
+  //! Increment next primitive
   int inc_prim();
 
+  //! Update internal primitive counter
   void update_prim();
 
+  /**
+   * Store data into
+   * @param work
+   * @param output
+   * @param dim
+   */
   void store(const double *work, double *output, long dim);
 
   // 'public' iterator fields
-  long shell_type0;
-  double con_coeff, alpha0;
-  const double *r0;  /// The current center
-  const double *scales0;  /// Normalization constants
-  long ibasis0;  /// Basis function counters (for output storage)
+  long shell_type0; ///< shell angular momentum
+  double con_coeff; ///< contraction coefficient
+  double alpha0; ///< shell exponent
+  const double *r0;  ///< The current center
+  const double *scales0;  ///< Normalization constants
+  long ibasis0;  ///< Basis function counters (for output storage)
 
   // 'private' iterator fields
-  long ishell0;  /// Shell counters
-  long nprim0, iprim0, oprim0;  /// Primitive counters
+  long ishell0;  ///< Shell counters
+  long nprim0; ///< number of primitives
+  long iprim0; ///< primitive counter
+  long oprim0;  ///< primitive offset
 };
 
 #endif  // GBASIS_ITER_GB1_H_
