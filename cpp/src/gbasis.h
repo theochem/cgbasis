@@ -55,8 +55,7 @@ class GBasis {
   long *basis_offsets; ///< offsets of basis functions by center
   long *prim_offsets; ///< offsets for primitives by center
   long *scales_offsets; ///< offsets for normalization constants by center
-  long *shell_lookup; ///< shell lookup table
-
+  long *shell_lookup; ///< Index of the first basis function for each shell of contracted Gaussians.
   double *scales;  ///< pre-computed normalization constants.
   long nbasis; ///< number of basis functions
   long nscales; ///< number of normalization constants
@@ -148,32 +147,100 @@ class GBasis {
 
   virtual ~GBasis();
 
+  /**
+ * Normalization constant for cartesian gaussian basis functions
+ * @param alpha Exponent
+ * @param n Cartesian center
+ * @return constant
+ */
   virtual const double normalization(const double alpha, const long *n) const = 0;
 
+  /**
+   * Calculate normalization constants for shells and store internally
+   */
   void init_scales();
 
+  /**
+   * Move gaussian center by a given offset. Used for intracule/extracule type integrals.
+   * @param r Original basis function center
+   * @param shift Offset
+   * @param r_total Shifted basis function center
+   */
   void shift_center(const double *r, double *shift, double *r_total);
 
+  /**
+   * Compute two index integral
+   * @param output Array to write output.
+   * @param integral Integral kernel
+   */
   void compute_two_index(double *output, GB2Integral *integral);
 
+  /**
+   * Compute four index integral in physicist's notation.
+   * @param output Array to write output
+   * @param integral Integral kernel
+   * @param shift offset for integration over particle 1.
+   */
   void compute_four_index(double *output, GB4Integral *integral, double *shift = nullptr);
 
+  /**
+   * Evaluate a gaussian basis function at a grid point
+   * @param output The output array
+   * @param point The real-space point
+   * @param grid_fn The function to evaluate
+   */
   void compute_grid_point1(double *output, double *point, GB1GridFn *grid_fn);
 
+  /**
+   * Evaluate a pair of gaussian basis functions at a grid point
+   * @param dm A density matrix to be contracted against the result
+   * @param point The real-space point to evaluate the functions at
+   * @param grid_fn The function to evaluate
+   * @return
+   */
   double compute_grid_point2(double *dm, double *point, GB2DMGridFn *grid_fn);
 
+  /**
+   * Number of basis functions
+   * @return
+   */
   const long get_nbasis() const { return nbasis; }
 
+  /**
+   * Number of normalization constants
+   * @return
+   */
   const long get_nscales() const { return nscales; }
 
+  /**
+   * Maximum angular momenta
+   * @return
+   */
   const long get_max_shell_type() const { return max_shell_type; }
 
+  /**
+   * Index of the first basis function for each shell of contracted Gaussians.
+   * @return
+   */
   const long *get_basis_offsets() const { return basis_offsets; }
 
+  /**
+   * Index of the first primitive for each shell of contracted Gaussians.
+   * @return
+   */
   const long *get_prim_offsets() const { return prim_offsets; }
 
+  /**
+   * Index of the contracted shell of Gaussians for each basis function.
+   * @return
+   */
   const long *get_shell_lookup() const { return shell_lookup; }
 
+  /**
+   * normalization constants by shell
+   * @param iprim Index of primitive
+   * @return
+   */
   const double *get_scales(long iprim) const { return scales + scales_offsets[iprim]; }
 };
 
