@@ -63,6 +63,13 @@ long get_shell_nbasis(long shell_type);
  */
 long get_max_shell_type();
 
+/**
+ * Euclidean distance squared
+ * @param r0 Point 0
+ * @param r1 Point 1
+ * @return distance
+ */
+
 const double dist_sq(const double *r0, const double *r1);
 
 // Auxiliary functions for Gaussian integrals
@@ -114,6 +121,9 @@ double gpt_coeff(long k, long n0, long n1, double pa, double pb);
  */
 double gb_overlap_int1d(long n0, long n1, double pa, double pb, double gamma_inv);
 
+/**
+ * Helper function for nuclear attraction
+ */
 void nuclear_attraction_helper(double *work_g, long n0, long n1, double pa, double pb, double pc,
                                double gamma_inv);
 
