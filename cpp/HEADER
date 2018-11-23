@@ -1,14 +1,14 @@
-GBasis is a gaussian basis integration library for quantum chemistry.
-Copyright (C) 2011-2017 The GBasis developers
+HORTON: Helpful Open-source Research TOol for N-fermion systems.
+Copyright (C) 2011-2017 The HORTON Development Team
 
-This file is part of GBasis.
+This file is part of HORTON.
 
-GBasis is free software; you can redistribute it and/or
+HORTON is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
 as published by the Free Software Foundation; either version 3
 of the License, or (at your option) any later version.
 
-GBasis is distributed in the hope that it will be useful,
+HORTON is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
