@@ -51,7 +51,7 @@ class GB2Integral : public GBCalculator {
   long shell_type1; ///< shell type 1
   const double *r0; ///< gaussian center 0
   const double *r1; ///< Gaussian center 1
-  IterPow2 i2p; /// Cartesian basis function iterator
+  IterPow2 i2p; ///< Cartesian basis function iterator
  public:
   /**
    * Construct a GB2Integral object.

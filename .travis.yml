@@ -131,7 +131,7 @@ script:
 # Static linting
 # ~~~~~~~~~~~~~~
 - if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
-    (cd ${CPPDIR}; cardboardlinter --refspec $TRAVIS_BRANCH -f static) &&
+    (cd ${CPPDIR}; cardboardlinter --refspec $TRAVIS_BRANCH -f static);
     (cd ${PYDIR}; cardboardlinter --refspec $TRAVIS_BRANCH -f static);
   fi
 
