@@ -72,43 +72,37 @@ class IterGB2 {
 
   // 'public' iterator fields
 
-  /// Shell types
-  long shell_type0;
-  long shell_type1;
+
+  long shell_type0; ///< Shell types
+  long shell_type1; ///< Shell types
   /// Contraction coefficient
   double con_coeff;
-  /// Exponents
-  double alpha0;
-  double alpha1;
 
-  /// Current gaussian centers
-  const double *r0;
-  const double *r1;
+  double alpha0; ///< Exponents
+  double alpha1; ///< Exponents
 
-  /// Normalization constants
-  const double *scales0;
-  const double *scales1;
+  const double *r0; ///< Current gaussian centers
+  const double *r1; ///< Current gaussian centers
 
-  /// Basis function counters
-  long ibasis0;
-  long ibasis1;
+  const double *scales0; ///< Normalization constants
+  const double *scales1; ///< Normalization constants
+
+  long ibasis0; ///< Basis function counters
+  long ibasis1; ///< Basis function counters
 
   // 'private' iterator fields
-  /// Shell counters
-  long ishell0;
-  long ishell1;
 
-  /// number of primitives
-  long nprim0;
-  long nprim1;
+  long ishell0; ///< Shell counters
+  long ishell1; ///< Shell counters
 
-  /// primitive counters
-  long iprim0;
-  long iprim1;
+  long nprim0; /// number of primitives
+  long nprim1; /// number of primitives
 
-  //primitive offsets
-  long oprim0;
-  long oprim1;
+  long iprim0; ///< primitive counters
+  long iprim1; ///< primitive counters
+
+  long oprim0; ///< primitive offsets
+  long oprim1; ///< primitive offsets
 };
 
 #endif  // GBASIS_ITER_GB2_H_

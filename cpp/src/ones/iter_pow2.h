@@ -19,7 +19,7 @@
 //--
 
 /**
- * @file iter_pow.h
+ * @file iter_pow2.h
  * @brief Iterators over Cartesian polynomials in one shell
  */
 
@@ -31,18 +31,20 @@ int iter_pow1_inc(long *n);
 
 class IterPow2 {
  private:
-  /// shell types
-  long shell_type0, shell_type1;
+  long shell_type0; ///< shell types
+  long shell_type1; ///< shell types
  public:
   /// reinitialize on a new shell
   void reset(long shell_type0, long shell_type1);
   /// increment to next basis function, first within the shell, then to the next shell.
   int inc();
-  /// 3D cartesian shell type
-  long n0[3];
-  long n1[3];
-  /// basis counters and offsets.
-  long offset, ibasis0, ibasis1;
+
+  long n0[3]; ///< 3D cartesian shell type
+  long n1[3]; ///< 3D cartesian shell type
+
+  long offset; ///< basis offset
+  long ibasis0; ///< basis counter
+  long ibasis1; ///< basis counter
 };
 
 #endif
