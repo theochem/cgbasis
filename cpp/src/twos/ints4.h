@@ -19,7 +19,7 @@
 //--
 
 /**
- * @file ints.h
+ * @file ints4.h
  * @brief Evaluation of integrals of Gaussian basis functions
  *
     The implementation of the two-index operators in this module are based on
@@ -122,30 +122,34 @@ class GB4Integral : public GBCalculator {
                    double alpha3, const double *scales0, const double *scales1,
                    const double *scales2, const double *scales3) = 0;
 
-  // ! Transform the results in the work array from Cartesian to pure functions where needed.
+  /// Transform the results in the work array from Cartesian to pure functions where needed.
   void cart_to_pure();
 
-  const long get_shell_type0() const { return shell_type0; }  // !< Shell type of contraction 0
-  const long get_shell_type1() const { return shell_type1; }  // !< Shell type of contraction 1
-  const long get_shell_type2() const { return shell_type2; }  // !< Shell type of contraction 2
-  const long get_shell_type3() const { return shell_type3; }  // !< Shell type of contraction 3
+  /// Shell type of contraction 0
+  const long get_shell_type0() const { return shell_type0; }
+  /// Shell type of contraction 1
+  const long get_shell_type1() const { return shell_type1; }
+  /// Shell type of contraction 2
+  const long get_shell_type2() const { return shell_type2; }
+  /// Shell type of contraction 3
+  const long get_shell_type3() const { return shell_type3; }
 
  protected:
-  long shell_type0;  // !< Shell type of contraction 0
-  long shell_type1;  // !< Shell type of contraction 1
-  long shell_type2;  // !< Shell type of contraction 2
-  long shell_type3;  // !< Shell type of contraction 3
-  const double *r0;  // !< Center of contraction 0
-  const double *r1;  // !< Center of contraction 1
-  const double *r2;  // !< Center of contraction 2
-  const double *r3;  // !< Center of contraction 3
+  long shell_type0;  ///< Shell type of contraction 0
+  long shell_type1;  ///< Shell type of contraction 1
+  long shell_type2;  ///< Shell type of contraction 2
+  long shell_type3;  ///< Shell type of contraction 3
+  const double *r0;  ///< Center of contraction 0
+  const double *r1;  ///< Center of contraction 1
+  const double *r2;  ///< Center of contraction 2
+  const double *r3;  ///< Center of contraction 3
 };
 
 //! Arguments associated with one primitive shell in LibInt conventions.
 typedef struct {
-  unsigned int am;  // !< Shell type in LibInt conventions.
-  const double *r;  // !< Center of a primitive shell.
-  double alpha;     // !< Exponent of a primitive shell.
+  unsigned int am;  ///< Shell type in LibInt conventions.
+  const double *r;  ///< Center of a primitive shell.
+  double alpha;     ///< Exponent of a primitive shell.
 } libint_arg_t;
 
 //! Base class for four-center integrals that use LibInt.
@@ -276,7 +280,8 @@ class GB4ErfIntegralLibInt : public GB4IntegralLibInt {
   virtual void laplace_of_potential(double prefac, double rho, double t, long mmax,
                                     double *output);
 
-  const double get_mu() const { return mu; }  // !< The range-separation parameter.
+  /// The range-separation parameter.
+  const double get_mu() const { return mu; }
 
  private:
   double mu;  // !< The range-separation parameter.
@@ -323,8 +328,10 @@ class GB4GaussIntegralLibInt : public GB4IntegralLibInt {
   virtual void laplace_of_potential(double prefac, double rho, double t, long mmax,
                                     double *output);
 
-  const double get_c() const { return c; }  // !< Coefficient of the gaussian.
-  const double get_alpha() const { return alpha; }  // !< Exponential parameter of the gaussian.
+  /// Coefficient of the gaussian.
+  const double get_c() const { return c; }
+  /// Exponential parameter of the gaussian.
+  const double get_alpha() const { return alpha; }
 
  private:
   double c;  // !< Coefficient of the gaussian.
@@ -359,7 +366,8 @@ class GB4RAlphaIntegralLibInt : public GB4IntegralLibInt {
   virtual void laplace_of_potential(double prefac, double rho, double t, long mmax,
                                     double *output);
 
-  const double get_alpha() const { return alpha; }  // !< The power of r.
+  /// The power of r.
+  const double get_alpha() const { return alpha; }
 
  private:
   double alpha;  // !< The power of r.
