@@ -50,7 +50,7 @@ class GB2Integral : public GBCalculator {
   long shell_type0; ///< shell type 0
   long shell_type1; ///< shell type 1
   const double *r0; ///< gaussian center 0
-  const double *r1; /// Gaussian center 1
+  const double *r1; ///< Gaussian center 1
   IterPow2 i2p; /// Cartesian basis function iterator
  public:
   /**
@@ -100,8 +100,16 @@ class GB2Integral : public GBCalculator {
    */
   void cart_to_pure();
 
+  /**
+   * Angular momentum of shell 0
+   * @return
+   */
   const long get_shell_type0() const { return shell_type0; }
 
+  /**
+   * Angular momentum of shell 1
+   * @return
+   */
   const long get_shell_type1() const { return shell_type1; }
 };
 
@@ -110,6 +118,10 @@ class GB2Integral : public GBCalculator {
  */
 class GB2OverlapIntegral : public GB2Integral {
  public:
+  /**
+   * Compute the overlap integrals in a Gaussian orbital basis.
+   * @param max_shell_type maximum shell type of integral
+   */
   explicit GB2OverlapIntegral(long max_shell_type) : GB2Integral(max_shell_type) {}
 
   virtual void
@@ -121,6 +133,10 @@ class GB2OverlapIntegral : public GB2Integral {
  */
 class GB2KineticIntegral : public GB2Integral {
  public:
+  /**
+   * Compute the kinetic integrals in a Gaussian orbital basis.
+   * @param max_shell_type maximum shell type of integral
+   */
   explicit GB2KineticIntegral(long max_shell_type) : GB2Integral(max_shell_type) {}
 
   virtual void
@@ -278,7 +294,11 @@ class GB2ErfAttractionIntegral : public GB2AttractionIntegral {
     */
   virtual void laplace_of_potential(double gamma, double arg, long mmax, double *output);
 
-  const double get_mu() const { return mu; }  // !< The range-separation parameter.
+  /**
+   * The range-separation parameter.
+   * @return
+   */
+  const double get_mu() const { return mu; }
 
  private:
   double mu;  // !< The range-separation parameter.
@@ -335,8 +355,16 @@ class GB2GaussAttractionIntegral : public GB2AttractionIntegral {
     */
   virtual void laplace_of_potential(double gamma, double arg, long mmax, double *output);
 
-  const double get_c() const { return c; }  // !< Coefficient of the gaussian.
-  const double get_alpha() const { return alpha; }  // !< Exponential parameter of the gaussian.
+  /**
+   * Coefficient of the gaussian.
+   * @return
+   */
+  const double get_c() const { return c; }
+  /**
+   * Exponential parameter of the gaussian.
+   * @return
+   */
+  const double get_alpha() const { return alpha; }
 
  private:
   double c;  // !< Coefficient of the gaussian.

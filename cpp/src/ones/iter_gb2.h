@@ -19,7 +19,7 @@
 //--
 
 /**
- * @file iter_gb.h
+ * @file iter_gb2.h
  * @brief Iterators over Gaussian basis functions
  */
 
@@ -76,23 +76,48 @@ class IterGB2 {
   long shell_type0, shell_type1;
   /// Contraction coefficient
   double con_coeff;
+  //@{
   /// Exponents
-  double alpha0, alpha1;
+  double alpha0;
+  double alpha1;
+  //@}
+  //@{
   /// Current gaussian centers
   const double *r0;
   const double *r1;
+  //@}
+  //@{
   /// Normalization constants
   const double *scales0;
   const double *scales1;
+  //@}
+  //@{
   /// Basis function counters
-  long ibasis0, ibasis1;
+  long ibasis0;
+  long ibasis1;
+  //@}
 
   // 'private' iterator fields
-
+  //@{
   /// Shell counters
-  long ishell0, ishell1;
-  /// Primitive counters
-  long nprim0, nprim1, iprim0, iprim1, oprim0, oprim1;
+  long ishell0;
+  long ishell1;
+  //@}
+  //@{
+  /// number of primitives
+  long nprim0;
+  long nprim1;
+  //@}
+  //@{
+  // primitive counters
+  long iprim0;
+  long iprim1;
+  //@}
+  //@{
+  //primitive offsets
+  long oprim0;
+  long oprim1;
+  //@}
 };
 
 #endif  // GBASIS_ITER_GB2_H_
