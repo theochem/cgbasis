@@ -35,6 +35,7 @@ class IterGB1 {
   const long *basis_offsets;
 
  public:
+  //! A 1-basis function iterator. Just used for basic structure.
   explicit IterGB1(GBasis *gbasis);
   IterGB1(const IterGB1 &other) = delete;
 

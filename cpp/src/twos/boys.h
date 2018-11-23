@@ -28,6 +28,9 @@
 
 #include "../common.h"
 
+/**
+ * Maximum pre-computed boys functions
+ */
 #define BOYS_MAX_M 4*MAX_SHELL_TYPE
 
 /** @brief

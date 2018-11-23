@@ -29,6 +29,9 @@
 ///Increment to next basis function, within the same angular momentum.
 int iter_pow1_inc(long *n);
 
+/**
+ * Iterator over 2 cartesian polynomials in one shell.
+ */
 class IterPow2 {
  private:
   long shell_type0; ///< shell types

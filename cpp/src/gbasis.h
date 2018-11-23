@@ -244,9 +244,14 @@ class GBasis {
   const double *get_scales(long iprim) const { return scales + scales_offsets[iprim]; }
 };
 
+/// Compute integrals of gaussian basis functions
 class GOBasis : public GBasis {
  public:
-  // double compute_normalization(double alpha, long nx, long ny, long nz);
+  /**
+   * @brief
+   *    Computes various integrals of gaussian basis functions. See constructor of GBasis for detailed description
+   *    of parameters.
+   */
   GOBasis(const double *centers, const long *shell_map, const long *nprims,
           const long *shell_types, const double *alphas, const double *con_coeffs,
           const long ncenter, const long nshell, const long nprim_total);
@@ -408,6 +413,25 @@ class GOBasis : public GBasis {
    */
   void compute_multipole_moment(long *xyz, double *center, double *output);
 
+  /**
+   * @brief
+   *    Compute functions of the molecular orbitals on a grid.
+   *
+   * @param nfn
+   *    Number of functions.
+   * @param coeffs
+   *    Coefficients of the basis function expansion
+   * @param npoint
+   *    Number of grid points to be calculated
+   * @param points
+   *    Coordinates of grid points to be calculated
+   * @param norb
+   *    Number of orbitals
+   * @param iorbs
+   *    Orbitals to be calculated
+   * @param output
+   *    Output array with the integrals
+   */
   void compute_grid1_exp(long nfn, double *coeffs, long npoint, double *points,
                          long norb, long *iorbs, double *output);
 
@@ -418,7 +442,7 @@ class GOBasis : public GBasis {
           The number of functions.
 
       @param coeffs
-          The coefficients for the basisfunction expanion.
+          The coefficients for the basis function expansion.
 
       @param npoint
           The number of grid points to be calculated.
@@ -438,12 +462,62 @@ class GOBasis : public GBasis {
   void compute_grid1_grad_exp(long nfn, double *coeffs, long npoint,
                               double *points, long norb, long *iorbs, double *output);
 
+  /**
+   * Compute some density function on a grid for a given density matrix
+   *
+   * @param dm
+   *    Density Matrix, assumed symmetric
+   * @param npoint
+   *    Number of cartesian grid points
+   * @param points
+   *    Cartesian grid points
+   * @param grid_fn
+   *    The function to evaluate on the grid
+   * @param output
+   *    Output array
+   * @param epsilon
+   *    Allow errors on the grid of this magnitude for efficiency. Some grid_fn implementations may ignore this
+   *    parameter.
+   * @param dmmaxrow
+   *    Maximum absolute value of the dm over each row.
+   */
   void compute_grid1_dm(double *dm, long npoint, double *points,
                         GB1DMGridFn *grid_fn, double *output,
                         double epsilon, double *dmmaxrow);
 
+  /**
+   * Compute hartree potential on a grid for a given dm
+   *
+   * @param dm
+   *    Density matrix, assumed symmetric
+   * @param npoint
+   *    Number of cartesian grid points
+   * @param points
+   *    Cartesian grid points
+   * @param output
+   *    Output array
+   */
   void compute_grid2_dm(double *dm, long npoint, double *points, double *output);
 
+  /**
+   * Compute Fock operator from some sort of potential
+   *
+   * @param npoint
+   *    Number of cartesian grid points
+   * @param points
+   *    Cartesian grid points
+   * @param weights
+   *    Integration weights
+   * @param pot_stride
+   *    Stride of the pots array
+   * @param pots
+   *    Derivative of the energy toward the density-related quantities
+   *    at all grid points. The number of columns depends on grid_fn.
+   * @param grid_fn
+   *    Function to be evaluated on a grid
+   * @param output
+   *    Output array
+   */
   void compute_grid1_fock(long npoint, double *points, double *weights,
                           long pot_stride, double *pots,
                           GB1DMGridFn *grid_fn, double *output);

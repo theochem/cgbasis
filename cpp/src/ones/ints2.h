@@ -45,6 +45,9 @@
 #include "../calc.h"
 #include "iter_pow2.h"
 
+/**
+ * Integral of two basis functions. Commonly used for 1-electron integrals.
+ */
 class GB2Integral : public GBCalculator {
  protected:
   long shell_type0; ///< shell type 0

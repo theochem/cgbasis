@@ -36,6 +36,10 @@ class IterGB4 {
   const long *basis_offsets;
 
  public:
+  /**
+   * Iterator over 4 basis functions in specified order. Used for 2-electron integrals.
+   * @param gbasis
+   */
   explicit IterGB4(GBasis *gbasis);
   IterGB4(const IterGB4 &other) = delete;
 

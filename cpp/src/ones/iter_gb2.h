@@ -36,6 +36,7 @@ class IterGB2 {
   const long *basis_offsets;
 
  public:
+  /// 2-basis function iterator, commonly used for 1-electron integrals.
   explicit IterGB2(GBasis *gbasis);
   IterGB2(const IterGB2 &other) = delete;
 
