@@ -95,8 +95,8 @@ class IterGB2 {
   long ishell0; ///< Shell counters
   long ishell1; ///< Shell counters
 
-  long nprim0; /// number of primitives
-  long nprim1; /// number of primitives
+  long nprim0; ///< number of primitives
+  long nprim1; ///< number of primitives
 
   long iprim0; ///< primitive counters
   long iprim1; ///< primitive counters

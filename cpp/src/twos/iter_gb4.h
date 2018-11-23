@@ -19,7 +19,7 @@
 //--
 
 /**
- * @file iter_gb.h
+ * @file iter_gb4.h
  * @brief Iterators over Gaussian basis functions
  */
 
@@ -60,36 +60,56 @@ class IterGB4 {
 
   // 'public' iterator fields
 
-  /// shell types
-  long shell_type0, shell_type1, shell_type2, shell_type3;
+  long shell_type0; ///< shell types
+  long shell_type1; ///< shell types
+  long shell_type2; ///< shell types
+  long shell_type3; ///< shell types
   /// Contraction coefficient
   double con_coeff;
-  /// Exponents
-  double alpha0, alpha1, alpha2, alpha3;
-  /// current gaussian centers
-  const double *r0;
-  const double *r1;
-  const double *r2;
-  const double *r3;
-  /// normalization constants
-  const double *scales0;
-  const double *scales1;
-  const double *scales2;
-  const double *scales3;
-  /// basis function counters
-  long ibasis0, ibasis1, ibasis2, ibasis3;
+
+  double alpha0; ///< Exponents
+  double alpha1; ///< Exponents
+  double alpha2; ///< Exponents
+  double alpha3; ///< Exponents
+
+  const double *r0; ///< current gaussian centers
+  const double *r1; ///< current gaussian centers
+  const double *r2; ///< current gaussian centers
+  const double *r3; ///< current gaussian centers
+
+  const double *scales0; ///< normalization constants
+  const double *scales1; ///< normalization constants
+  const double *scales2; ///< normalization constants
+  const double *scales3; ///< normalization constants
+
+  long ibasis0; ///< basis function counters
+  long ibasis1; ///< basis function counters
+  long ibasis2; ///< basis function counters
+  long ibasis3; ///< basis function counters
 
   // 'private' iterator fields
 
-  /// shell counters
-  long ishell0, ishell1, ishell2, ishell3;
-  long ishell3_max;
-  /// number of primitives
-  long nprim0, nprim1, nprim2, nprim3;
-  /// primitive counters
-  long iprim0, iprim1, iprim2, iprim3;
-  /// primitive offsets
-  long oprim0, oprim1, oprim2, oprim3;
+  long ishell0; ///< shell counters
+  long ishell1; ///< shell counters
+  long ishell2; ///< shell counters
+  long ishell3; ///< shell counters
+
+  long ishell3_max; ///< shell
+
+  long nprim0; ///< number of primitives
+  long nprim1; ///< number of primitives
+  long nprim2; ///< number of primitives
+  long nprim3; ///< number of primitives
+
+  long iprim0; ///< primitive counters
+  long iprim1; ///< primitive counters
+  long iprim2; ///< primitive counters
+  long iprim3; ///< primitive counters
+
+  long oprim0; ///< primitive offsets
+  long oprim1; ///< primitive offsets
+  long oprim2; ///< primitive offsets
+  long oprim3; ///< primitive offsets
 };
 
 #endif  // GBASIS_ITER_GB4_H_
