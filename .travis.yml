@@ -145,7 +145,7 @@ script:
     (cd ${PYDIR}; BUILD_DEBUG=True conda-build -c local -q conda.recipe) &&
     conda install -c local ${CONDA_PKG_NAME_PY} &&
     if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
-       cardboardlinter --refspec $TRAVIS_BRANCH -f 'dynamic';
+       (cd ${PYDIR}; cardboardlinter --refspec $TRAVIS_BRANCH -f 'dynamic');
     fi &&
     conda uninstall ${CONDA_PKG_NAME_PY} ${CONDA_PKG_NAME_CPP};
   fi
