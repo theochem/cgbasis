@@ -9,7 +9,7 @@ import numpy as np
 
 
 def get_version():
-    """Get the version string set by Travis, else default to version 0.0.0"""
+    """Get the version string set by Travis, else default to version 0.0.0."""
     return os.environ.get("PROJECT_VERSION", "0.0.0")
 
 

@@ -25,9 +25,9 @@ from typing import Union, Dict, Iterable, List, Type
 
 import numpy as np
 
-from .cext_common import GBasis
 from .cext1 import GOBasis1
 from .cext2 import GOBasis2
+from .cext_common import GBasis
 from .cext_grids import GOBasisGrid
 from .cext_sparse import GOBasisSparse
 from .iobas import load_basis_atom_map_nwchem, load_basis_atom_map_gbs, dump_basis_atom_map_gbs
@@ -42,7 +42,7 @@ __all__ = [
 
 
 def get_gobasis1(coordinates: np.ndarray, numbers: np.ndarray, default: Union[str, GOBasisFamily],
-                element_map: Dict = None, index_map: Dict = None, pure: bool = True) -> GOBasis1:
+                 element_map: Dict = None, index_map: Dict = None, pure: bool = True) -> GOBasis1:
     """Return GOBasis for a given molecule. This is the standard way to get integrals.
 
     Parameters
@@ -77,8 +77,9 @@ def get_gobasis1(coordinates: np.ndarray, numbers: np.ndarray, default: Union[st
     gobasis_desc = GOBasisDesc(default, element_map, index_map, pure)
     return gobasis_desc.apply_to(coordinates, numbers, GOBasis1)
 
+
 def get_gobasis2(coordinates: np.ndarray, numbers: np.ndarray, default: Union[str, GOBasisFamily],
-                element_map: Dict = None, index_map: Dict = None, pure: bool = True) -> GOBasis2:
+                 element_map: Dict = None, index_map: Dict = None, pure: bool = True) -> GOBasis2:
     """Return GOBasis for a given molecule. This is the standard way to get integrals.
 
     Parameters
@@ -113,8 +114,11 @@ def get_gobasis2(coordinates: np.ndarray, numbers: np.ndarray, default: Union[st
     gobasis_desc = GOBasisDesc(default, element_map, index_map, pure)
     return gobasis_desc.apply_to(coordinates, numbers, GOBasis2)
 
-def get_gobasis_grid(coordinates: np.ndarray, numbers: np.ndarray, default: Union[str, GOBasisFamily],
-                element_map: Dict = None, index_map: Dict = None, pure: bool = True) -> GOBasisGrid:
+
+def get_gobasis_grid(coordinates: np.ndarray, numbers: np.ndarray,
+                     default: Union[str, GOBasisFamily],
+                     element_map: Dict = None, index_map: Dict = None,
+                     pure: bool = True) -> GOBasisGrid:
     """Return GOBasis for a given molecule. This is the standard way to get integrals.
 
     Parameters
@@ -149,8 +153,11 @@ def get_gobasis_grid(coordinates: np.ndarray, numbers: np.ndarray, default: Unio
     gobasis_desc = GOBasisDesc(default, element_map, index_map, pure)
     return gobasis_desc.apply_to(coordinates, numbers, GOBasisGrid)
 
-def get_gobasis_sparse(coordinates: np.ndarray, numbers: np.ndarray, default: Union[str, GOBasisFamily],
-                element_map: Dict = None, index_map: Dict = None, pure: bool = True) -> GOBasisSparse:
+
+def get_gobasis_sparse(coordinates: np.ndarray, numbers: np.ndarray,
+                       default: Union[str, GOBasisFamily],
+                       element_map: Dict = None, index_map: Dict = None,
+                       pure: bool = True) -> GOBasisSparse:
     """Return GOBasis for a given molecule. This is the standard way to get integrals.
 
     Parameters
@@ -184,6 +191,7 @@ def get_gobasis_sparse(coordinates: np.ndarray, numbers: np.ndarray, default: Un
     """
     gobasis_desc = GOBasisDesc(default, element_map, index_map, pure)
     return gobasis_desc.apply_to(coordinates, numbers, GOBasisSparse)
+
 
 class GOBasisDesc:
     """A user specification of the basis set."""
@@ -225,7 +233,8 @@ class GOBasisDesc:
                 self.element_map[number] = element_map[key]
                 del element_map[key]
 
-    def apply_to(self, coordinates: np.ndarray, numbers: np.ndarray, cls: Type[GBasis]) -> Type[GBasis]:
+    def apply_to(self, coordinates: np.ndarray, numbers: np.ndarray, cls: Type[GBasis]) -> Type[
+        GBasis]:
         """Construct a GOBasis object for the given molecular geometry
 
         Parameters

@@ -21,14 +21,13 @@
 
 
 import numpy as np
-from nose.tools import assert_raises
+from gbasis.cext_common import _get_shell_nbasis
+from gbasis.cext_sparse import _GB4ElectronRepulsionIntegralLibInt
+from gbasis.test.cext import _GB2OverlapIntegral, _cart_to_pure_low, _get_max_shell_type
 from nose.plugins.attrib import attr
+from nose.tools import assert_raises
 
 from .common import load_olp, load_kin, load_na
-from gbasis.cext_sparse import _GB4ElectronRepulsionIntegralLibInt
-from gbasis.cext_common import _get_shell_nbasis
-from gbasis.test.cext import _GB2OverlapIntegral, _cart_to_pure_low, _get_max_shell_type
-
 
 tfs = {
     2: np.array([
@@ -40,24 +39,32 @@ tfs = {
     ]),
     3: np.array([
         [0, 0, -0.67082039324993690892, 0, 0, 0, 0, -0.67082039324993690892, 0, 1.0],
-        [-0.61237243569579452455, 0, 0, -0.27386127875258305673, 0, 1.0954451150103322269, 0, 0, 0, 0],
-        [0, -0.27386127875258305673, 0, 0, 0, 0, -0.61237243569579452455, 0, 1.0954451150103322269, 0],
+        [-0.61237243569579452455, 0, 0, -0.27386127875258305673, 0, 1.0954451150103322269, 0, 0, 0,
+         0],
+        [0, -0.27386127875258305673, 0, 0, 0, 0, -0.61237243569579452455, 0, 1.0954451150103322269,
+         0],
         [0, 0, 0.86602540378443864676, 0, 0, 0, 0, -0.86602540378443864676, 0, 0],
         [0, 0, 0, 0, 1.0, 0, 0, 0, 0, 0],
         [0.790569415042094833, 0, 0, -1.0606601717798212866, 0, 0, 0, 0, 0, 0],
         [0, 1.0606601717798212866, 0, 0, 0, 0, -0.790569415042094833, 0, 0, 0],
     ]),
     4: np.array([
-        [0.375, 0, 0, 0.21957751641341996535, 0, -0.87831006565367986142, 0, 0, 0, 0, 0.375, 0, -0.87831006565367986142,
+        [0.375, 0, 0, 0.21957751641341996535, 0, -0.87831006565367986142, 0, 0, 0, 0, 0.375, 0,
+         -0.87831006565367986142,
          0, 1.0],
-        [0, 0, -0.89642145700079522998, 0, 0, 0, 0, -0.40089186286863657703, 0, 1.19522860933439364, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, -0.40089186286863657703, 0, 0, 0, 0, 0, 0, -0.89642145700079522998, 0, 1.19522860933439364, 0],
-        [-0.5590169943749474241, 0, 0, 0, 0, 0.9819805060619657157, 0, 0, 0, 0, 0.5590169943749474241, 0,
+        [0, 0, -0.89642145700079522998, 0, 0, 0, 0, -0.40089186286863657703, 0, 1.19522860933439364,
+         0, 0, 0, 0, 0],
+        [0, 0, 0, 0, -0.40089186286863657703, 0, 0, 0, 0, 0, 0, -0.89642145700079522998, 0,
+         1.19522860933439364, 0],
+        [-0.5590169943749474241, 0, 0, 0, 0, 0.9819805060619657157, 0, 0, 0, 0,
+         0.5590169943749474241, 0,
          -0.9819805060619657157, 0, 0],
-        [0, -0.42257712736425828875, 0, 0, 0, 0, -0.42257712736425828875, 0, 1.1338934190276816816, 0, 0, 0, 0, 0, 0],
+        [0, -0.42257712736425828875, 0, 0, 0, 0, -0.42257712736425828875, 0, 1.1338934190276816816,
+         0, 0, 0, 0, 0, 0],
         [0, 0, 0.790569415042094833, 0, 0, 0, 0, -1.0606601717798212866, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 1.0606601717798212866, 0, 0, 0, 0, 0, 0, -0.790569415042094833, 0, 0, 0],
-        [0.73950997288745200532, 0, 0, -1.2990381056766579701, 0, 0, 0, 0, 0, 0, 0.73950997288745200532, 0, 0, 0, 0],
+        [0.73950997288745200532, 0, 0, -1.2990381056766579701, 0, 0, 0, 0, 0, 0,
+         0.73950997288745200532, 0, 0, 0, 0],
         [0, 1.1180339887498948482, 0, 0, 0, 0, -1.1180339887498948482, 0, 0, 0, 0, 0, 0, 0, 0],
     ]),
 }
@@ -163,14 +170,18 @@ def test_cart_pure_domain():
     work_cart = np.random.normal(0, 1, (3, 70))
     work_pure = np.random.normal(0, 1, (3, 70))
     with assert_raises(ValueError):
-        _cart_to_pure_low(work_cart.reshape(-1), work_pure.reshape(-1), shell_type=_get_max_shell_type() + 1, nant=1,
+        _cart_to_pure_low(work_cart.reshape(-1), work_pure.reshape(-1),
+                          shell_type=_get_max_shell_type() + 1, nant=1,
                           npost=1)
     with assert_raises(ValueError):
-        _cart_to_pure_low(work_cart.reshape(-1), work_pure.reshape(-1), shell_type=-1, nant=1, npost=1)
+        _cart_to_pure_low(work_cart.reshape(-1), work_pure.reshape(-1), shell_type=-1, nant=1,
+                          npost=1)
     with assert_raises(ValueError):
-        _cart_to_pure_low(work_cart.reshape(-1), work_pure.reshape(-1), shell_type=3, nant=0, npost=1)
+        _cart_to_pure_low(work_cart.reshape(-1), work_pure.reshape(-1), shell_type=3, nant=0,
+                          npost=1)
     with assert_raises(ValueError):
-        _cart_to_pure_low(work_cart.reshape(-1), work_pure.reshape(-1), shell_type=3, nant=1, npost=0)
+        _cart_to_pure_low(work_cart.reshape(-1), work_pure.reshape(-1), shell_type=3, nant=1,
+                          npost=0)
 
 
 @attr('slow')

@@ -117,10 +117,9 @@ def check_delta(fun: Callable, fun_deriv: Callable, x: np.ndarray, dxs: List):
     # Make sure that all cases for which dn1 is above the threshold, dnd is below
     # the threshold
     if not (dnds[mask] < threshold).all():
-        raise AssertionError((
-                                 'The first order approximation on the difference is too wrong. The '
-                                 'threshold is %.1e.\n\nDifferences:\n%s\n\nFirst order '
-                                 'approximation to differences:\n%s\n\nAbsolute errors:\n%s')
+        raise AssertionError(('The first order approximation on the difference is too wrong. The '
+                              'threshold is %.1e.\n\nDifferences:\n%s\n\nFirst order '
+                              'approximation to differences:\n%s\n\nAbsolute errors:\n%s')
                              % (threshold,
                                 ' '.join('%.1e' % v for v in dn1s[mask]),
                                 ' '.join('%.1e' % v for v in dn2s[mask]),

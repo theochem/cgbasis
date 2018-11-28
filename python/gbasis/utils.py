@@ -18,7 +18,7 @@
 # along with this program; if not, see <http://www.gnu.org/licenses/>
 #
 # --
-"""Utility Functions"""
+"""Utility Functions."""
 
 from typing import List
 

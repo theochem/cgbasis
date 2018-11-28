@@ -107,6 +107,7 @@ def check_g09_dipole(fn):
     ----------
     fn : str
         The sanitized FCHK filename with '.' and '-' substituted with '_'.
+
     """
     obasis = load_obasis1(fn)
     mol = load_mdata(fn)
@@ -152,6 +153,7 @@ def check_g09_quadrupole(fn):
     ----------
     fn : str
         The sanitized FCHK filename with '.' and '-' substituted with '_'.
+
     """
     obasis = load_obasis1(fn)
     mol = load_mdata(fn)

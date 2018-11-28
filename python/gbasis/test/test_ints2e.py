@@ -22,14 +22,14 @@
 
 
 import numpy as np
-
 from gbasis.cext_common import _get_shell_nbasis
-from .common import load_obasis2, load_json
 from gbasis.cext_sparse import (_GB4RAlphaIntegralLibInt, _GB4ErfIntegralLibInt,
                                 _GB4GaussIntegralLibInt,
                                 _GB4ElectronRepulsionIntegralLibInt,
                                 _GB4DeltaIntegralLibInt,
                                 _GB4IntraDensIntegralLibInt)
+
+from .common import load_obasis2, load_json
 from ..gobasis import get_gobasis2
 
 
@@ -377,6 +377,7 @@ def get_erf_repulsion(alphas0, alphas1, alphas2, alphas3, r0, r1, r2, r3,
         Shell types of the four primitive shells.
     mu : float
         The range-separation parameters.
+
     """
     max_shell_type = 4
     gb4i = _GB4ErfIntegralLibInt(max_shell_type, mu)
@@ -415,6 +416,7 @@ def check_erf_repulsion(alphas0, alphas1, alphas2, alphas3, r0, r1, r2, r3, scal
         The expected result.
     mu : float
         The range-separation parameters.
+
     """
     result1 = get_erf_repulsion(alphas0, alphas1, alphas2, alphas3, r0, r1, r2, r3,
                                 scales0, scales1, scales2, scales3, shell_type0,
@@ -774,6 +776,7 @@ def check_gauss_repulsion(alphas0, alphas1, alphas2, alphas3, r0, r1, r2, r3, sc
         Coefficient of the gaussian.
     alpha : float
         Exponential parameter of the gaussian.
+
     """
     max_shell_type = 4
     max_nbasis = _get_shell_nbasis(max_shell_type)
@@ -1297,6 +1300,7 @@ def check_ralpha_repulsion(alphas0, alphas1, alphas2, alphas3, r0, r1, r2, r3, s
         The expected result.
     alpha : float
         The interaction is r to the power alpha.
+
     """
     max_shell_type = 4
     max_nbasis = _get_shell_nbasis(max_shell_type)

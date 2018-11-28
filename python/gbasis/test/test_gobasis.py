@@ -636,6 +636,7 @@ def check_normalization(number, basis):
              basis sets.)
     basis : str
             The basis set, e.g. cc-pvdz.
+
     """
     # Run test on a Helium atom
     coordinates = np.array([[0.0, 0.0, 0.0]])

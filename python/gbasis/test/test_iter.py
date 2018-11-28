@@ -21,13 +21,13 @@
 
 
 import numpy as np
-from nose.tools import assert_raises
-
-from gbasis.cext_common import _get_shell_nbasis
 from gbasis.cext1 import GOBasis1
 from gbasis.cext2 import GOBasis2
+from gbasis.cext_common import _get_shell_nbasis
 from gbasis.cext_grids import GOBasisGrid
 from gbasis.test.cext import _IterPow1, _IterPow2, _iter_pow1_inc, _IterGB1, _IterGB2, _IterGB4
+from nose.tools import assert_raises
+
 
 def test_iter_pow1_inc_l0():
     indexes = np.zeros(3, int)
@@ -496,7 +496,8 @@ def test_itergb4_idea():
                     ])
                     good = tboc[i, j, k, l] == expected
                     if not good:
-                        raise AssertionError('(%i,%i,%i,%i): %i != %i' % (i, j, k, l, tboc[i, j, k, l], expected))
+                        raise AssertionError(
+                            '(%i,%i,%i,%i): %i != %i' % (i, j, k, l, tboc[i, j, k, l], expected))
 
 
 def get_itergb4():
@@ -549,7 +550,8 @@ def test_itergb4_idea_inc_shell():
                     ])
                     good = tboc[i, j, k, l] == expected
                     if not good:
-                        raise AssertionError('(%i,%i,%i,%i): %i != %i' % (i, j, k, l, tboc[i, j, k, l], expected))
+                        raise AssertionError(
+                            '(%i,%i,%i,%i): %i != %i' % (i, j, k, l, tboc[i, j, k, l], expected))
 
 
 def test_itergb4_inc_shell():
@@ -569,9 +571,11 @@ def test_itergb4_inc_shell():
         )
         f1 = np.array(list(i4.public_fields))
         f2 = np.array([
-            gobasis.con_coeffs[oprims[is0]] * gobasis.con_coeffs[oprims[is1]] * gobasis.con_coeffs[oprims[is2]] *
+            gobasis.con_coeffs[oprims[is0]] * gobasis.con_coeffs[oprims[is1]] * gobasis.con_coeffs[
+                oprims[is2]] *
             gobasis.con_coeffs[oprims[is3]],
-            gobasis.shell_types[is0], gobasis.shell_types[is1], gobasis.shell_types[is2], gobasis.shell_types[is3],
+            gobasis.shell_types[is0], gobasis.shell_types[is1], gobasis.shell_types[is2],
+            gobasis.shell_types[is3],
             gobasis.alphas[oprims[is0]], gobasis.alphas[oprims[is1]], gobasis.alphas[oprims[is2]],
             gobasis.alphas[oprims[is3]],
             gobasis.centers[gobasis.shell_map[is0], 0], gobasis.centers[gobasis.shell_map[is0], 1],
@@ -664,10 +668,13 @@ def test_itergb4_inc_prim():
         )
         f1 = np.array(list(i4.public_fields))
         f2 = np.array([
-            gobasis.con_coeffs[oprims[is0] + ip0] * gobasis.con_coeffs[oprims[is1] + ip1] * gobasis.con_coeffs[
+            gobasis.con_coeffs[oprims[is0] + ip0] * gobasis.con_coeffs[oprims[is1] + ip1] *
+            gobasis.con_coeffs[
                 oprims[is2] + ip2] * gobasis.con_coeffs[oprims[is3] + ip3],
-            gobasis.shell_types[is0], gobasis.shell_types[is1], gobasis.shell_types[is2], gobasis.shell_types[is3],
-            gobasis.alphas[oprims[is0] + ip0], gobasis.alphas[oprims[is1] + ip1], gobasis.alphas[oprims[is2] + ip2],
+            gobasis.shell_types[is0], gobasis.shell_types[is1], gobasis.shell_types[is2],
+            gobasis.shell_types[is3],
+            gobasis.alphas[oprims[is0] + ip0], gobasis.alphas[oprims[is1] + ip1],
+            gobasis.alphas[oprims[is2] + ip2],
             gobasis.alphas[oprims[is3] + ip3],
             gobasis.centers[gobasis.shell_map[is0], 0], gobasis.centers[gobasis.shell_map[is0], 1],
             gobasis.centers[gobasis.shell_map[is0], 2],
@@ -736,6 +743,7 @@ def test_itergb4_store():
     ]
     for i0, i1, i2, i3 in permutations:
         assert abs(
-            output[slices[i0], slices[i1], slices[i2], slices[i3]] - work.transpose(i0, i1, i2, i3)).max() < 1e-10
+            output[slices[i0], slices[i1], slices[i2], slices[i3]] - work.transpose(i0, i1, i2,
+                                                                                    i3)).max() < 1e-10
         mask[slices[i0], slices[i1], slices[i2], slices[i3]] = False
     assert abs(output[mask]).max() == 0.0

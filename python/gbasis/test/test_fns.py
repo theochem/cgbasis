@@ -24,10 +24,10 @@ import numpy as np
 from nose.plugins.attrib import attr
 from nose.tools import assert_raises
 
-from .lightgrid import generate_molecular_grid, integrate
 from .common import (load_obasis_grid, load_obasis1, load_dm, load_mdata, load_orbsa_coeffs,
                      load_orbsb_coeffs,
                      load_orbsa_occs, load_orbsb_occs, load_orbsa_dms, load_orbsb_dms, check_delta)
+from .lightgrid import generate_molecular_grid, integrate
 from .. import (GOBasisGrid, GOBasisAtom, GOBasisContraction, _GB1DMGridGradientFn,
                 _GB1DMGridDensityFn,
                 get_gobasis_grid)
