@@ -18,7 +18,7 @@
 # along with this program; if not, see <http://www.gnu.org/licenses/>
 #
 # --
-"""Input/Output routines for gaussian basis sets"""
+"""Input/Output routines for gaussian basis sets."""
 from typing import List, Dict
 
 import numpy as np
@@ -33,7 +33,7 @@ __all__ = [
 
 
 def str_to_shell_types(s: str, pure: bool = False) -> List[int]:
-    """Convert a string into a list of contraction types"""
+    """Convert a string into a list of contraction types."""
     if pure:
         d = {'s': 0, 'p': 1, 'd': -2, 'f': -3, 'g': -4, 'h': -5, 'i': -6}
     else:
@@ -42,12 +42,12 @@ def str_to_shell_types(s: str, pure: bool = False) -> List[int]:
 
 
 def shell_type_to_str(shell_type: int) -> str:
-    """Convert a shell type into a character"""
+    """Convert a shell type into a character."""
     return {0: 's', 1: 'p', 2: 'd', 3: 'f', 4: 'g', 5: 'h', 6: 'i'}[abs(shell_type)]
 
 
 def fortran_float(s: str) -> float:
-    """Convert a string to a float. Works also with D before the mantissa"""
+    """Convert a string to a float. Works also with D before the mantissa."""
     return float(s.replace('D', 'E').replace('d', 'e'))
 
 
@@ -137,6 +137,7 @@ def dump_basis_atom_map_gbs(filename: str, name: str, basis_atom_map: Dict):
         Name of the basis set to mention in the comments of the written file.
     basis_atom_map
         Keys are atomic numbers, values are GOBasisAtom objects.
+
     """
     with open(filename, 'w') as f:
         f.write('!Basis set, {0}, generated using HORTON\n\n'.format(name))
