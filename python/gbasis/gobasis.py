@@ -200,6 +200,7 @@ class GOBasisDesc:
                  element_map: Dict = None, index_map: Dict = None,
                  pure: bool = True):
         """
+        A user specifictation of the basis set.
 
         Parameters
         ----------
@@ -214,6 +215,7 @@ class GOBasisDesc:
         pure
             By default pure basis functions are used. Set this to false to
             switch to Cartesian basis functions.
+
         """
         self.default = default
         if element_map is None:
@@ -235,7 +237,7 @@ class GOBasisDesc:
 
     def apply_to(self, coordinates: np.ndarray, numbers: np.ndarray, cls: Type[GBasis]) -> Type[
         GBasis]:
-        """Construct a GOBasis object for the given molecular geometry
+        """Construct a GOBasis object for the given molecular geometry.
 
         Parameters
         ----------
@@ -264,8 +266,9 @@ class GOBasisDesc:
         con_coeffs = []
 
         def get_basis(i: int, n: int) -> str:
-            """Look up the basis for a given atom. First by `index_map`, then by `element_map`,
-            then by `default`.
+            """Look up the basis for a given atom.
+
+            First by `index_map`, then by `element_map`, then by `default`.
 
             Parameters
             ----------
@@ -358,6 +361,7 @@ class GOBasisFamily:
         The dictionary of atomic numbers as keys and GOBasisAtom instances as values.
     filename
         The filename storing the basis set.
+
     """
 
     def __init__(self, name: str, basis_atom_map: Dict[int, GOBasisAtom] = None,
@@ -404,6 +408,7 @@ class GOBasisFamily:
         Returns
         -------
             An instance of GOBasisAtom
+
         """
         if self.basis_atom_map is None:
             self.load()
@@ -411,7 +416,9 @@ class GOBasisFamily:
 
     def load(self):
         """Load the basis set from file if it hasn't been done already.
+
         If the basis_atom_map is already defined (not None), then the load method is ignored.
+
         """
         # if basis_atom_map is already defined
         if self.basis_atom_map is not None:
@@ -434,6 +441,7 @@ class GOBasisFamily:
         ----------
         filename
             Name of the gbs file that will be created.
+
         """
         self.load()
         if filename.endswith('.gbs'):
@@ -448,7 +456,7 @@ class GOBasisFamily:
                 bc.to_arrays()
 
     def _to_segmented(self):
-        """Convert all contractions from generalized to segmented"""
+        """Convert all contractions from generalized to segmented."""
         new_basis_atom_map = {}
         for n, ba in self.basis_atom_map.items():
             new_bcs = []
@@ -518,7 +526,9 @@ class GOBasisAtom:
     def extend(self, i: int, shell_map: List[int], nprims: List[int], shell_types: List[int],
                alphas: List[float], con_coeffs: List[float], pure=True):
         """
-        Add basis functions to an atom. This can take an existing set of parameters for GOBasis and
+        Add basis functions to an atom.
+
+        This can take an existing set of parameters for GOBasis and
         add an atom (which is defined by this instance) to it.
 
         Parameters
@@ -575,6 +585,7 @@ class GOBasisContraction:
             In the case of a generalized contraction, this is a
             2D array-like object, where each row corresponds to a primitive and
             the columns correspond to different contractions.
+
         """
         self.shell_type = shell_type
         self.alphas = alphas
@@ -590,13 +601,15 @@ class GOBasisContraction:
         return self.con_coeffs.ndim >= 2
 
     def get_segmented_bcs(self) -> List[GOBasisContraction]:
-        """Return a list of segmented contractions if the original instance contains a generalized
-        contraction.
+        """Return a list of segmented contractions.
+
+        Only valid if the original instance contains a generalized contraction.
 
         Raises
         ------
         TypeError
             If contraction is not generalized.
+        
         """
         if not self.is_generalized():
             raise TypeError('Conversion to segmented contractions only makes sense for '
