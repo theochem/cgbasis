@@ -50,7 +50,7 @@ __all__ = [
 cdef class GOBasisGrid(GBasis):
     cdef public list _biblio
     cdef c_gbasis.GOBasis* _this
-    
+
     def __cinit__(self, centers, shell_map, nprims, shell_types, alphas, con_coeffs):
         self._this = new c_gbasis.GOBasis(
             <double*>self._centers.data, <long*>self._shell_map.data,

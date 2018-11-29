@@ -247,5 +247,3 @@ cdef class GOBasis1(GBasis):
         self._this.compute_multipole_moment(
             &xyz[0], &center[0], &output[0, 0])
         return np.asarray(output)
-
-
