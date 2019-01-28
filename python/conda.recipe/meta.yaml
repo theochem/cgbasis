@@ -1,0 +1,38 @@
+package:
+  version: "{{ PROJECT_VERSION }}"
+  name: 'python-gbasis'
+
+source:
+  path: ../
+
+build:
+  script_env:
+    - BUILD_DEBUG
+  number: 0
+  run_exports:
+    - python-gbasis
+
+requirements:
+  build:
+    - {{ compiler('cxx') }}
+  host:
+    - python ={{ MYCONDAPY }}
+    - cython >=0.24.1
+    - libint =2.0.3
+    - numpy
+    - setuptools
+    - nose
+    - cxx-gbasis >=0.2.1
+  run:
+    - python >=3
+    - numpy
+    - scipy
+    - nose
+
+test:
+  requires:
+    - nose
+
+about:
+  home: https://github.com/theochem/gbasis
+  license: GPL3

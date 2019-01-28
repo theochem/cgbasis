@@ -1,5 +1,5 @@
 recursive-include gbasis *.pyx *.pxd *.h *.cpp
-recursive-exclude gbasis cext.cpp
+recursive-exclude gbasis cext*.cpp
 
 include README.rst
 include LICENSE

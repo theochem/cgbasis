@@ -8,6 +8,7 @@ dependencies:
   - gcc_linux-64
   - gxx_linux-64
   - cython
+  - cxx-gbasis
   - pip:
       - breathe
       - exhale

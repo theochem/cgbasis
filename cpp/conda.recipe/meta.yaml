@@ -1,0 +1,31 @@
+package:
+  version: 0.2.1
+  name: 'cxx-gbasis'
+
+source:
+  path: ../
+
+build:
+  script_env:
+    - BUILD_DEBUG
+  number: 0
+  run_exports:
+    - cxx-gbasis
+
+requirements:
+  build:
+    - {{ compiler('c') }}
+    - {{ compiler('cxx') }}
+    - cmake
+    - make
+  host:
+    - libint =2.0.3
+  run:
+    - libint =2.0.3
+test:
+  commands:
+    - conda inspect linkages cxx-gbasis
+
+about:
+  home: https://github.com/theochem/gbasis
+  license: GPL3
