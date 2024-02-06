@@ -12,11 +12,11 @@ About
 CGBasis is a HORTON3 package for calculating Gaussian Basis integrals. To read
 the documentation, please see here: https://gbasis.readthedocs.io/en/latest/index.html.
 
-CGBasis was originally conceived as the high-performance version of [GBasis](https://github.com/theochem/gbasis). It is no longer actively
+CGBasis was originally conceived as the high-performance version of `GBasis <https://github.com/theochem/gbasis>`_. It is no longer actively
 maintained because, for most purposes, GBasis has good enough performance either innately, or through
-its links to [libcint](https://github.com/sunqm/libcint). It seemed wiser to focus our efforts as a community on GBasis.
+its links to `libcint <https://github.com/sunqm/libcint>`_. It seemed wiser to focus our efforts as a community on GBasis.
 
-We would encourage users to try [Gbasis](gbasis.qcdevs.org) and fall back on CGBasis or the similar utilities in [HORTON 2.x](https://github.com/theochem/horton) only where needed.
+We would encourage users to try `Gbasis <gbasis.qcdevs.org>`_ and fall back on CGBasis or the similar utilities in `HORTON 2.x <https://github.com/theochem/horton>` only where needed.
 
 License
 -------
